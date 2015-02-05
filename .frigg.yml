@@ -1,0 +1,8 @@
+tasks:
+  - npm install
+  - make lint
+  - make cover
+
+coverage:
+  path: coverage/cobertura-coverage.xml
+  parser: cobertura

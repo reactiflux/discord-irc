@@ -12,16 +12,20 @@ node_modules: package.json
 	@npm install
 
 jshint:
-	$(JSHINT) .
+	$(JSHINT) --exclude-path .gitignore .
 
 jscs:
 	$(JSCS) .
 
-test:
+make cover:
 	$(ISTANBUL) cover $(MOCHA) $(TESTS)
 	$(ISTANBUL) report cobertura
+
+make lint: jshint jscs
+
+test: jshint jscs cover
 
 server:
 	@supervisor index
 
-.PHONY: server install test jshint jscs production
+.PHONY: server install cover test jshint jscs lint production
