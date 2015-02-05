@@ -1,3 +1,4 @@
+/* jshint expr: true */
 var request = require('supertest');
 var chai = require('chai');
 var sinonChai = require('sinon-chai');
@@ -43,7 +44,6 @@ describe('/send', function() {
         var error = res.body;
         error.text.should.equal('Invalid hook token received');
         error.status.should.equal(403);
-
         sayStub.should.not.have.been.called;
         done();
       }.bind(this));
@@ -52,7 +52,7 @@ describe('/send', function() {
   it('should return 200 for messages from slackbot', function(done) {
     var bodyParts = [
       'token=' + process.env.OUTGOING_HOOK_TOKEN,
-      'user_id=USLACKBOT',
+      'user_id=USLACKBOT'
     ];
     var body = bodyParts.join('&');
 
@@ -60,7 +60,7 @@ describe('/send', function() {
       .post('/send')
       .send(body)
       .expect(200)
-      .end(function(err, res) {
+      .end(function(err) {
         if (err) return done(err);
         sayStub.should.not.have.been.called;
         done();
@@ -83,7 +83,7 @@ describe('/send', function() {
       .post('/send')
       .send(body)
       .expect(202)
-      .end(function(err, res) {
+      .end(function(err) {
         if (err) return done(err);
 
         var ircChannel = channelMapping['#' + channel];

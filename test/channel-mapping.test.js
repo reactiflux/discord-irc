@@ -17,7 +17,7 @@ describe('Channel Mapping', function() {
   });
 
   it('should fail without # in channels', function() {
-    process.env.CHANNEL_MAPPING = JSON.stringify({ 'slack': 'irc' });
+    process.env.CHANNEL_MAPPING = JSON.stringify({ slack: 'irc' });
     function wrap() {
       validateChannelMapping();
     }
