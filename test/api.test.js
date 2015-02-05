@@ -51,6 +51,24 @@ describe('/send', function() {
       });
   });
 
+  it('should return 200 for messages from slackbot', function(done) {
+    var bodyParts = [
+      'token=' + process.env.OUTGOING_HOOK_TOKEN,
+      'user_id=USLACKBOT',
+    ];
+    var body = bodyParts.join('&');
+
+    request(app)
+      .post('/send')
+      .send(body)
+      .expect(200)
+      .end(function(err, res) {
+        if (err) return done(err);
+        sayStub.should.not.have.been.called;
+        done();
+      });
+  });
+
   it('should try to send an irc message', function(done) {
     var channel = 'slack';
     var username = 'testuser';
