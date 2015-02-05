@@ -3,6 +3,10 @@
   "version": "0.1.0",
   "description": "A gateway between Slack and IRC.",
   "main": "index.js",
+  "repository": {
+    "type": "git",
+    "url": "git@github.com:ekmartin/slack-irc.git"
+  },
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1"
   },
