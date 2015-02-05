@@ -1,6 +1,10 @@
 BIN = node_modules/.bin
+MOCHA = $(BIN)/_mocha
+ISTANBUL = $(BIN)/istanbul
 JSHINT = $(BIN)/jshint
 JSCS = $(BIN)/jscs
+
+TESTS = $(shell find test -name "*.test.js")
 
 install: node_modules
 
@@ -12,6 +16,10 @@ jshint:
 
 jscs:
 	$(JSCS) .
+
+test:
+	$(ISTANBUL) cover $(MOCHA) $(TESTS)
+	$(ISTANBUL) report cobertura
 
 server:
 	@supervisor index

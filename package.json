@@ -14,14 +14,22 @@
   "license": "MIT",
   "dependencies": {
     "body-parser": "^1.11.0",
-    "check-env": "^1.1.0",
+    "check-env": "^1.2.0",
     "express": "^4.11.2",
     "irc": "^0.3.9",
     "lodash": "^3.1.0",
     "superagent": "^0.21.0"
   },
   "devDependencies": {
+    "chai": "^1.10.0",
+    "istanbul": "^0.3.5",
     "jscs": "^1.10.0",
-    "jshint": "^2.6.0"
+    "jshint": "^2.6.0",
+    "mocha": "^2.1.0",
+    "mock-fs": "^2.3.2",
+    "rewire": "^2.1.4",
+    "sinon": "^1.12.2",
+    "sinon-chai": "^2.6.0",
+    "supertest": "^0.15.0"
   }
 }
