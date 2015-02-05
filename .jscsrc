@@ -1,0 +1,7 @@
+{
+  "preset": "airbnb",
+  "excludeFiles": ["node_modules/**", "coverage/**"],
+  "disallowMultipleVarDecl": true,
+  "requireMultipleVarDecl": null,
+  "safeContextKeyword": ["that"]
+}

@@ -1,0 +1,21 @@
+{
+  "name": "slack-irc",
+  "version": "0.1.0",
+  "description": "A gateway between Slack and IRC.",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "Martin Ek <mail@ekmartin.no>",
+  "license": "MIT",
+  "dependencies": {
+    "body-parser": "^1.11.0",
+    "express": "^4.11.2",
+    "irc": "^0.3.9",
+    "superagent": "^0.21.0"
+  },
+  "devDependencies": {
+    "jscs": "^1.10.0",
+    "jshint": "^2.6.0"
+  }
+}
