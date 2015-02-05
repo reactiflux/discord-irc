@@ -8,11 +8,27 @@ describe('Channel Mapping', function() {
     '#channel': '#otherchannel'
   };
 
-  it('should fail if env var CHANNEL_MAPPING isn\'t JSON', function() {
+  it('should fail when not given proper JSON', function() {
     process.env.CHANNEL_MAPPING = 'not json';
-    function bad() {
+    function wrap() {
       validateChannelMapping();
     }
-    (bad).should.throw(ChannelMappingError, /Invalid channel mapping given/);
+    (wrap).should.throw(ChannelMappingError, /Invalid channel mapping given/);
+  });
+
+  it('should fail without # in channels', function() {
+    process.env.CHANNEL_MAPPING = JSON.stringify({ 'slack': 'irc' });
+    function wrap() {
+      validateChannelMapping();
+    }
+    (wrap).should.throw(ChannelMappingError, /Invalid channel mapping given/);
+  });
+
+  it('should not fail if given a proper channel list as JSON', function() {
+    process.env.CHANNEL_MAPPING = JSON.stringify({ '#slack': '#irc' });
+    function wrap() {
+      validateChannelMapping();
+    }
+    (wrap).should.not.throw();
   });
 });
