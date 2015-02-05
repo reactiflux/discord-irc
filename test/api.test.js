@@ -34,6 +34,12 @@ describe('/send', function() {
     addListenerStub.reset();
   });
 
+  it('should attach listeners', function() {
+    var listeners = addListenerStub.callCount;
+    console.log(addListenerStub.firstCall.args[1]);
+    listeners.should.equal(3);
+  });
+
   it('should return 403 for invalid tokens', function(done) {
     request(app)
       .post('/send')
@@ -94,4 +100,5 @@ describe('/send', function() {
         done();
       });
   });
+
 });
