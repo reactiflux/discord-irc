@@ -1,5 +1,6 @@
-# slack-irc
-> Connects Slack and IRC channels by sending messages back and forth. 
+# slack-irc [![Build status](https://ci.frigg.io/badges/ekmartin/slack-irc/)](https://ci.frigg.io/ekmartin/slack-irc/last/) [![Coverage status](https://ci.frigg.io/badges/coverage/ekmartin/slack-irc/)](https://ci.frigg.io/ekmartin/slack-irc/last/)
+
+> Connects Slack and IRC channels by sending messages back and forth.
 
 ## License
 
