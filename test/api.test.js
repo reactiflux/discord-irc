@@ -8,8 +8,6 @@ chai.use(sinonChai);
 chai.should();
 
 describe('/send', function() {
-  var app;
-
   var channelMapping = {
     '#slack': '#irc'
   };
@@ -26,7 +24,7 @@ describe('/send', function() {
     process.env.OUTGOING_HOOK_TOKEN = 'test';
     process.env.CHANNEL_MAPPING = JSON.stringify(channelMapping);
 
-    app = require('../lib/server');
+    this.app = require('../lib/server');
   });
 
   afterEach(function() {
@@ -34,14 +32,8 @@ describe('/send', function() {
     addListenerStub.reset();
   });
 
-  it('should attach listeners', function() {
-    var listeners = addListenerStub.callCount;
-    console.log(addListenerStub.firstCall.args[1]);
-    listeners.should.equal(3);
-  });
-
   it('should return 403 for invalid tokens', function(done) {
-    request(app)
+    request(this.app)
       .post('/send')
       .send('token=badtoken')
       .expect(403)
@@ -54,7 +46,7 @@ describe('/send', function() {
 
         sayStub.should.not.have.been.called;
         done();
-      });
+      }.bind(this));
   });
 
   it('should return 200 for messages from slackbot', function(done) {
@@ -64,7 +56,7 @@ describe('/send', function() {
     ];
     var body = bodyParts.join('&');
 
-    request(app)
+    request(this.app)
       .post('/send')
       .send(body)
       .expect(200)
@@ -72,7 +64,7 @@ describe('/send', function() {
         if (err) return done(err);
         sayStub.should.not.have.been.called;
         done();
-      });
+      }.bind(this));
   });
 
   it('should try to send an irc message', function(done) {
@@ -87,7 +79,7 @@ describe('/send', function() {
     ];
     var body = bodyParts.join('&');
 
-    request(app)
+    request(this.app)
       .post('/send')
       .send(body)
       .expect(202)
@@ -98,7 +90,7 @@ describe('/send', function() {
         sayStub.should.have.been.calledOnce;
         sayStub.should.have.been.calledWithExactly(ircChannel, username + ': ' + message);
         done();
-      });
+      }.bind(this));
   });
 
 });
