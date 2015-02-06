@@ -2,6 +2,8 @@
 
 > Connects Slack and IRC channels by sending messages back and forth.
 
+## Demo
+![Slack IRC](http://i.imgur.com/XGVXY6n.gif)
 ## Installation
 ```bash
 In the repository folder:
