@@ -2,6 +2,38 @@
 
 > Connects Slack and IRC channels by sending messages back and forth.
 
+## Installation
+```bash
+In the repository folder:
+$ npm install
+```
+
+## Configuration
+
+You will have to set up an [outgoing webhook integration](https://api.slack.com/outgoing-webhooks) for each channel you want to connect to an IRC-channel. You only need one [incoming integration](https://api.slack.com/incoming-webhooks), as slack-irc will supply the channel itself.
+
+slack-irc uses environment variables for configuration. Required environment variables are:
+```bash
+export IRC_SERVER='irc.freenode.net'
+export BOT_NICK='SlackIRC' # IRC Nick
+export OUTGOING_HOOK_TOKEN='Hook token from the Slack outgoing integration'
+export INCOMING_HOOK_URL='Hook URL from the Slack incoming integration'
+export CHANNEL_MAPPING='{
+    "#slack-channel": "#irc-channel",
+    "#other-slack-channel": "#other-irc-channel"
+}'
+```
+If you put these in a `.environment`-file or similar, you can do `source .environment` to expose the variables before starting the server.
+The channel mapping is used to connect each Slack channel with an IRC channel.
+
+The server can then be started with `npm start`.
+
+## Tests
+Run the tests with:
+```bash
+$ make test
+```
+
 ## License
 
 (The MIT License)
