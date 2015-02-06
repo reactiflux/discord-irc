@@ -88,7 +88,7 @@ describe('/send', function() {
 
         var ircChannel = channelMapping['#' + channel];
         sayStub.should.have.been.calledOnce;
-        sayStub.should.have.been.calledWithExactly(ircChannel, username + ': ' + message);
+        sayStub.should.have.been.calledWithExactly(ircChannel, '<' + username + '> ' + message);
         done();
       }.bind(this));
   });
