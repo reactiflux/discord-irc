@@ -1,10 +1,9 @@
-var app = require('./lib/server');
-var logger = require('winston');
 var checkEnv = require('check-env');
 
-checkEnv(
-  ['IRC_SERVER', 'BOT_NICK', 'CHANNEL_MAPPING', 'INCOMING_HOOK_URL', 'OUTGOING_HOOK_TOKEN']
-);
+checkEnv(['CONFIG_FILE']);
+
+var app = require('./lib/server');
+var logger = require('winston');
 
 if (process.env.NODE_ENV !== 'production') {
   logger.level = 'debug';

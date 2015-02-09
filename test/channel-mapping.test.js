@@ -1,33 +1,29 @@
 var chai = require('chai');
-var ChannelMappingError = require('../lib/errors').ChannelMappingError;
-var validateChannelMapping = require('../lib/helpers').validateChannelMapping;
+var ConfigurationError = require('../lib/errors').ConfigurationError;
+var validateChannelMapping = require('../lib/validators').validateChannelMapping;
 chai.should();
 
 describe('Channel Mapping', function() {
-  var mapping = {
-    '#channel': '#otherchannel'
-  };
-
   it('should fail when not given proper JSON', function() {
-    process.env.CHANNEL_MAPPING = 'not json';
+    var wrongMapping = 'not json';
     function wrap() {
-      validateChannelMapping();
+      validateChannelMapping(wrongMapping);
     }
-    (wrap).should.throw(ChannelMappingError, /Invalid channel mapping given/);
+    (wrap).should.throw(ConfigurationError, /Invalid channel mapping given/);
   });
 
   it('should fail without # in channels', function() {
-    process.env.CHANNEL_MAPPING = JSON.stringify({ slack: 'irc' });
+    var wrongMapping = { slack: 'irc' };
     function wrap() {
-      validateChannelMapping();
+      validateChannelMapping(wrongMapping);
     }
-    (wrap).should.throw(ChannelMappingError, /Invalid channel mapping given/);
+    (wrap).should.throw(ConfigurationError, /Invalid channel mapping given/);
   });
 
   it('should not fail if given a proper channel list as JSON', function() {
-    process.env.CHANNEL_MAPPING = JSON.stringify({ '#slack': '#irc' });
+    var correctMapping = { '#channel': '#otherchannel' };
     function wrap() {
-      validateChannelMapping();
+      validateChannelMapping(correctMapping);
     }
     (wrap).should.not.throw();
   });

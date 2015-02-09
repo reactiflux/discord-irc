@@ -4,15 +4,13 @@ var chai = require('chai');
 var sinonChai = require('sinon-chai');
 var sinon = require('sinon');
 var irc = require('irc');
+var createBots = require('../lib/helpers').createBots;
+var testConfig = require('./single-test-config.json');
 
 chai.use(sinonChai);
 chai.should();
 
 describe('/send', function() {
-  var channelMapping = {
-    '#slack': '#irc'
-  };
-
   var addListenerStub = sinon.stub();
   var sayStub = sinon.stub();
 
@@ -22,8 +20,7 @@ describe('/send', function() {
     clientStub.prototype.say = sayStub;
     irc.Client = clientStub;
 
-    process.env.OUTGOING_HOOK_TOKEN = 'test';
-    process.env.CHANNEL_MAPPING = JSON.stringify(channelMapping);
+    process.env.CONFIG_FILE = process.cwd() + '/test/single-test-config.json';
 
     this.app = require('../lib/server');
   });
@@ -51,7 +48,7 @@ describe('/send', function() {
 
   it('should return 200 for messages from slackbot', function(done) {
     var bodyParts = [
-      'token=' + process.env.OUTGOING_HOOK_TOKEN,
+      'token=' + testConfig.outgoingToken,
       'user_id=USLACKBOT'
     ];
     var body = bodyParts.join('&');
@@ -72,7 +69,7 @@ describe('/send', function() {
     var username = 'testuser';
     var message = 'hi';
     var bodyParts = [
-      'token=' + process.env.OUTGOING_HOOK_TOKEN,
+      'token=' + testConfig.outgoingToken,
       'channel_name=' + channel,
       'user_name=' + username,
       'text=' + message
@@ -86,7 +83,7 @@ describe('/send', function() {
       .end(function(err) {
         if (err) return done(err);
 
-        var ircChannel = channelMapping['#' + channel];
+        var ircChannel = testConfig.channelMapping['#' + channel];
         sayStub.should.have.been.calledOnce;
         sayStub.should.have.been.calledWithExactly(ircChannel, '<' + username + '> ' + message);
         done();

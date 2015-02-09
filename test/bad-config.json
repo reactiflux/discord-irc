@@ -1,0 +1,10 @@
+[
+  {
+    "server": "irc.bottest.org",
+    "incomingURL": "http://slack.com/hook",
+    "outgoingToken": "test",
+    "channelMapping": {
+      "#slack": "#irc"
+    }
+  }
+]
