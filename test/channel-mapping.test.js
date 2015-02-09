@@ -1,6 +1,6 @@
 var chai = require('chai');
 var ConfigurationError = require('../lib/errors').ConfigurationError;
-var validateChannelMapping = require('../lib/helpers').validateChannelMapping;
+var validateChannelMapping = require('../lib/validators').validateChannelMapping;
 chai.should();
 
 describe('Channel Mapping', function() {
