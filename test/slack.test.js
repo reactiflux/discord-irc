@@ -1,13 +1,11 @@
 var chai = require('chai');
 var nock = require('nock');
 var SlackGateway = require('../lib/slack-gateway');
+var testConfig = require('./test-config.json');
+
 chai.should();
 
 describe('Slack Gateway', function() {
-  var channelMapping = {
-    '#slack': '#irc'
-  };
-
   var baseURL = 'http://slack.com';
 
   var user = 'user';
@@ -15,8 +13,6 @@ describe('Slack Gateway', function() {
   var message = 'message';
 
   before(function() {
-    process.env.CHANNEL_MAPPING = JSON.stringify(channelMapping);
-    process.env.INCOMING_HOOK_URL = baseURL + '/hook';
     this.slackMock = nock(baseURL)
       .post('/hook', {
         username: user,
@@ -25,7 +21,8 @@ describe('Slack Gateway', function() {
       })
       .reply(200);
 
-    this.slackGateway = new SlackGateway();
+    var config = testConfig[0];
+    this.slackGateway = new SlackGateway(config.incomingURL, config.channelMapping);
   });
 
   it('should invert the channel mapping', function() {

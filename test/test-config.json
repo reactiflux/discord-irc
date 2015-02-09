@@ -1,0 +1,21 @@
+[
+  {
+    "nickname": "test",
+    "server": "irc.bottest.org",
+    "incomingURL": "http://slack.com/hook",
+    "outgoingToken": "test",
+    "channelMapping": {
+      "#slack": "#irc"
+    }
+  },
+  {
+    "nickname": "test2",
+    "server": "irc.bottest.org",
+    "incomingURL": "http://slack.com/hook",
+    "outgoingToken": "test",
+    "channelMapping": {
+      "#slack": "#irc"
+    }
+  }
+]
+
