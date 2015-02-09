@@ -2,7 +2,7 @@
 var chai = require('chai');
 var sinon = require('sinon');
 var irc = require('irc');
-var createBots = require('../lib/irc');
+var createBots = require('../lib/helpers').createBots;
 var ConfigurationError = require('../lib/errors').ConfigurationError;
 
 chai.should();

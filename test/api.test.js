@@ -3,9 +3,8 @@ var request = require('supertest');
 var chai = require('chai');
 var sinonChai = require('sinon-chai');
 var sinon = require('sinon');
-var rewire = require('rewire');
 var irc = require('irc');
-var createBots = require('../lib/irc');
+var createBots = require('../lib/helpers').createBots;
 var testConfig = require('./single-test-config.json');
 
 chai.use(sinonChai);
