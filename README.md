@@ -15,10 +15,8 @@ $ npm install
 You will have to set up an [outgoing webhook integration](https://api.slack.com/outgoing-webhooks) for each channel you want to connect to an IRC-channel. You only need one [incoming integration](https://api.slack.com/incoming-webhooks), as slack-irc will supply the channel itself.
 
 slack-irc requires a JSON-configuration file, which should be available at the path given through the environment variable `CONFIG_FILE`. The configuration file needs to be an object or an array, depending on the number of IRC bots you want to run.
-<<<<<<< Updated upstream
-=======
-This allows you to use one instance of node-irc for multiple Slack teams if wanted, even if the IRC channels are on different networks.
->>>>>>> Stashed changes
+
+This allows you to use one instance of slack-irc for multiple Slack teams if wanted, even if the IRC channels are on different networks.
 
 Example configuration:
 ```js
@@ -34,20 +32,15 @@ Example configuration:
   },
   {
     "nickname": "test2",
-    "server": "irc.bottest.org",
-    "incomingURL": "http://slack.com/hook",
-    "outgoingToken": "test",
+    "server": "irc.testbot.org",
+    "incomingURL": "http://slack.com/hook/differenthook",
+    "outgoingToken": "other test",
     "channelMapping": {
-      "#slack": "#irc"
+      "#other-slack": "#new-irc-channel"
     }
   }
 ]
 ```
-<<<<<<< Updated upstream
-
-Each configuration object results in its own IRC-bot, and are completely independent of eachother (this means that you can use one instance of slack-irc for multiple Slack teams if wanted).
-=======
->>>>>>> Stashed changes
 
 The server can then be started with `npm start`.
 

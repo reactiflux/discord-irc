@@ -1,6 +1,6 @@
 {
   "name": "slack-irc",
-  "version": "0.2.0",
+  "version": "1.0.1",
   "description": "A gateway between Slack and IRC.",
   "main": "index.js",
   "repository": {
