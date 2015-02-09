@@ -14,19 +14,33 @@ $ npm install
 
 You will have to set up an [outgoing webhook integration](https://api.slack.com/outgoing-webhooks) for each channel you want to connect to an IRC-channel. You only need one [incoming integration](https://api.slack.com/incoming-webhooks), as slack-irc will supply the channel itself.
 
-slack-irc uses environment variables for configuration. Required environment variables are:
-```bash
-export IRC_SERVER='irc.freenode.net'
-export BOT_NICK='SlackIRC' # IRC Nick
-export OUTGOING_HOOK_TOKEN='Hook token from the Slack outgoing integration'
-export INCOMING_HOOK_URL='Hook URL from the Slack incoming integration'
-export CHANNEL_MAPPING='{
-    "#slack-channel": "#irc-channel",
-    "#other-slack-channel": "#other-irc-channel"
-}'
+slack-irc requires a JSON-configuration file, which should be available at the path given through the environment variable `CONFIG_FILE`. The configuration file needs to be an object or an array, depending on the number of IRC bots you want to run.
+
+Example configuration:
+```js
+[
+  {
+    "nickname": "test",
+    "server": "irc.bottest.org",
+    "incomingURL": "http://slack.com/hook", // Incoming hook URL from Slack
+    "outgoingToken": "test", // Outgoing hook token from Slack
+    "channelMapping": { // Maps each Slack-channel to an IRC-channel, used to direct messages to the correct place
+      "#slack": "#irc"
+    }
+  },
+  {
+    "nickname": "test2",
+    "server": "irc.bottest.org",
+    "incomingURL": "http://slack.com/hook",
+    "outgoingToken": "test",
+    "channelMapping": {
+      "#slack": "#irc"
+    }
+  }
+]
 ```
-If you put these in a `.environment`-file or similar, you can do `source .environment` to expose the variables before starting the server.
-The channel mapping is used to connect each Slack channel with an IRC channel.
+
+Each configuration object results in its own IRC-bot, and are completely independent of eachother (this means that you can use one instance of slack-irc for multiple Slack teams if wanted).
 
 The server can then be started with `npm start`.
 
