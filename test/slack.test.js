@@ -16,6 +16,7 @@ describe('Slack Gateway', function() {
     this.slackMock = nock(baseURL)
       .post('/hook', {
         username: user,
+        icon_url: 'http://api.adorable.io/avatars/48/' + user + '.png',
         channel: '#slack',
         text: message
       })
