@@ -79,7 +79,7 @@ describe('/send', function() {
     request(this.app)
       .post('/send')
       .send(body)
-      .expect(202)
+      .expect(200)
       .end(function(err) {
         if (err) return done(err);
 
