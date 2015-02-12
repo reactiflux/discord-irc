@@ -4,17 +4,27 @@
 
 ## Demo
 ![Slack IRC](http://i.imgur.com/XGVXY6n.gif)
-## Installation
+
+## Installation and usage
+Either by installing through npm:
+```bash
+$ npm install -g slack-irc
+$ slack-irc --config path/to/config.json
+```
+
+or by cloning the repository:
+
 ```bash
 In the repository folder:
 $ npm install
+$ npm start
 ```
 
 ## Configuration
 
 You will have to set up an [outgoing webhook integration](https://api.slack.com/outgoing-webhooks) for each channel you want to connect to an IRC-channel. You only need one [incoming integration](https://api.slack.com/incoming-webhooks), as slack-irc will supply the channel itself.
 
-slack-irc requires a JSON-configuration file, which should be available at the path given through the environment variable `CONFIG_FILE`. The configuration file needs to be an object or an array, depending on the number of IRC bots you want to run.
+slack-irc requires a JSON-configuration file, whose path can be given either through the CLI-option `--config` or the environment variable `CONFIG_FILE`. The configuration file needs to be an object or an array, depending on the number of IRC bots you want to run.
 
 This allows you to use one instance of slack-irc for multiple Slack teams if wanted, even if the IRC channels are on different networks.
 
@@ -41,8 +51,6 @@ Example configuration:
   }
 ]
 ```
-
-The server can then be started with `npm start`.
 
 ## Tests
 Run the tests with:
