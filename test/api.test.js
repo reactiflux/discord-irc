@@ -32,7 +32,7 @@ describe('/send', function() {
 
   it('should return 403 for invalid tokens', function(done) {
     request(this.app)
-      .post('/send')
+      .post('/')
       .send('token=badtoken')
       .expect(403)
       .expect('Content-Type', /json/)
@@ -54,7 +54,7 @@ describe('/send', function() {
     var body = bodyParts.join('&');
 
     request(this.app)
-      .post('/send')
+      .post('/')
       .send(body)
       .expect(200)
       .end(function(err) {
@@ -77,7 +77,7 @@ describe('/send', function() {
     var body = bodyParts.join('&');
 
     request(this.app)
-      .post('/send')
+      .post('/')
       .send(body)
       .expect(200)
       .end(function(err) {

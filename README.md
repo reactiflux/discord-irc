@@ -22,7 +22,7 @@ $ npm start
 
 ## Configuration
 
-You will have to set up an [outgoing webhook integration](https://api.slack.com/outgoing-webhooks) for each channel you want to connect to an IRC-channel. You only need one [incoming integration](https://api.slack.com/incoming-webhooks), as slack-irc will supply the channel itself.
+You will have to set up an [outgoing webhook integration](https://api.slack.com/outgoing-webhooks) for each channel you want to connect to an IRC-channel, pointing at the URL of your slack-irc instance. You only need one [incoming integration](https://api.slack.com/incoming-webhooks), as slack-irc will supply the channel itself.
 
 slack-irc requires a JSON-configuration file, whose path can be given either through the CLI-option `--config` or the environment variable `CONFIG_FILE`. The configuration file needs to be an object or an array, depending on the number of IRC bots you want to run.
 
