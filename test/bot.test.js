@@ -30,8 +30,8 @@ describe('Bot', function() {
     var bots = createBots();
     bots.length.should.equal(2);
 
-    // 3 listeners per bot, two bots = 6
-    addListenerStub.should.have.callCount(6);
+    // 4 listeners per bot, two bots = 8
+    addListenerStub.should.have.callCount(8);
   });
 
   it('should work when given an object as a config file', function() {
