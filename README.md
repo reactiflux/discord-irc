@@ -36,6 +36,10 @@ Example configuration:
     "server": "irc.bottest.org",
     "incomingURL": "http://slack.com/hook", // Incoming hook URL from Slack
     "outgoingToken": "test", // Outgoing hook token from Slack
+    "autoSendCommands": [ // Commands that will be sent on connect
+        ["MODE", "test", "+x"],
+        ["AUTH", "test", "password"]
+    ],
     "channelMapping": { // Maps each Slack-channel to an IRC-channel, used to direct messages to the correct place
       "#slack": "#irc"
     }
