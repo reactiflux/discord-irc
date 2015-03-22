@@ -2,9 +2,10 @@
 
 var program = require('commander');
 var checkEnv = require('check-env');
+var createBots = require('./lib/helpers').createBots;
 var logger = require('winston');
 
-if (process.env.NODE_ENV !== 'production') {
+if (process.env.NODE_ENV === 'development') {
   logger.level = 'debug';
 }
 
@@ -19,7 +20,4 @@ program
 if (!program.config) checkEnv(['CONFIG_FILE']);
 else process.env.CONFIG_FILE = program.config;
 
-var app = require('./lib/server');
-app.listen(app.get('port'), function() {
-  logger.debug('Listening on port %d', app.get('port'));
-});
+createBots();
