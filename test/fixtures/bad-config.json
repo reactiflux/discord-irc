@@ -1,8 +1,7 @@
 [
   {
     "server": "irc.bottest.org",
-    "incomingURL": "http://slack.com/hook",
-    "outgoingToken": "test",
+    "token": "hei",
     "channelMapping": {
       "#slack": "#irc"
     }
