@@ -3,23 +3,37 @@ var events = require('events');
 var sinon = require('sinon');
 var ChannelStub = require('./channel-stub');
 
-function SlackStub() {}
+function SlackStub() {
+  this.returnWrongStubInfo = false;
+}
 util.inherits(SlackStub, events.EventEmitter);
 
 SlackStub.prototype.getChannelGroupOrDMByName = function() {
+  if (this.returnWrongStubInfo) return;
   return new ChannelStub();
 };
 
 SlackStub.prototype.getChannelGroupOrDMByID = function() {
+  if (this.returnWrongStubInfo) return;
   return new ChannelStub();
 };
 
 SlackStub.prototype.getUserByID = function() {
+  if (this.returnWrongStubInfo) {
+    return {
+      name: 'nottheuser'
+    };
+  }
+
   return {
     name: 'testuser'
   };
 };
 
 SlackStub.prototype.login = sinon.stub();
+
+SlackStub.prototype.resetStub = function() {
+  this.returnWrongStubInfo = false;
+};
 
 module.exports = SlackStub;

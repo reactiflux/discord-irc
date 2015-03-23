@@ -22,6 +22,7 @@ describe('Bot', function() {
   });
 
   afterEach(function() {
+    this.bot.slack.resetStub();
     ClientStub.prototype.say.reset();
     ChannelStub.prototype.postMessage.reset();
   });
@@ -42,6 +43,18 @@ describe('Bot', function() {
     ChannelStub.prototype.postMessage.should.have.been.calledWith(message);
   });
 
+  it('should not send messages to slack if the channel isn\'t in the channel mapping',
+  function() {
+    this.bot.sendToSlack('user', '#wrongchan', 'message');
+    ChannelStub.prototype.postMessage.should.not.have.been.called;
+  });
+
+  it('should not send messages to slack if the bot isn\'t in the channel', function() {
+    this.bot.slack.returnWrongStubInfo = true;
+    this.bot.sendToSlack('user', '#irc', 'message');
+    ChannelStub.prototype.postMessage.should.not.have.been.called;
+  });
+
   it('should send correct messages to irc', function() {
     var text = 'testmessage';
     var message = {
@@ -54,5 +67,15 @@ describe('Bot', function() {
     this.bot.sendToIRC(message);
     var ircText = '<testuser> ' + text;
     ClientStub.prototype.say.should.have.been.calledWith('#irc', ircText);
+  });
+
+  it('should not send messages to irc if the channel isn\'t in the channel mapping',
+  function() {
+    this.bot.slack.returnWrongStubInfo = true;
+    var message = {
+      channel: 'wrongchannel'
+    };
+    this.bot.sendToIRC(message);
+    ClientStub.prototype.say.should.not.have.been.called;
   });
 });

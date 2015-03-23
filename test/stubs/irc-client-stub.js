@@ -7,4 +7,8 @@ util.inherits(ClientStub, events.EventEmitter);
 
 ClientStub.prototype.say = sinon.stub();
 
+ClientStub.prototype.send = sinon.stub();
+
+ClientStub.prototype.join = sinon.stub();
+
 module.exports = ClientStub;
