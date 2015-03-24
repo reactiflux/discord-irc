@@ -8,15 +8,14 @@ function SlackStub() {
 }
 util.inherits(SlackStub, events.EventEmitter);
 
-SlackStub.prototype.getChannelGroupOrDMByName = function() {
+SlackStub.prototype.getChannelStub = function() {
   if (this.returnWrongStubInfo) return;
   return new ChannelStub();
 };
 
-SlackStub.prototype.getChannelGroupOrDMByID = function() {
-  if (this.returnWrongStubInfo) return;
-  return new ChannelStub();
-};
+SlackStub.prototype.getChannelByID = SlackStub.prototype.getChannelStub;
+SlackStub.prototype.getChannelGroupOrDMByName = SlackStub.prototype.getChannelStub;
+SlackStub.prototype.getChannelGroupOrDMByID = SlackStub.prototype.getChannelStub;
 
 SlackStub.prototype.getUserByID = function() {
   if (this.returnWrongStubInfo) {

@@ -78,4 +78,17 @@ describe('Bot', function() {
     this.bot.sendToIRC(message);
     ClientStub.prototype.say.should.not.have.been.called;
   });
+
+  it('should parse text from slack', function() {
+    this.bot.parseText('>><<').should.equal('>><<');
+    this.bot.parseText('<!channel> <!group> <!everyone>')
+      .should.equal('@channel @group @everyone');
+    this.bot.parseText('<#CSOMEID> <#CSOMEID|readable>')
+      .should.equal('#slack readable');
+    this.bot.parseText('<@USOMEID> <@USOMEID|readable>')
+      .should.equal('@testuser readable');
+    this.bot.parseText('<https://example.com>').should.equal('https://example.com');
+    this.bot.parseText('<!somecommand> <!somecommand|readable>')
+      .should.equal('<somecommand> <readable>');
+  });
 });
