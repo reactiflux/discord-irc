@@ -22,11 +22,20 @@ $ npm start
 
 ## Configuration
 
-You will have to set up an [outgoing webhook integration](https://api.slack.com/outgoing-webhooks) for each channel you want to connect to an IRC-channel, pointing at the URL of your slack-irc instance. You only need one [incoming integration](https://api.slack.com/incoming-webhooks), as slack-irc will supply the channel itself.
+slack-irc uses Slack's [bot users](https://api.slack.com/bot-users).
+This means you'll have to set up a bot user as a Slack integration, and invite it
+to the Slack channels you want it to listen in on. This can be done using Slack's `/invite <botname>`
+command. This has to be done manually as there's no way to do it through the Slack bot user API at
+the moment.
 
-slack-irc requires a JSON-configuration file, whose path can be given either through the CLI-option `--config` or the environment variable `CONFIG_FILE`. The configuration file needs to be an object or an array, depending on the number of IRC bots you want to run.
+slack-irc requires a JSON-configuration file, whose path can be given either through
+the CLI-option `--config` or the environment variable `CONFIG_FILE`. The configuration
+file needs to be an object or an array, depending on the number of IRC bots you want to run.
 
-This allows you to use one instance of slack-irc for multiple Slack teams if wanted, even if the IRC channels are on different networks.
+This allows you to use one instance of slack-irc for multiple Slack teams if wanted, even
+if the IRC channels are on different networks.
+
+To set the log level to debug, export the environment variable `NODE_ENV` as `development`.
 
 Example configuration:
 ```js
@@ -34,21 +43,20 @@ Example configuration:
   {
     "nickname": "test",
     "server": "irc.bottest.org",
-    "incomingURL": "http://slack.com/hook", // Incoming hook URL from Slack
-    "outgoingToken": "test", // Outgoing hook token from Slack
+    "token": "slacktoken", // Your bot user's token
     "autoSendCommands": [ // Commands that will be sent on connect
         ["MODE", "test", "+x"],
         ["AUTH", "test", "password"]
     ],
     "channelMapping": { // Maps each Slack-channel to an IRC-channel, used to direct messages to the correct place
-      "#slack": "#irc"
+      "#slack": "#irc",
+      "privategroup": "#other-channel" // No hash in front of private groups
     }
   },
   {
     "nickname": "test2",
     "server": "irc.testbot.org",
-    "incomingURL": "http://slack.com/hook/differenthook",
-    "outgoingToken": "other test",
+    "token": "slacktoken2",
     "channelMapping": {
       "#other-slack": "#new-irc-channel"
     }

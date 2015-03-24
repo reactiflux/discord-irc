@@ -12,14 +12,6 @@ describe('Channel Mapping', function() {
     (wrap).should.throw(ConfigurationError, /Invalid channel mapping given/);
   });
 
-  it('should fail without # in channels', function() {
-    var wrongMapping = { slack: 'irc' };
-    function wrap() {
-      validateChannelMapping(wrongMapping);
-    }
-    (wrap).should.throw(ConfigurationError, /Invalid channel mapping given/);
-  });
-
   it('should not fail if given a proper channel list as JSON', function() {
     var correctMapping = { '#channel': '#otherchannel' };
     function wrap() {

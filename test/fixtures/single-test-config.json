@@ -1,0 +1,12 @@
+{
+  "nickname": "test",
+  "server": "irc.bottest.org",
+  "token": "testtoken",
+  "autoSendCommands": [
+    ["MODE", "test", "+x"],
+    ["AUTH", "test", "password"]
+  ],
+  "channelMapping": {
+    "#slack": "#irc"
+  }
+}
