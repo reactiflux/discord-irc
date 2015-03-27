@@ -1,6 +1,16 @@
 # Changelog
 This project adheres to [Semantic Versioning](http://semver.org/).
 
+## [3.1.0] - 2015-03-27
+### Added
+- Make the bot able to join password protected IRC channels. Example:
+
+```json
+"channelMapping": {
+  "#slack": "#irc channel-password",
+}
+```
+
 ## [3.0.0] - 2015-03-24
 ### Changed
 Move from using outgoing/incoming integrations to Slack's

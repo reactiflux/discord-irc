@@ -39,7 +39,7 @@ describe('Bot', function() {
       icon_url: 'http://api.adorable.io/avatars/48/testuser.png'
     };
 
-    this.bot.sendToSlack(message.username, config.channelMapping['#slack'], message.text);
+    this.bot.sendToSlack(message.username, '#irc', message.text);
     ChannelStub.prototype.postMessage.should.have.been.calledWith(message);
   });
 

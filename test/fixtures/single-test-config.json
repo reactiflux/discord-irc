@@ -7,6 +7,6 @@
     ["AUTH", "test", "password"]
   ],
   "channelMapping": {
-    "#slack": "#irc"
+    "#slack": "#irc channelKey"
   }
 }

@@ -37,6 +37,9 @@ if the IRC channels are on different networks.
 
 To set the log level to debug, export the environment variable `NODE_ENV` as `development`.
 
+slack-irc also supports invite-only IRC channels, and will join any channels it's invited to
+as long as they're present in the channel mapping.
+
 Example configuration:
 ```js
 [
@@ -49,7 +52,7 @@ Example configuration:
         ["AUTH", "test", "password"]
     ],
     "channelMapping": { // Maps each Slack-channel to an IRC-channel, used to direct messages to the correct place
-      "#slack": "#irc",
+      "#slack": "#irc channel-password", // Add channel keys after the channel name
       "privategroup": "#other-channel" // No hash in front of private groups
     }
   },
