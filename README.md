@@ -48,6 +48,7 @@ Example configuration:
     "server": "irc.bottest.org",
     "token": "slacktoken", // Your bot user's token
     "autoSendCommands": [ // Commands that will be sent on connect
+        ["PRIVMSG", "NickServ", "IDENTIFY password"],
         ["MODE", "test", "+x"],
         ["AUTH", "test", "password"]
     ],
