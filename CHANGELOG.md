@@ -1,6 +1,12 @@
 # Changelog
 This project adheres to [Semantic Versioning](http://semver.org/).
 
+## [3.2.0] - 2015-04-03
+### Added
+- Support for passing [node-irc](http://node-irc.readthedocs.org/en/latest/API.html#irc.Client) 
+options directly by adding an `ircOptions` object to the config. Also sets `floodProtection` on 
+by default, with a delay of 500 ms.
+
 ## [3.1.0] - 2015-03-27
 ### Added
 - Make the bot able to join password protected IRC channels. Example:

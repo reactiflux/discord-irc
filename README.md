@@ -43,20 +43,27 @@ as long as they're present in the channel mapping.
 Example configuration:
 ```js
 [
+  // Bot 1:
   {
     "nickname": "test",
     "server": "irc.bottest.org",
     "token": "slacktoken", // Your bot user's token
     "autoSendCommands": [ // Commands that will be sent on connect
-        ["PRIVMSG", "NickServ", "IDENTIFY password"],
-        ["MODE", "test", "+x"],
-        ["AUTH", "test", "password"]
+      ["PRIVMSG", "NickServ", "IDENTIFY password"],
+      ["MODE", "test", "+x"],
+      ["AUTH", "test", "password"]
     ],
     "channelMapping": { // Maps each Slack-channel to an IRC-channel, used to direct messages to the correct place
       "#slack": "#irc channel-password", // Add channel keys after the channel name
       "privategroup": "#other-channel" // No hash in front of private groups
+    },
+    "ircOptions": { // Optional node-irc options
+      "floodProtection": false, // On by default
+      "floodProtectionDelay": 1000 // 500 by default
     }
   },
+
+  // Bot 2:
   {
     "nickname": "test2",
     "server": "irc.testbot.org",
@@ -67,6 +74,8 @@ Example configuration:
   }
 ]
 ```
+
+`ircOptions` is passed directly to node-irc ([available options](http://node-irc.readthedocs.org/en/latest/API.html#irc.Client)).
 
 ## Tests
 Run the tests with:
