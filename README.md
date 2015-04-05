@@ -40,7 +40,7 @@ To set the log level to debug, export the environment variable `NODE_ENV` as `de
 slack-irc also supports invite-only IRC channels, and will join any channels it's invited to
 as long as they're present in the channel mapping.
 
-Example configuration:
+### Example configuration
 ```js
 [
   // Bot 1:
@@ -82,6 +82,9 @@ Run the tests with:
 ```bash
 $ make test
 ```
+
+## Docker
+A third-party Docker container can be found [here](https://github.com/caktux/slackbridge/).
 
 ## License
 
