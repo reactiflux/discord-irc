@@ -1,6 +1,10 @@
 # Changelog
 This project adheres to [Semantic Versioning](http://semver.org/).
 
+## [3.2.1] - 2015-04-07
+### Fixed
+- Convert newlines sent from Slack to spaces to prevent the bot from sending multiple messages.
+
 ## [3.2.0] - 2015-04-03
 ### Added
 - Support for passing [node-irc](http://node-irc.readthedocs.org/en/latest/API.html#irc.Client) 

@@ -80,6 +80,7 @@ describe('Bot', function() {
   });
 
   it('should parse text from slack', function() {
+    this.bot.parseText('hi\nhi\r\nhi\r').should.equal('hi hi hi ');
     this.bot.parseText('>><<').should.equal('>><<');
     this.bot.parseText('<!channel> <!group> <!everyone>')
       .should.equal('@channel @group @everyone');
