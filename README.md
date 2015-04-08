@@ -3,7 +3,7 @@
 > Connects Slack and IRC channels by sending messages back and forth.
 
 ## Demo
-![Slack IRC](http://i.imgur.com/XGVXY6n.gif)
+![Slack IRC](http://i.imgur.com/58H6HgO.gif)
 
 ## Installation and usage
 Either by installing through npm:
