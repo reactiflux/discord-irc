@@ -92,4 +92,9 @@ describe('Bot', function() {
     this.bot.parseText('<!somecommand> <!somecommand|readable>')
       .should.equal('<somecommand> <readable>');
   });
+
+  it('should parse emojis correctly', function() {
+    this.bot.parseText(':smile:').should.equal(':)');
+    this.bot.parseText(':train:').should.equal(':train:');
+  });
 });
