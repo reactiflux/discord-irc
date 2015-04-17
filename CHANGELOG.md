@@ -1,6 +1,11 @@
 # Changelog
 This project adheres to [Semantic Versioning](http://semver.org/).
 
+## [3.3.0] - 2015-04-17
+### Added
+- Conversion of emojis to text smileys from Slack to IRC, by [andebor](https://github.com/andebor).
+Relevant issue: [#10](https://github.com/ekmartin/slack-irc/issues/10)
+
 ## [3.2.1] - 2015-04-07
 ### Fixed
 - Convert newlines sent from Slack to spaces to prevent the bot from sending multiple messages.
