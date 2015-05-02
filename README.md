@@ -9,7 +9,7 @@
 Either by installing through npm:
 ```bash
 $ npm install -g slack-irc
-$ slack-irc --config path/to/config.json
+$ slack-irc --config /path/to/config.json
 ```
 
 or by cloning the repository:
@@ -17,7 +17,7 @@ or by cloning the repository:
 ```bash
 In the repository folder:
 $ npm install
-$ npm start
+$ node index.js --config /path/to/config.json
 ```
 
 ## Configuration
