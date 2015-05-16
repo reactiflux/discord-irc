@@ -1,6 +1,10 @@
 # Changelog
 This project adheres to [Semantic Versioning](http://semver.org/).
 
+## [3.3.2] - 2015-05-17
+### Fixed
+- Upgrade dependencies.
+
 ## [3.3.1] - 2015-05-17
 ### Fixed
 - Make IRC channel names case insensitive in the channel mapping.
