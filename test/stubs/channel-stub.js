@@ -6,6 +6,7 @@ function ChannelStub() {
   this.name = 'slack';
   this.is_channel = true;
 }
+
 util.inherits(ChannelStub, events.EventEmitter);
 
 ChannelStub.prototype.postMessage = sinon.stub();

@@ -3,6 +3,7 @@ var events = require('events');
 var sinon = require('sinon');
 
 function ClientStub() {}
+
 util.inherits(ClientStub, events.EventEmitter);
 
 ClientStub.prototype.say = sinon.stub();

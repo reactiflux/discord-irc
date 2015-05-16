@@ -6,6 +6,7 @@ var ChannelStub = require('./channel-stub');
 function SlackStub() {
   this.returnWrongStubInfo = false;
 }
+
 util.inherits(SlackStub, events.EventEmitter);
 
 SlackStub.prototype.getChannelStub = function() {

@@ -22,6 +22,7 @@ describe('Channel Mapping', function() {
     function wrap() {
       validateChannelMapping(wrongMapping);
     }
+
     (wrap).should.throw(ConfigurationError, /Invalid channel mapping given/);
   });
 
@@ -30,6 +31,7 @@ describe('Channel Mapping', function() {
     function wrap() {
       validateChannelMapping(correctMapping);
     }
+
     (wrap).should.not.throw();
   });
 

@@ -39,6 +39,7 @@ describe('Create Bots', function() {
     function wrap() {
       createBots();
     }
+
     (wrap).should.throw(ConfigurationError, 'Missing configuration field nickname');
   });
 
@@ -48,6 +49,7 @@ describe('Create Bots', function() {
     function wrap() {
       createBots();
     }
+
     (wrap).should.throw(ConfigurationError);
   });
 });
