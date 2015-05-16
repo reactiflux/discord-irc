@@ -43,6 +43,18 @@ describe('Bot', function() {
     ChannelStub.prototype.postMessage.should.have.been.calledWith(message);
   });
 
+  it('should lowercase channel names before sending to slack', function() {
+    var message = {
+      text: 'testmessage',
+      username: 'testuser',
+      parse: 'full',
+      icon_url: 'http://api.adorable.io/avatars/48/testuser.png'
+    };
+
+    this.bot.sendToSlack(message.username, '#IRC', message.text);
+    ChannelStub.prototype.postMessage.should.have.been.calledWith(message);
+  });
+
   it('should not send messages to slack if the channel isn\'t in the channel mapping',
   function() {
     this.bot.sendToSlack('user', '#wrongchan', 'message');

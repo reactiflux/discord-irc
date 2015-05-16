@@ -5,6 +5,7 @@ var ConfigurationError = require('../lib/errors').ConfigurationError;
 var validateChannelMapping = require('../lib/validators').validateChannelMapping;
 var Bot = rewire('../lib/bot');
 var config = require('./fixtures/single-test-config.json');
+var caseConfig = require('./fixtures/case-sensitivity-config.json');
 var SlackStub = require('./stubs/slack-stub');
 var ClientStub = require('./stubs/irc-client-stub');
 
@@ -37,5 +38,11 @@ describe('Channel Mapping', function() {
     bot.channelMapping['#slack'].should.equal('#irc');
     bot.invertedMapping['#irc'].should.equal('#slack');
     bot.channels[0].should.equal('#irc channelKey');
+  });
+
+  it('should lowercase IRC channel names', function() {
+    var bot = new Bot(caseConfig);
+    bot.channelMapping['#slack'].should.equal('#irc');
+    bot.channelMapping['#OtherSlack'].should.equal('#otherirc');
   });
 });
