@@ -1,6 +1,11 @@
 # Changelog
 This project adheres to [Semantic Versioning](http://semver.org/).
 
+## [3.3.1] - 2015-05-17
+### Fixed
+- Make IRC channel names case insensitive in the channel mapping.
+Relevant issue: [#31](https://github.com/ekmartin/slack-irc/issues/31)
+
 ## [3.3.0] - 2015-04-17
 ### Added
 - Conversion of emojis to text smileys from Slack to IRC, by [andebor](https://github.com/andebor).
@@ -12,8 +17,8 @@ Relevant issue: [#10](https://github.com/ekmartin/slack-irc/issues/10)
 
 ## [3.2.0] - 2015-04-03
 ### Added
-- Support for passing [node-irc](http://node-irc.readthedocs.org/en/latest/API.html#irc.Client) 
-options directly by adding an `ircOptions` object to the config. Also sets `floodProtection` on 
+- Support for passing [node-irc](http://node-irc.readthedocs.org/en/latest/API.html#irc.Client)
+options directly by adding an `ircOptions` object to the config. Also sets `floodProtection` on
 by default, with a delay of 500 ms.
 
 ## [3.1.0] - 2015-03-27
