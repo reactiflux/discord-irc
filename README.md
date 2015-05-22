@@ -20,6 +20,13 @@ $ npm install
 $ node index.js --config /path/to/config.json
 ```
 
+It can also be used as a node module:
+```js
+var slackIRC = require('slack-irc');
+var config = require('./config.json');
+slackIRC(config);
+```
+
 ## Configuration
 
 slack-irc uses Slack's [bot users](https://api.slack.com/bot-users).

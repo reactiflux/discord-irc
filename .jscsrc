@@ -4,8 +4,5 @@
   "disallowMultipleVarDecl": true,
   "requireMultipleVarDecl": null,
   "requireCamelCaseOrUpperCaseIdentifiers": "ignoreProperties",
-  "requirePaddingNewLinesAfterBlocks": {
-    "allExcept": ["inCallExpressions", "inArrayExpressions", "inProperties"]
-  },
   "safeContextKeyword": ["that"]
 }

@@ -1,6 +1,10 @@
 # Changelog
 This project adheres to [Semantic Versioning](http://semver.org/).
 
+## [3.4.0] - 2015-05-22
+### Added
+- Made it possible to require slack-irc as a node module.
+
 ## [3.3.2] - 2015-05-17
 ### Fixed
 - Upgrade dependencies.
