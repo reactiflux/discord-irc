@@ -50,7 +50,17 @@ as long as they're present in the channel mapping.
 ### Example configuration
 ```js
 [
-  // Bot 1:
+  // Bot 1 (minimal configuration):
+  {
+    "nickname": "test2",
+    "server": "irc.testbot.org",
+    "token": "slacktoken2",
+    "channelMapping": {
+      "#other-slack": "#new-irc-channel"
+    }
+  },
+
+  // Bot 2 (advanced options):
   {
     "nickname": "test",
     "server": "irc.bottest.org",
@@ -67,16 +77,6 @@ as long as they're present in the channel mapping.
     "ircOptions": { // Optional node-irc options
       "floodProtection": false, // On by default
       "floodProtectionDelay": 1000 // 500 by default
-    }
-  },
-
-  // Bot 2:
-  {
-    "nickname": "test2",
-    "server": "irc.testbot.org",
-    "token": "slacktoken2",
-    "channelMapping": {
-      "#other-slack": "#new-irc-channel"
     }
   }
 ]
