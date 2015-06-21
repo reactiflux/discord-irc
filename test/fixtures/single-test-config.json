@@ -2,6 +2,7 @@
   "nickname": "test",
   "server": "irc.bottest.org",
   "token": "testtoken",
+  "commandCharacters": ["!", "."],
   "autoSendCommands": [
     ["MODE", "test", "+x"],
     ["AUTH", "test", "password"]
