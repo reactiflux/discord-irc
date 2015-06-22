@@ -120,6 +120,9 @@ describe('Bot', function() {
     };
 
     this.bot.sendToIRC(message);
-    ClientStub.prototype.say.should.have.been.calledWith('#irc', text);
+    ClientStub.prototype.say.getCall(0).args.should.deep.equal([
+      '#irc', 'Command sent from Slack by testuser:'
+    ]);
+    ClientStub.prototype.say.getCall(1).args.should.deep.equal(['#irc', text]);
   });
 });
