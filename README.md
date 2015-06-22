@@ -77,7 +77,10 @@ as long as they're present in the channel mapping.
     "ircOptions": { // Optional node-irc options
       "floodProtection": false, // On by default
       "floodProtectionDelay": 1000 // 500 by default
-    }
+    },
+    // Makes the bot hide the username prefix for messages that start
+    // with one of these characters (commands):
+    "commandCharacters": ["!", "."]
   }
 ]
 ```

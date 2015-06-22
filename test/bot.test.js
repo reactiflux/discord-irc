@@ -109,4 +109,20 @@ describe('Bot', function() {
     this.bot.parseText(':smile:').should.equal(':)');
     this.bot.parseText(':train:').should.equal(':train:');
   });
+
+  it('should hide usernames for commands', function() {
+    var text = '!test command';
+    var message = {
+      channel: 'slack',
+      getBody: function() {
+        return text;
+      }
+    };
+
+    this.bot.sendToIRC(message);
+    ClientStub.prototype.say.getCall(0).args.should.deep.equal([
+      '#irc', 'Command sent from Slack by testuser:'
+    ]);
+    ClientStub.prototype.say.getCall(1).args.should.deep.equal(['#irc', text]);
+  });
 });
