@@ -1,6 +1,11 @@
 # Changelog
 This project adheres to [Semantic Versioning](http://semver.org/).
 
+## [3.5.1] - 2015-06-26
+### Fixed
+- A bug introduced in 3.5.0 where Slack messages sent to IRC wouldn't get parsed.
+Adds a test to confirm correct behavior.
+
 ## [3.5.0] - 2015-06-22
 ### Added
 - `commandCharacters` option - makes the bot hide the username prefix for
@@ -8,7 +13,8 @@ messages that start with one of the provided characters when posting to IRC.
 A `Command sent from Slack by username:` message will be posted to the IRC
 channel before the command is submitted.
 
-## [3.4.0] - 2015-05-22
+#t
+ [3.4.0] - 2015-05-22
 ### Added
 - Made it possible to require slack-irc as a node module.
 

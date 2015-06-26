@@ -91,6 +91,19 @@ describe('Bot', function() {
     ClientStub.prototype.say.should.not.have.been.called;
   });
 
+  it('should parse text from slack when sending messages', function() {
+    var text = '<@USOMEID> <@USOMEID|readable>';
+    var message = {
+      channel: 'slack',
+      getBody: function() {
+        return text;
+      }
+    };
+
+    this.bot.sendToIRC(message);
+    ClientStub.prototype.say.should.have.been.calledWith('#irc', '<testuser> @testuser readable');
+  });
+
   it('should parse text from slack', function() {
     this.bot.parseText('hi\nhi\r\nhi\r').should.equal('hi hi hi ');
     this.bot.parseText('>><<').should.equal('>><<');
