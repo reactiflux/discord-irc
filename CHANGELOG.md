@@ -13,8 +13,7 @@ messages that start with one of the provided characters when posting to IRC.
 A `Command sent from Slack by username:` message will be posted to the IRC
 channel before the command is submitted.
 
-#t
- [3.4.0] - 2015-05-22
+## [3.4.0] - 2015-05-22
 ### Added
 - Made it possible to require slack-irc as a node module.
 
