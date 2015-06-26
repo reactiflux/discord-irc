@@ -29,12 +29,11 @@
   },
   "license": "MIT",
   "dependencies": {
-    "body-parser": "~1.12.4",
     "check-env": "~1.2.0",
     "commander": "~2.8.1",
     "irc": "~0.3.9",
-    "lodash": "~3.8.0",
-    "slack-client": "^1.4.0",
+    "lodash": "~3.9.3",
+    "slack-client": "~1.4.0",
     "winston": "~1.0.0"
   },
   "devDependencies": {
@@ -43,11 +42,8 @@
     "jscs": "~1.13.1",
     "jshint": "~2.7.0",
     "mocha": "~2.2.5",
-    "mock-fs": "~2.7.0",
-    "nock": "~2.0.1",
     "rewire": "^2.3.1",
     "sinon": "~1.14.1",
-    "sinon-chai": "~2.7.0",
-    "supertest": "~1.0.1"
+    "sinon-chai": "~2.7.0"
   }
 }

@@ -3,6 +3,7 @@
 var createBots = require('./lib/helpers').createBots;
 var logger = require('winston');
 
+/*istanbul ignore next*/
 if (process.env.NODE_ENV === 'development') {
   logger.level = 'debug';
 }

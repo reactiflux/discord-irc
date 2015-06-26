@@ -1,6 +1,10 @@
 # Changelog
 This project adheres to [Semantic Versioning](http://semver.org/).
 
+## [3.5.2] - 2015-06-26
+### Fixed
+- Remove old unused dependencies.
+
 ## [3.5.1] - 2015-06-26
 ### Fixed
 - A bug introduced in 3.5.0 where Slack messages sent to IRC wouldn't get parsed.

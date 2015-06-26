@@ -18,7 +18,7 @@ jscs:
 	$(JSCS) .
 
 make cover:
-	$(ISTANBUL) cover $(MOCHA) $(TESTS)
+	NODE_ENV="test" $(ISTANBUL) cover $(MOCHA) $(TESTS)
 	$(ISTANBUL) report cobertura
 
 make lint: jshint jscs
