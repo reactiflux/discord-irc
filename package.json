@@ -1,6 +1,6 @@
 {
   "name": "slack-irc",
-  "version": "3.5.1",
+  "version": "3.5.2",
   "description": "Connects IRC and Slack channels by sending messages back and forth.",
   "keywords": [
     "slack",
