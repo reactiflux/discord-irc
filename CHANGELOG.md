@@ -1,6 +1,11 @@
 # Changelog
 This project adheres to [Semantic Versioning](http://semver.org/).
 
+## [3.6.0] - 2015-09-14
+### Added
+- Support for actions from IRC to Slack and vice versa (/me messages).
+- Support for sending notices from IRC to Slack (/notice #channel message).
+
 ## [3.5.2] - 2015-06-26
 ### Fixed
 - Remove old unused dependencies.
