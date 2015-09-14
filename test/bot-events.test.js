@@ -76,7 +76,7 @@ describe('Bot Events', function() {
     Bot.prototype.sendToIRC.should.have.not.have.been.called;
   });
 
-  it('should not send messages to irc if it has a subtype', function() {
+  it('should not send messages to irc if it has an invalid subtype', function() {
     var message = {
       type: 'message',
       subtype: 'bot_message'

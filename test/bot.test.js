@@ -81,6 +81,21 @@ describe('Bot', function() {
     ClientStub.prototype.say.should.have.been.calledWith('#irc', ircText);
   });
 
+  it('should send /me messages to irc', function() {
+    var text = 'testmessage';
+    var message = {
+      channel: 'slack',
+      subtype: 'me_message',
+      getBody: function() {
+        return text;
+      }
+    };
+
+    this.bot.sendToIRC(message);
+    var ircText = 'Action: testuser ' + text;
+    ClientStub.prototype.say.should.have.been.calledWith('#irc', ircText);
+  });
+
   it('should not send messages to irc if the channel isn\'t in the channel mapping',
   function() {
     this.bot.slack.returnWrongStubInfo = true;
