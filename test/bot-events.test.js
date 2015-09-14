@@ -93,6 +93,15 @@ describe('Bot Events', function() {
     Bot.prototype.sendToSlack.should.have.been.calledWithExactly(author, channel, text);
   });
 
+  it('should send notices to slack', function() {
+    var channel = '#channel';
+    var author = 'user';
+    var text = 'hi';
+    var formattedText = '*' + text + '*';
+    this.bot.ircClient.emit('notice', author, channel, text);
+    Bot.prototype.sendToSlack.should.have.been.calledWithExactly(author, channel, formattedText);
+  });
+
   it('should send actions to slack', function() {
     var channel = '#channel';
     var author = 'user';
