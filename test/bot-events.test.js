@@ -89,8 +89,18 @@ describe('Bot Events', function() {
     var channel = '#channel';
     var author = 'user';
     var text = 'hi';
-    this.bot.ircClient.emit('message', channel, author, text);
-    Bot.prototype.sendToSlack.should.have.been.calledWithExactly(channel, author, text);
+    this.bot.ircClient.emit('message', author, channel, text);
+    Bot.prototype.sendToSlack.should.have.been.calledWithExactly(author, channel, text);
+  });
+
+  it('should send actions to slack', function() {
+    var channel = '#channel';
+    var author = 'user';
+    var text = 'hi';
+    var formattedText = '_hi_';
+    var message = {};
+    this.bot.ircClient.emit('action', author, channel, text, message);
+    Bot.prototype.sendToSlack.should.have.been.calledWithExactly(author, channel, formattedText);
   });
 
   it('should join channels when invited', function() {
