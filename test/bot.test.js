@@ -1,7 +1,6 @@
-/* jshint expr: true */
+/* eslint no-unused-expressions: 0 */
 var chai = require('chai');
 var sinonChai = require('sinon-chai');
-var sinon = require('sinon');
 var rewire = require('rewire');
 var irc = require('irc');
 var Bot = rewire('../lib/bot');

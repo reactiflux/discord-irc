@@ -19,7 +19,9 @@
   },
   "scripts": {
     "start": "node index.js",
-    "test": "make test"
+    "lint": "eslint . --ignore-path .gitignore",
+    "coverage": "istanbul cover _mocha $(find test -name '*.test.js') && istanbul report cobertura",
+    "test": "npm run lint && npm run coverage"
   },
   "bin": {
     "slack-irc": "./index.js"
@@ -38,11 +40,13 @@
   },
   "devDependencies": {
     "chai": "~2.3.0",
+    "eslint": "~1.6.0",
+    "eslint-config-airbnb": "~0.1.0",
     "istanbul": "~0.3.5",
     "jscs": "~1.13.1",
     "jshint": "~2.7.0",
     "mocha": "~2.2.5",
-    "rewire": "^2.3.1",
+    "rewire": "~2.3.1",
     "sinon": "~1.14.1",
     "sinon-chai": "~2.7.0"
   }

@@ -10,7 +10,7 @@ function SlackStub() {
 util.inherits(SlackStub, events.EventEmitter);
 
 SlackStub.prototype.getChannelStub = function() {
-  if (this.returnWrongStubInfo) return;
+  if (this.returnWrongStubInfo) return null;
   return new ChannelStub();
 };
 

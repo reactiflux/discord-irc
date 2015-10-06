@@ -1,4 +1,4 @@
-/* jshint expr: true */
+/* eslint no-unused-expressions: 0 */
 var chai = require('chai');
 var sinon = require('sinon');
 var sinonChai = require('sinon-chai');

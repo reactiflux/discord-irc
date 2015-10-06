@@ -1,4 +1,4 @@
-/* jshint expr: true */
+/* eslint no-unused-expressions: 0 */
 var chai = require('chai');
 var sinonChai = require('sinon-chai');
 var sinon = require('sinon');
@@ -7,7 +7,6 @@ var irc = require('irc');
 var logger = require('winston');
 var Bot = rewire('../lib/bot');
 var SlackStub = require('./stubs/slack-stub');
-var ChannelStub = require('./stubs/channel-stub');
 var ClientStub = require('./stubs/irc-client-stub');
 var config = require('./fixtures/single-test-config.json');
 

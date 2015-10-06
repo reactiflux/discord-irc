@@ -1,6 +1,5 @@
-/* jshint expr: true */
+/* eslint no-unused-expressions: 0 */
 var chai = require('chai');
-var logger = require('winston');
 var sinon = require('sinon');
 var sinonChai = require('sinon-chai');
 var createBots = require('../lib/helpers').createBots;

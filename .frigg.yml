@@ -1,7 +1,7 @@
 tasks:
   - npm install
-  - make lint
-  - make cover
+  - npm run lint
+  - npm run coverage
 
 coverage:
   path: coverage/cobertura-coverage.xml
