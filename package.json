@@ -1,21 +1,21 @@
 {
-  "name": "slack-irc",
-  "version": "3.6.0",
-  "description": "Connects IRC and Slack channels by sending messages back and forth.",
+  "name": "discord-irc",
+  "version": "0.1.0",
+  "description": "Connects IRC and Discord channels by sending messages back and forth.",
   "keywords": [
-    "slack",
+    "discord",
     "irc",
     "gateway",
     "bot",
-    "slack-irc"
+    "discord-irc"
   ],
   "main": "index.js",
   "repository": {
     "type": "git",
-    "url": "git@github.com:ekmartin/slack-irc.git"
+    "url": "git@github.com:ekmartin/discord-irc.git"
   },
   "bugs": {
-    "url": "https://github.com/ekmartin/slack-irc/issues"
+    "url": "https://github.com/ekmartin/discord-irc/issues"
   },
   "scripts": {
     "start": "node index.js",
@@ -24,7 +24,7 @@
     "test": "npm run lint && npm run coverage"
   },
   "bin": {
-    "slack-irc": "./index.js"
+    "discord-irc": "./index.js"
   },
   "author": {
     "name": "Martin Ek <mail@ekmartin.no>"
@@ -35,11 +35,11 @@
     "commander": "~2.8.1",
     "irc": "~0.3.9",
     "lodash": "~3.9.3",
-    "slack-client": "~1.4.0",
     "winston": "~1.0.0"
   },
   "devDependencies": {
     "chai": "~2.3.0",
+    "discord.js": "~3.8.2",
     "eslint": "~1.6.0",
     "eslint-config-airbnb": "~0.1.0",
     "istanbul": "~0.3.5",

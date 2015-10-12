@@ -26,4 +26,4 @@ node_modules
 # Environment variables and configuration
 .env
 .environment
-/*.json
+config.json
