@@ -1,21 +1,21 @@
 /* eslint no-unused-expressions: 0 */
-var chai = require('chai');
-var sinon = require('sinon');
-var sinonChai = require('sinon-chai');
-var irc = require('irc');
-var logger = require('winston');
-var discord = require('discord.js');
-var Bot = require('../lib/bot');
-var DiscordStub = require('./stubs/discord-stub');
-var ClientStub = require('./stubs/irc-client-stub');
-var config = require('./fixtures/single-test-config.json');
+import chai from 'chai';
+import sinon from 'sinon';
+import sinonChai from 'sinon-chai';
+import irc from 'irc';
+import logger from 'winston';
+import discord from 'discord.js';
+import Bot from '../lib/bot';
+import DiscordStub from './stubs/discord-stub';
+import ClientStub from './stubs/irc-client-stub';
+import config from './fixtures/single-test-config.json';
 
 chai.should();
 chai.use(sinonChai);
 
 describe('Bot', function() {
-  var discordChannel = DiscordStub.prototype.getChannel();
-  var sandbox = sinon.sandbox.create({
+  const discordChannel = DiscordStub.prototype.getChannel();
+  const sandbox = sinon.sandbox.create({
     useFakeTimers: false,
     useFakeServer: false
   });
@@ -43,17 +43,17 @@ describe('Bot', function() {
   });
 
   it('should send correctly formatted messages to discord', function() {
-    var username = 'testuser';
-    var text = 'test message';
-    var formatted = '**<' + username + '>** ' + text;
+    const username = 'testuser';
+    const text = 'test message';
+    const formatted = '**<' + username + '>** ' + text;
     this.bot.sendToDiscord(username, '#irc', text);
     DiscordStub.prototype.sendMessage.should.have.been.calledWith(discordChannel, formatted);
   });
 
   it('should lowercase channel names before sending to discord', function() {
-    var username = 'testuser';
-    var text = 'test message';
-    var formatted = '**<' + username + '>** ' + text;
+    const username = 'testuser';
+    const text = 'test message';
+    const formatted = '**<' + username + '>** ' + text;
     this.bot.sendToDiscord(username, '#IRC', text);
     DiscordStub.prototype.sendMessage.should.have.been.calledWith(discordChannel, formatted);
   });
@@ -65,8 +65,8 @@ describe('Bot', function() {
   });
 
   it('should send correct messages to irc', function() {
-    var text = 'testmessage';
-    var message = {
+    const text = 'testmessage';
+    const message = {
       content: text,
       mentions: [],
       channel: {
@@ -79,12 +79,12 @@ describe('Bot', function() {
     };
 
     this.bot.sendToIRC(message);
-    var ircText = '<' + message.author.username + '> ' + text;
+    const ircText = '<' + message.author.username + '> ' + text;
     ClientStub.prototype.say.should.have.been.calledWith('#irc', ircText);
   });
 
   it('should not send its own messages to irc', function() {
-    var message = {
+    const message = {
       author: {
         username: 'bot',
         id: this.bot.discord.user.id
@@ -97,7 +97,7 @@ describe('Bot', function() {
 
   it('should not send messages to irc if the channel isn\'t in the channel mapping',
   function() {
-    var message = {
+    const message = {
       channel: {
         name: 'wrongdiscord'
       },
@@ -112,8 +112,8 @@ describe('Bot', function() {
   });
 
   it('should parse text from discord when sending messages', function() {
-    var text = '<#1234>';
-    var message = {
+    const text = '<#1234>';
+    const message = {
       content: text,
       mentions: [],
       channel: {
@@ -130,7 +130,7 @@ describe('Bot', function() {
   });
 
   it('should convert user mentions from discord', function() {
-    var message = {
+    const message = {
       mentions: [{
         id: 123,
         username: 'testuser'
@@ -142,7 +142,7 @@ describe('Bot', function() {
   });
 
   it('should convert newlines from discord', function() {
-    var message = {
+    const message = {
       mentions: [],
       content: 'hi\nhi\r\nhi\r'
     };
@@ -151,8 +151,8 @@ describe('Bot', function() {
   });
 
   it('should hide usernames for commands', function() {
-    var text = '!test command';
-    var message = {
+    const text = '!test command';
+    const message = {
       content: text,
       mentions: [],
       channel: {

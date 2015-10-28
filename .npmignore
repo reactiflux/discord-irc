@@ -28,5 +28,6 @@ node_modules
 .environment
 config.json
 
-# Build
-dist/
+# Ignore everything except build:
+lib/
+test/

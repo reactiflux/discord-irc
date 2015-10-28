@@ -1,11 +1,11 @@
-var chai = require('chai');
-var errors = require('../lib/errors');
+import chai from 'chai';
+import { ConfigurationError } from '../lib/errors';
 
 chai.should();
 
-describe('Errors', function() {
-  it('should have a configuration error', function() {
-    var error = new errors.ConfigurationError();
+describe('Errors', () => {
+  it('should have a configuration error', () => {
+    const error = new ConfigurationError();
     error.message.should.equal('Invalid configuration file given');
     error.should.be.an.instanceof(Error);
   });
