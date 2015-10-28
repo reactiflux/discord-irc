@@ -1,22 +1,22 @@
-var util = require('util');
-var events = require('events');
-var sinon = require('sinon');
+import events from 'events';
+import sinon from 'sinon';
 
-function DiscordStub() {
-  this.user = {
+class DiscordStub extends events.EventEmitter {
+  user = {
     id: 'testid'
-  };
+  }
+
+  getChannel(key, value) {
+    if (key === 'name' && value !== 'discord') return null;
+    return {
+      name: 'discord',
+      id: 1234
+    };
+  }
+
+  login() {
+    return sinon.stub();
+  }
 }
-util.inherits(DiscordStub, events.EventEmitter);
 
-DiscordStub.prototype.getChannel = function(key, value) {
-  if (key === 'name' && value !== 'discord') return null;
-  return {
-    name: 'discord',
-    id: 1234
-  };
-};
-
-DiscordStub.prototype.login = sinon.stub();
-
-module.exports = DiscordStub;
+export default DiscordStub;

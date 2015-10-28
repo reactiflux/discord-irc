@@ -1,20 +1,20 @@
-/* eslint no-unused-expressions: 0 */
-var chai = require('chai');
-var sinonChai = require('sinon-chai');
-var sinon = require('sinon');
-var irc = require('irc');
-var discord = require('discord.js');
-var logger = require('winston');
-var Bot = require('../lib/bot');
-var DiscordStub = require('./stubs/discord-stub');
-var ClientStub = require('./stubs/irc-client-stub');
-var config = require('./fixtures/single-test-config.json');
+/* eslint-disable no-unused-expressions */
+import chai from 'chai';
+import sinonChai from 'sinon-chai';
+import sinon from 'sinon';
+import irc from 'irc';
+import discord from 'discord.js';
+import logger from 'winston';
+import Bot from '../lib/bot';
+import DiscordStub from './stubs/discord-stub';
+import ClientStub from './stubs/irc-client-stub';
+import config from './fixtures/single-test-config.json';
 
 chai.should();
 chai.use(sinonChai);
 
 describe('Bot Events', function() {
-  var sandbox = sinon.sandbox.create({
+  const sandbox = sinon.sandbox.create({
     useFakeTimers: false,
     useFakeServer: false
   });
@@ -45,13 +45,15 @@ describe('Bot Events', function() {
   it('should try to send autoSendCommands on registered IRC event', function() {
     this.bot.ircClient.emit('registered');
     ClientStub.prototype.send.should.have.been.calledTwice;
-    ClientStub.prototype.send.getCall(0).args.should.deep.equal(config.autoSendCommands[0]);
-    ClientStub.prototype.send.getCall(1).args.should.deep.equal(config.autoSendCommands[1]);
+    ClientStub.prototype.send.getCall(0)
+      .args.should.deep.equal(config.autoSendCommands[0]);
+    ClientStub.prototype.send.getCall(1)
+      .args.should.deep.equal(config.autoSendCommands[1]);
   });
 
   it('should error log on error events', function() {
-    var discordError = new Error('discord');
-    var ircError = new Error('irc');
+    const discordError = new Error('discord');
+    const ircError = new Error('irc');
     this.bot.discord.emit('error', discordError);
     this.bot.ircClient.emit('error', ircError);
     this.errorSpy.getCall(0).args[0].should.equal('Received error event from Discord');
@@ -61,66 +63,67 @@ describe('Bot Events', function() {
   });
 
   it('should send messages to irc if correct', function() {
-    var message = {
+    const message = {
       type: 'message'
     };
+
     this.bot.discord.emit('message', message);
     this.bot.sendToIRC.should.have.been.calledWithExactly(message);
   });
 
   it('should send messages to discord', function() {
-    var channel = '#channel';
-    var author = 'user';
-    var text = 'hi';
+    const channel = '#channel';
+    const author = 'user';
+    const text = 'hi';
     this.bot.ircClient.emit('message', author, channel, text);
     this.bot.sendToDiscord.should.have.been.calledWithExactly(author, channel, text);
   });
 
   it('should send notices to discord', function() {
-    var channel = '#channel';
-    var author = 'user';
-    var text = 'hi';
-    var formattedText = '*' + text + '*';
+    const channel = '#channel';
+    const author = 'user';
+    const text = 'hi';
+    const formattedText = `*${text}*`;
     this.bot.ircClient.emit('notice', author, channel, text);
     this.bot.sendToDiscord.should.have.been.calledWithExactly(author, channel, formattedText);
   });
 
   it('should send actions to discord', function() {
-    var channel = '#channel';
-    var author = 'user';
-    var text = 'hi';
-    var formattedText = '_hi_';
-    var message = {};
+    const channel = '#channel';
+    const author = 'user';
+    const text = 'hi';
+    const formattedText = '_hi_';
+    const message = {};
     this.bot.ircClient.emit('action', author, channel, text, message);
     this.bot.sendToDiscord.should.have.been.calledWithExactly(author, channel, formattedText);
   });
 
   it('should join channels when invited', function() {
-    var channel = '#irc';
-    var author = 'user';
+    const channel = '#irc';
+    const author = 'user';
     this.bot.ircClient.emit('invite', channel, author);
-    var firstCall = this.debugSpy.getCall(1);
+    const firstCall = this.debugSpy.getCall(1);
     firstCall.args[0].should.equal('Received invite:');
     firstCall.args[1].should.equal(channel);
     firstCall.args[2].should.equal(author);
 
     ClientStub.prototype.join.should.have.been.calledWith(channel);
-    var secondCall = this.debugSpy.getCall(2);
+    const secondCall = this.debugSpy.getCall(2);
     secondCall.args[0].should.equal('Joining channel:');
     secondCall.args[1].should.equal(channel);
   });
 
   it('should not join channels that aren\'t in the channel mapping', function() {
-    var channel = '#wrong';
-    var author = 'user';
+    const channel = '#wrong';
+    const author = 'user';
     this.bot.ircClient.emit('invite', channel, author);
-    var firstCall = this.debugSpy.getCall(1);
+    const firstCall = this.debugSpy.getCall(1);
     firstCall.args[0].should.equal('Received invite:');
     firstCall.args[1].should.equal(channel);
     firstCall.args[2].should.equal(author);
 
     ClientStub.prototype.join.should.not.have.been.called;
-    var secondCall = this.debugSpy.getCall(2);
+    const secondCall = this.debugSpy.getCall(2);
     secondCall.args[0].should.equal('Channel not found in config, not joining:');
     secondCall.args[1].should.equal(channel);
   });

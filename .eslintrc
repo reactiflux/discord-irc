@@ -1,10 +1,15 @@
 {
-  "extends": "airbnb/legacy",
+  "extends": "airbnb/base",
   "rules": {
     "func-names": 0,
     "vars-on-top": 0,
     "id-length": 0,
-    "comma-dangle": [2, "never"]
+    "comma-dangle": [2, "never"],
+    "object-curly-spacing": [2, "always"],
+    "prefer-spread": 2,
+    "constructor-super": 2,
+    "arrow-spacing": [2, { "before": true, "after": true }],
+    "spaced-comment": 0 // disable because of hashbang bug
   },
   "env": {
     "mocha": true,

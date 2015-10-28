@@ -1,24 +1,24 @@
-var chai = require('chai');
-var irc = require('irc');
-var discord = require('discord.js');
-var ConfigurationError = require('../lib/errors').ConfigurationError;
-var validateChannelMapping = require('../lib/validators').validateChannelMapping;
-var Bot = require('../lib/bot');
-var config = require('./fixtures/single-test-config.json');
-var caseConfig = require('./fixtures/case-sensitivity-config.json');
-var DiscordStub = require('./stubs/discord-stub');
-var ClientStub = require('./stubs/irc-client-stub');
+import chai from 'chai';
+import irc from 'irc';
+import discord from 'discord.js';
+import Bot from '../lib/bot';
+import config from './fixtures/single-test-config.json';
+import caseConfig from './fixtures/case-sensitivity-config.json';
+import DiscordStub from './stubs/discord-stub';
+import ClientStub from './stubs/irc-client-stub';
+import { validateChannelMapping } from '../lib/validators';
+import { ConfigurationError } from '../lib/errors';
 
 chai.should();
 
-describe('Channel Mapping', function() {
-  before(function() {
+describe('Channel Mapping', () => {
+  before(() => {
     irc.Client = ClientStub;
     discord.Client = DiscordStub;
   });
 
-  it('should fail when not given proper JSON', function() {
-    var wrongMapping = 'not json';
+  it('should fail when not given proper JSON', () => {
+    const wrongMapping = 'not json';
     function wrap() {
       validateChannelMapping(wrongMapping);
     }
@@ -26,8 +26,8 @@ describe('Channel Mapping', function() {
     (wrap).should.throw(ConfigurationError, /Invalid channel mapping given/);
   });
 
-  it('should not fail if given a proper channel list as JSON', function() {
-    var correctMapping = { '#channel': '#otherchannel' };
+  it('should not fail if given a proper channel list as JSON', () => {
+    const correctMapping = { '#channel': '#otherchannel' };
     function wrap() {
       validateChannelMapping(correctMapping);
     }
@@ -35,15 +35,15 @@ describe('Channel Mapping', function() {
     (wrap).should.not.throw();
   });
 
-  it('should clear channel keys from the mapping', function() {
-    var bot = new Bot(config);
+  it('should clear channel keys from the mapping', () => {
+    const bot = new Bot(config);
     bot.channelMapping['#discord'].should.equal('#irc');
     bot.invertedMapping['#irc'].should.equal('#discord');
     bot.channels[0].should.equal('#irc channelKey');
   });
 
-  it('should lowercase IRC channel names', function() {
-    var bot = new Bot(caseConfig);
+  it('should lowercase IRC channel names', () => {
+    const bot = new Bot(caseConfig);
     bot.channelMapping['#discord'].should.equal('#irc');
     bot.channelMapping['#otherDiscord'].should.equal('#otherirc');
   });
