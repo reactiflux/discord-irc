@@ -1,13 +1,15 @@
 {
-  "nickname": "test",
-  "server": "irc.bottest.org",
-  "token": "testtoken",
+  "nickname": "Reactiflux",
+  "server": "irc.freenode.net",
+  "discordEmail": "discord@test.com",
+  "discordPassword": "whatapassword",
   "commandCharacters": ["!", "."],
   "autoSendCommands": [
     ["MODE", "test", "+x"],
     ["AUTH", "test", "password"]
   ],
   "channelMapping": {
-    "#slack": "#irc channelKey"
+    "#discord": "#irc channelKey",
+    "#notinchannel": "#otherIRC"
   }
 }

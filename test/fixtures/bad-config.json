@@ -3,7 +3,7 @@
     "server": "irc.bottest.org",
     "token": "hei",
     "channelMapping": {
-      "#slack": "#irc"
+      "#discord": "#irc"
     }
   }
 ]

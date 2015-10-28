@@ -1,19 +1,20 @@
 [
   {
     "nickname": "test",
-    "server": "irc.bottest.org",
-    "token": "testtoken",
+    "server": "irc.freenode.net",
+    "discordEmail": "discord@test.com",
+    "discordPassword": "whatapassword",
     "channelMapping": {
-      "#slack": "#irc"
+      "#discord": "#irc"
     }
   },
   {
     "nickname": "test2",
-    "server": "irc.bottest.org",
-    "token": "testtoken",
+    "server": "irc.freenode.net",
+    "discordEmail": "discord@test.com",
+    "discordPassword": "whatapassword",
     "channelMapping": {
-      "#slack": "#irc"
+      "#discord": "#irc"
     }
   }
 ]
-

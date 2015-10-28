@@ -2,11 +2,11 @@
 var chai = require('chai');
 var sinonChai = require('sinon-chai');
 var sinon = require('sinon');
-var rewire = require('rewire');
 var irc = require('irc');
+var discord = require('discord.js');
 var logger = require('winston');
-var Bot = rewire('../lib/bot');
-var SlackStub = require('./stubs/slack-stub');
+var Bot = require('../lib/bot');
+var DiscordStub = require('./stubs/discord-stub');
 var ClientStub = require('./stubs/irc-client-stub');
 var config = require('./fixtures/single-test-config.json');
 
@@ -14,31 +14,32 @@ chai.should();
 chai.use(sinonChai);
 
 describe('Bot Events', function() {
-  before(function() {
-    this.infoSpy = sinon.spy(logger, 'info');
-    this.debugSpy = sinon.spy(logger, 'debug');
-    this.errorSpy = sinon.spy(logger, 'error');
+  var sandbox = sinon.sandbox.create({
+    useFakeTimers: false,
+    useFakeServer: false
+  });
+
+  beforeEach(function() {
+    this.infoSpy = sandbox.stub(logger, 'info');
+    this.debugSpy = sandbox.stub(logger, 'debug');
+    this.errorSpy = sandbox.stub(logger, 'error');
     irc.Client = ClientStub;
-    Bot.__set__('Slack', SlackStub);
-    Bot.prototype.sendToIRC = sinon.stub();
-    Bot.prototype.sendToSlack = sinon.stub();
+    discord.Client = DiscordStub;
+    ClientStub.prototype.send = sandbox.stub();
+    ClientStub.prototype.join = sandbox.stub();
     this.bot = new Bot(config);
+    this.bot.sendToIRC = sandbox.stub();
+    this.bot.sendToDiscord = sandbox.stub();
     this.bot.connect();
   });
 
   afterEach(function() {
-    Bot.prototype.sendToIRC.reset();
-    Bot.prototype.sendToSlack.reset();
-    ClientStub.prototype.send.reset();
-    ClientStub.prototype.join.reset();
-    this.infoSpy.reset();
-    this.debugSpy.reset();
-    this.errorSpy.reset();
+    sandbox.restore();
   });
 
-  it('should log on slack open event', function() {
-    this.bot.slack.emit('open');
-    this.debugSpy.should.have.been.calledWithExactly('Connected to Slack');
+  it('should log on discord ready event', function() {
+    this.bot.discord.emit('ready');
+    this.debugSpy.should.have.been.calledWithExactly('Connected to Discord');
   });
 
   it('should try to send autoSendCommands on registered IRC event', function() {
@@ -49,12 +50,12 @@ describe('Bot Events', function() {
   });
 
   it('should error log on error events', function() {
-    var slackError = new Error('slack');
+    var discordError = new Error('discord');
     var ircError = new Error('irc');
-    this.bot.slack.emit('error', slackError);
+    this.bot.discord.emit('error', discordError);
     this.bot.ircClient.emit('error', ircError);
-    this.errorSpy.getCall(0).args[0].should.equal('Received error event from Slack');
-    this.errorSpy.getCall(0).args[1].should.equal(slackError);
+    this.errorSpy.getCall(0).args[0].should.equal('Received error event from Discord');
+    this.errorSpy.getCall(0).args[1].should.equal(discordError);
     this.errorSpy.getCall(1).args[0].should.equal('Received error event from IRC');
     this.errorSpy.getCall(1).args[1].should.equal(ircError);
   });
@@ -63,65 +64,48 @@ describe('Bot Events', function() {
     var message = {
       type: 'message'
     };
-    this.bot.slack.emit('message', message);
-    Bot.prototype.sendToIRC.should.have.been.calledWithExactly(message);
+    this.bot.discord.emit('message', message);
+    this.bot.sendToIRC.should.have.been.calledWithExactly(message);
   });
 
-  it('should not send messages to irc if the type isn\'t message', function() {
-    var message = {
-      type: 'notmessage'
-    };
-    this.bot.slack.emit('message', message);
-    Bot.prototype.sendToIRC.should.have.not.have.been.called;
-  });
-
-  it('should not send messages to irc if it has an invalid subtype', function() {
-    var message = {
-      type: 'message',
-      subtype: 'bot_message'
-    };
-    this.bot.slack.emit('message', message);
-    Bot.prototype.sendToIRC.should.have.not.have.been.called;
-  });
-
-  it('should send messages to slack', function() {
+  it('should send messages to discord', function() {
     var channel = '#channel';
     var author = 'user';
     var text = 'hi';
     this.bot.ircClient.emit('message', author, channel, text);
-    Bot.prototype.sendToSlack.should.have.been.calledWithExactly(author, channel, text);
+    this.bot.sendToDiscord.should.have.been.calledWithExactly(author, channel, text);
   });
 
-  it('should send notices to slack', function() {
+  it('should send notices to discord', function() {
     var channel = '#channel';
     var author = 'user';
     var text = 'hi';
     var formattedText = '*' + text + '*';
     this.bot.ircClient.emit('notice', author, channel, text);
-    Bot.prototype.sendToSlack.should.have.been.calledWithExactly(author, channel, formattedText);
+    this.bot.sendToDiscord.should.have.been.calledWithExactly(author, channel, formattedText);
   });
 
-  it('should send actions to slack', function() {
+  it('should send actions to discord', function() {
     var channel = '#channel';
     var author = 'user';
     var text = 'hi';
     var formattedText = '_hi_';
     var message = {};
     this.bot.ircClient.emit('action', author, channel, text, message);
-    Bot.prototype.sendToSlack.should.have.been.calledWithExactly(author, channel, formattedText);
+    this.bot.sendToDiscord.should.have.been.calledWithExactly(author, channel, formattedText);
   });
 
   it('should join channels when invited', function() {
     var channel = '#irc';
     var author = 'user';
     this.bot.ircClient.emit('invite', channel, author);
-    var firstCall = this.debugSpy.getCall(0);
+    var firstCall = this.debugSpy.getCall(1);
     firstCall.args[0].should.equal('Received invite:');
     firstCall.args[1].should.equal(channel);
     firstCall.args[2].should.equal(author);
 
     ClientStub.prototype.join.should.have.been.calledWith(channel);
-    var secondCall = this.debugSpy.getCall(1);
+    var secondCall = this.debugSpy.getCall(2);
     secondCall.args[0].should.equal('Joining channel:');
     secondCall.args[1].should.equal(channel);
   });
@@ -130,13 +114,13 @@ describe('Bot Events', function() {
     var channel = '#wrong';
     var author = 'user';
     this.bot.ircClient.emit('invite', channel, author);
-    var firstCall = this.debugSpy.getCall(0);
+    var firstCall = this.debugSpy.getCall(1);
     firstCall.args[0].should.equal('Received invite:');
     firstCall.args[1].should.equal(channel);
     firstCall.args[2].should.equal(author);
 
     ClientStub.prototype.join.should.not.have.been.called;
-    var secondCall = this.debugSpy.getCall(1);
+    var secondCall = this.debugSpy.getCall(2);
     secondCall.args[0].should.equal('Channel not found in config, not joining:');
     secondCall.args[1].should.equal(channel);
   });

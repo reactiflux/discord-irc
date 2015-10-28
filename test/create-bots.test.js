@@ -52,7 +52,7 @@ describe('Create Bots', function() {
     (wrap).should.throw(ConfigurationError);
   });
 
-  it('should be possible to run it through require(\'slack-irc\')', function() {
+  it('should be possible to run it through require(\'discord-irc\')', function() {
     var bots = index(singleTestConfig);
     bots.length.should.equal(1);
     this.connectStub.should.have.been.called;
