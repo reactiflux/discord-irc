@@ -4,6 +4,9 @@
 
 A mostly feature complete port of [slack-irc](https://github.com/ekmartin/slack-irc).
 
+## Example
+![discord-irc](http://i.imgur.com/oI6iCrf.gif)
+
 ## Installation and usage
 Either by installing through npm:
 ```bash
@@ -16,13 +19,14 @@ or by cloning the repository:
 ```bash
 In the repository folder:
 $ npm install
-$ node index.js --config /path/to/config.json
+$ npm run build # Transpile ES6 to ES5 using Babel
+$ npm start -- --config /path/to/config.json # Note the extra double dash
 ```
 
-It can also be used as a node module:
+It can also be used as a module:
 ```js
-var discordIRC = require('discord-irc');
-var config = require('./config.json');
+import discordIRC from 'discord-irc';
+import config from './config.json';
 discordIRC(config);
 ```
 
@@ -68,7 +72,7 @@ Create a discord user and join the server you want to connect to IRC.
 ]
 ```
 
-`ircOptions` is passed directly to node-irc ([available options](http://node-irc.readthedocs.org/en/latest/API.html#irc.Client)).
+The `ircOptions` object is passed directly to node-irc ([available options](http://node-irc.readthedocs.org/en/latest/API.html#irc.Client)).
 
 ## Tests
 Run the tests with:
