@@ -2,8 +2,8 @@
 var chai = require('chai');
 var sinon = require('sinon');
 var sinonChai = require('sinon-chai');
-var rewire = require('rewire');
-var cli = rewire('../lib/cli');
+var helpers = require('../lib/helpers');
+var cli = require('../lib/cli');
 var testConfig = require('./fixtures/test-config.json');
 var singleTestConfig = require('./fixtures/single-test-config.json');
 
@@ -11,13 +11,17 @@ chai.should();
 chai.use(sinonChai);
 
 describe('CLI', function() {
-  before(function() {
-    this.createBotsStub = sinon.stub();
-    cli.__set__('createBots', this.createBotsStub);
+  var sandbox = sinon.sandbox.create({
+    useFakeTimers: false,
+    useFakeServer: false
+  });
+
+  beforeEach(function() {
+    this.createBotsStub = sandbox.stub(helpers, 'createBots');
   });
 
   afterEach(function() {
-    this.createBotsStub.reset();
+    sandbox.restore();
   });
 
   it('should be possible to give the config as an env var', function() {

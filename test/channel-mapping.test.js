@@ -1,12 +1,12 @@
 var chai = require('chai');
-var rewire = require('rewire');
 var irc = require('irc');
+var discord = require('discord.js');
 var ConfigurationError = require('../lib/errors').ConfigurationError;
 var validateChannelMapping = require('../lib/validators').validateChannelMapping;
-var Bot = rewire('../lib/bot');
+var Bot = require('../lib/bot');
 var config = require('./fixtures/single-test-config.json');
 var caseConfig = require('./fixtures/case-sensitivity-config.json');
-var SlackStub = require('./stubs/slack-stub');
+var DiscordStub = require('./stubs/discord-stub');
 var ClientStub = require('./stubs/irc-client-stub');
 
 chai.should();
@@ -14,7 +14,7 @@ chai.should();
 describe('Channel Mapping', function() {
   before(function() {
     irc.Client = ClientStub;
-    Bot.__set__('Slack', SlackStub);
+    discord.Client = DiscordStub;
   });
 
   it('should fail when not given proper JSON', function() {
@@ -37,14 +37,14 @@ describe('Channel Mapping', function() {
 
   it('should clear channel keys from the mapping', function() {
     var bot = new Bot(config);
-    bot.channelMapping['#slack'].should.equal('#irc');
-    bot.invertedMapping['#irc'].should.equal('#slack');
+    bot.channelMapping['#discord'].should.equal('#irc');
+    bot.invertedMapping['#irc'].should.equal('#discord');
     bot.channels[0].should.equal('#irc channelKey');
   });
 
   it('should lowercase IRC channel names', function() {
     var bot = new Bot(caseConfig);
-    bot.channelMapping['#slack'].should.equal('#irc');
-    bot.channelMapping['#OtherSlack'].should.equal('#otherirc');
+    bot.channelMapping['#discord'].should.equal('#irc');
+    bot.channelMapping['#otherDiscord'].should.equal('#otherirc');
   });
 });
