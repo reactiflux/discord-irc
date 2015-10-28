@@ -2,12 +2,7 @@
 
 > Connects [Discord](https://discordapp.com/) and IRC channels by sending messages back and forth.
 
-This is a work in progress port of [slack-irc](https://github.com/ekmartin/slack-irc).
-
-TODO:
- - [x] Port base functionality (two-way communication)
- - [ ] Port formatting transformers
- - [ ] Port tests
+A mostly feature complete port of [slack-irc](https://github.com/ekmartin/slack-irc).
 
 ## Installation and usage
 Either by installing through npm:
