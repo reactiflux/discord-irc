@@ -1,6 +1,10 @@
 # Changelog
 This project adheres to [Semantic Versioning](http://semver.org/).
 
+## [0.3.0] - 2015-10-28
+### Changed
+- Rewrote everything to ES6.
+
 ## [0.2.0] - 2015-10-28
 ### Added
 - Support for channel and username highlights from Discord to IRC.
