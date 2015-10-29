@@ -15,13 +15,17 @@ chai.should();
 chai.use(sinonChai);
 
 describe('Create Bots', function() {
-  before(function() {
-    this.connectStub = sinon.stub();
-    Bot.prototype.connect = this.connectStub;
+  const sandbox = sinon.sandbox.create({
+    useFakeTimers: false,
+    useFakeServer: false
+  });
+
+  beforeEach(function() {
+    this.connectStub = sandbox.stub(Bot.prototype, 'connect');
   });
 
   afterEach(function() {
-    this.connectStub.reset();
+    sandbox.restore();
   });
 
   it('should work when given an array of configs', function() {
