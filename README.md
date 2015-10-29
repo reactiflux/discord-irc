@@ -1,4 +1,4 @@
-# discord-irc
+# discord-irc ![Build status](https://ci.frigg.io/badges/reactiflux/discord-irc/)](https://ci.frigg.io/reactiflux/discord-irc/last/) [![Coverage status](https://ci.frigg.io/badges/coverage/reactiflux/discord-irc/)](https://ci.frigg.io/reactiflux/discord-irc/last/)
 
 > Connects [Discord](https://discordapp.com/) and IRC channels by sending messages back and forth.
 
