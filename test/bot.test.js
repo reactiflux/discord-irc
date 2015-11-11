@@ -79,8 +79,9 @@ describe('Bot', function() {
     };
 
     this.bot.sendToIRC(message);
-    const ircText = '<' + message.author.username + '> ' + text;
-    ClientStub.prototype.say.should.have.been.calledWith('#irc', ircText);
+    // Wrap in colors:
+    const expected = `<\u000304${message.author.username}\u000f> ${text}`;
+    ClientStub.prototype.say.should.have.been.calledWith('#irc', expected);
   });
 
   it('should not send its own messages to irc', function() {
@@ -125,8 +126,11 @@ describe('Bot', function() {
       }
     };
 
+    // Wrap it in colors:
+    const expected = `<\u000312${message.author.username}\u000f> #${message.channel.name}`;
     this.bot.sendToIRC(message);
-    ClientStub.prototype.say.should.have.been.calledWith('#irc', '<test> #discord');
+    ClientStub.prototype.say
+      .should.have.been.calledWith('#irc', expected);
   });
 
   it('should convert user mentions from discord', function() {
