@@ -1,6 +1,10 @@
 # Changelog
 This project adheres to [Semantic Versioning](http://semver.org/).
 
+## [0.4.0] - 2015-11-11
+### Added
+- Colors to IRC nicks.
+
 ## [0.3.0] - 2015-10-28
 ### Changed
 - Rewrote everything to ES6.
