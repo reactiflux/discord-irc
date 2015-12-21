@@ -6,7 +6,7 @@ import irc from 'irc';
 import logger from 'winston';
 import discord from 'discord.js';
 import Bot from '../lib/bot';
-import DiscordStub from './stubs/discord-stub';
+import DiscordStub, { getChannel } from './stubs/discord-stub';
 import ClientStub from './stubs/irc-client-stub';
 import config from './fixtures/single-test-config.json';
 
@@ -14,7 +14,7 @@ chai.should();
 chai.use(sinonChai);
 
 describe('Bot', function() {
-  const discordChannel = DiscordStub.prototype.getChannel();
+  const discordChannel = getChannel();
   const sandbox = sinon.sandbox.create({
     useFakeTimers: false,
     useFakeServer: false
