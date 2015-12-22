@@ -9,7 +9,10 @@
     "prefer-spread": 2,
     "constructor-super": 2,
     "arrow-spacing": [2, { "before": true, "after": true }],
-    "spaced-comment": 0 // disable because of hashbang bug
+    "space-before-function-paren": 0
+  },
+  "ecmaFeatures": {
+    "experimentalObjectRestSpread": true
   },
   "env": {
     "mocha": true,

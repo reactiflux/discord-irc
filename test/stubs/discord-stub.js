@@ -10,12 +10,15 @@ export function getChannel(key, value) {
 }
 
 class DiscordStub extends events.EventEmitter {
-  user = {
-    id: 'testid'
-  }
+  constructor() {
+    super();
+    this.user = {
+      id: 'testid'
+    };
 
-  channels = {
-    get: getChannel
+    this.channels = {
+      get: getChannel
+    };
   }
 
   login() {
