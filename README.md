@@ -43,7 +43,7 @@ Create a discord user and join the server you want to connect to IRC.
     "discordEmail": "user@mail.com",
     "discordPassword": "letmein123",
     "channelMapping": {
-      "#other-discord": "#new-irc-channel"
+      "DiscordServerName,#other-discord": "#new-irc-channel"
     }
   },
 
@@ -59,7 +59,7 @@ Create a discord user and join the server you want to connect to IRC.
       ["AUTH", "test", "password"]
     ],
     "channelMapping": { // Maps each Discord-channel to an IRC-channel, used to direct messages to the correct place
-      "#discord": "#irc channel-password" // Add channel keys after the channel name
+      "DiscordServerName,#discord": "#irc channel-password" // Add channel keys after the channel name
     },
     "ircOptions": { // Optional node-irc options
       "floodProtection": false, // On by default
