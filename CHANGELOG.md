@@ -1,6 +1,11 @@
 # Changelog
 This project adheres to [Semantic Versioning](http://semver.org/).
 
+## [0.4.1] - 2015-12-22
+### Changed
+- Comments are now stripped from JSON configs before they're parsed.
+- Upgraded dependencies.
+
 ## [0.4.0] - 2015-11-11
 ### Added
 - Colors to IRC nicks.
