@@ -65,7 +65,7 @@ Create a discord user and join the server you want to connect to IRC.
       "floodProtection": false, // On by default
       "floodProtectionDelay": 1000, // 500 by default
     },
-    ircNickColor: false, // Gives usernames a color in IRC for better readability (off by default)
+    "ircNickColor": false, // Gives usernames a color in IRC for better readability (on by default)
     // Makes the bot hide the username prefix for messages that start
     // with one of these characters (commands):
     "commandCharacters": ["!", "."]
