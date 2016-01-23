@@ -1,7 +1,7 @@
 # Changelog
 This project adheres to [Semantic Versioning](http://semver.org/).
 
-## [0.4.2] - 2016-01-23
+## [0.4.3] - 2016-01-23
 ### Fixed
 - Upgraded dependencies.
 - istanbul -> nyc for coverage.
