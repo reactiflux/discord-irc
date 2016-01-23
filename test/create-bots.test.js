@@ -1,4 +1,4 @@
-/* eslint no-unused-expressions: 0 */
+/* eslint-disable no-unused-expressions, prefer-arrow-callback */
 import chai from 'chai';
 import sinon from 'sinon';
 import sinonChai from 'sinon-chai';
@@ -9,7 +9,6 @@ import singleTestConfig from './fixtures/single-test-config.json';
 import badConfig from './fixtures/bad-config.json';
 import stringConfig from './fixtures/string-config.json';
 import { createBots } from '../lib/helpers';
-import { ConfigurationError } from '../lib/errors';
 
 chai.should();
 chai.use(sinonChai);
@@ -45,7 +44,7 @@ describe('Create Bots', function() {
       createBots(badConfig);
     }
 
-    (wrap).should.throw(ConfigurationError, 'Missing configuration field nickname');
+    (wrap).should.throw('Missing configuration field nickname');
   });
 
   it('should throw if a configuration file is neither an object or an array', function() {
@@ -53,7 +52,7 @@ describe('Create Bots', function() {
       createBots(stringConfig);
     }
 
-    (wrap).should.throw(ConfigurationError);
+    (wrap).should.throw('Invalid configuration file given');
   });
 
   it('should be possible to run it through require(\'discord-irc\')', function() {

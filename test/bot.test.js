@@ -1,4 +1,4 @@
-/* eslint no-unused-expressions: 0 */
+/* eslint-disable no-unused-expressions, prefer-arrow-callback */
 import chai from 'chai';
 import sinon from 'sinon';
 import sinonChai from 'sinon-chai';
@@ -45,7 +45,7 @@ describe('Bot', function() {
   it('should send correctly formatted messages to discord', function() {
     const username = 'testuser';
     const text = 'test message';
-    const formatted = '**<' + username + '>** ' + text;
+    const formatted = `**<${username}>** ${text}`;
     this.bot.sendToDiscord(username, '#irc', text);
     DiscordStub.prototype.sendMessage.should.have.been.calledWith(discordChannel, formatted);
   });
@@ -53,7 +53,7 @@ describe('Bot', function() {
   it('should lowercase channel names before sending to discord', function() {
     const username = 'testuser';
     const text = 'test message';
-    const formatted = '**<' + username + '>** ' + text;
+    const formatted = `**<${username}>** ${text}`;
     this.bot.sendToDiscord(username, '#IRC', text);
     DiscordStub.prototype.sendMessage.should.have.been.calledWith(discordChannel, formatted);
   });

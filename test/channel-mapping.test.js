@@ -7,7 +7,6 @@ import caseConfig from './fixtures/case-sensitivity-config.json';
 import DiscordStub from './stubs/discord-stub';
 import ClientStub from './stubs/irc-client-stub';
 import { validateChannelMapping } from '../lib/validators';
-import { ConfigurationError } from '../lib/errors';
 
 chai.should();
 
@@ -23,7 +22,7 @@ describe('Channel Mapping', () => {
       validateChannelMapping(wrongMapping);
     }
 
-    (wrap).should.throw(ConfigurationError, /Invalid channel mapping given/);
+    (wrap).should.throw('Invalid channel mapping given');
   });
 
   it('should not fail if given a proper channel list as JSON', () => {

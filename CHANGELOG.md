@@ -1,6 +1,11 @@
 # Changelog
 This project adheres to [Semantic Versioning](http://semver.org/).
 
+## [0.4.2] - 2016-01-23
+### Fixed
+- Upgraded dependencies.
+- istanbul -> nyc for coverage.
+
 ## [0.4.1] - 2015-12-22
 ### Changed
 - Comments are now stripped from JSON configs before they're parsed.
