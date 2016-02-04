@@ -84,6 +84,30 @@ describe('Bot', function() {
     ClientStub.prototype.say.should.have.been.calledWith('#irc', expected);
   });
 
+  it('should send attachment URL to IRC', function() {
+    const attachmentUrl = 'https://image/url.jpg';
+    const message = {
+      content: '',
+      attachments: [{
+        url: attachmentUrl
+      }],
+      mentions: [],
+      channel: {
+        name: 'discord'
+      },
+      author: {
+        username: 'otherauthor',
+        id: 'not bot id'
+      }
+    };
+
+    this.bot.sendToIRC(message);
+    // Wrap in colors:
+    const expected = `\u000304${message.author.username}\u000f posted an attachment to ` +
+      `#${message.channel.name} on Discord: ${attachmentUrl}`;
+    ClientStub.prototype.say.should.have.been.calledWith('#irc', expected);
+  });
+
   it('should not send its own messages to irc', function() {
     const message = {
       author: {
