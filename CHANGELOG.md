@@ -1,6 +1,11 @@
 # Changelog
 This project adheres to [Semantic Versioning](http://semver.org/).
 
+## [0.5.0] - 2016-02-08
+### Added
+- Discord attachments will be linked to on IRC when 
+they're posted (fixed by @rce).
+
 ## [0.4.3] - 2016-01-23
 ### Fixed
 - Upgraded dependencies.
