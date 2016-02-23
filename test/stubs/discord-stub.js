@@ -12,9 +12,6 @@ export function getChannel(key, value) {
 class DiscordStub extends events.EventEmitter {
   constructor() {
     super();
-    this.users = {
-      get: sinon.stub()
-    };
     this.user = {
       id: 'testid'
     };

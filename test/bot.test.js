@@ -27,6 +27,7 @@ describe('Bot', function() {
     irc.Client = ClientStub;
     discord.Client = DiscordStub;
     DiscordStub.prototype.sendMessage = sandbox.stub();
+    DiscordStub.prototype.users = { get: sandbox.stub() };
     ClientStub.prototype.say = sandbox.stub();
     ClientStub.prototype.send = sandbox.stub();
     ClientStub.prototype.join = sandbox.stub();
