@@ -131,6 +131,34 @@ describe('Bot', function() {
     ClientStub.prototype.say.should.have.been.calledWith('#irc', expected);
   });
 
+  it('should send text message and attachment URL to IRC if both exist', function() {
+    const text = 'Look at this cute cat picture!';
+    const attachmentUrl = 'https://image/url.jpg';
+    const message = {
+      content: text,
+      attachments: [{
+        url: attachmentUrl
+      }],
+      mentions: [],
+      channel: {
+        name: 'discord'
+      },
+      author: {
+        username: 'otherauthor',
+        id: 'not bot id'
+      }
+    };
+
+    this.bot.sendToIRC(message);
+
+    ClientStub.prototype.say.should.have.been.calledWith('#irc',
+      `<\u000304${message.author.username}\u000f> ${text}`);
+
+    const expected = `\u000304${message.author.username}\u000f posted an attachment to ` +
+      `#${message.channel.name} on Discord: ${attachmentUrl}`;
+    ClientStub.prototype.say.should.have.been.calledWith('#irc', expected);
+  });
+
   it('should not send its own messages to irc', function() {
     const message = {
       author: {
