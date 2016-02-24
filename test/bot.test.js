@@ -27,6 +27,7 @@ describe('Bot', function() {
     irc.Client = ClientStub;
     discord.Client = DiscordStub;
     DiscordStub.prototype.sendMessage = sandbox.stub();
+    DiscordStub.prototype.users = { get: sandbox.stub() };
     ClientStub.prototype.say = sandbox.stub();
     ClientStub.prototype.send = sandbox.stub();
     ClientStub.prototype.join = sandbox.stub();
@@ -167,6 +168,42 @@ describe('Bot', function() {
     };
 
     this.bot.parseText(message).should.equal('@testuser hi');
+  });
+
+  it('should convert user mentions from IRC', function() {
+    const testuser = new discord.User({ username: 'testuser', id: '123' }, this.bot.discord);
+    this.bot.discord.users.get.withArgs('username', testuser.username).returns(testuser);
+
+    const username = 'ircuser';
+    const text = 'Hello, @testuser!';
+    const expected = `**<${username}>** Hello, <@${testuser.id}>!`;
+
+    this.bot.sendToDiscord(username, '#irc', text);
+    DiscordStub.prototype.sendMessage.should.have.been.calledWith(discordChannel, expected);
+  });
+
+  it('should not convert user mentions from IRC if such user does not exist', function() {
+    const username = 'ircuser';
+    const text = 'See you there @5pm';
+    const expected = `**<${username}>** See you there @5pm`;
+
+    this.bot.sendToDiscord(username, '#irc', text);
+    DiscordStub.prototype.sendMessage.should.have.been.calledWith(discordChannel, expected);
+  });
+
+  it('should convert multiple user mentions from IRC', function() {
+    const testuser = new discord.User({ username: 'testuser', id: '123' }, this.bot.discord);
+    this.bot.discord.users.get.withArgs('username', testuser.username).returns(testuser);
+    const anotheruser = new discord.User({ username: 'anotheruser', id: '124' }, this.bot.discord);
+    this.bot.discord.users.get.withArgs('username', anotheruser.username).returns(anotheruser);
+
+    const username = 'ircuser';
+    const text = 'Hello, @testuser and @anotheruser, was our meeting scheduled @5pm?';
+    const expected = `**<${username}>** Hello, <@${testuser.id}> and <@${anotheruser.id}>,` +
+     ` was our meeting scheduled @5pm?`;
+
+    this.bot.sendToDiscord(username, '#irc', text);
+    DiscordStub.prototype.sendMessage.should.have.been.calledWith(discordChannel, expected);
   });
 
   it('should convert newlines from discord', function() {
