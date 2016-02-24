@@ -159,6 +159,27 @@ describe('Bot', function() {
     ClientStub.prototype.say.should.have.been.calledWith('#irc', expected);
   });
 
+  it('should not send an empty text message with an attachment to IRC', function() {
+    const message = {
+      content: '',
+      attachments: [{
+        url: 'https://image/url.jpg'
+      }],
+      mentions: [],
+      channel: {
+        name: 'discord'
+      },
+      author: {
+        username: 'otherauthor',
+        id: 'not bot id'
+      }
+    };
+
+    this.bot.sendToIRC(message);
+
+    ClientStub.prototype.say.should.have.been.calledOnce;
+  });
+
   it('should not send its own messages to irc', function() {
     const message = {
       author: {
