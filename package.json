@@ -38,7 +38,7 @@
     "check-env": "1.2.0",
     "commander": "2.9.0",
     "discord.js": "5.3.2",
-    "irc": "0.4.0",
+    "irc": "0.5.0",
     "lodash": "4.6.1",
     "strip-json-comments": "2.0.0",
     "winston": "2.1.1"
