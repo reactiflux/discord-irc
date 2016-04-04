@@ -125,9 +125,7 @@ describe('Bot', function() {
     };
 
     this.bot.sendToIRC(message);
-    // Wrap in colors:
-    const expected = `\u000304${message.author.username}\u000f posted an attachment to ` +
-      `#${message.channel.name} on Discord: ${attachmentUrl}`;
+    const expected = `<\u000304${message.author.username}\u000f> ${attachmentUrl}`;
     ClientStub.prototype.say.should.have.been.calledWith('#irc', expected);
   });
 
@@ -154,8 +152,7 @@ describe('Bot', function() {
     ClientStub.prototype.say.should.have.been.calledWith('#irc',
       `<\u000304${message.author.username}\u000f> ${text}`);
 
-    const expected = `\u000304${message.author.username}\u000f posted an attachment to ` +
-      `#${message.channel.name} on Discord: ${attachmentUrl}`;
+    const expected = `<\u000304${message.author.username}\u000f> ${attachmentUrl}`;
     ClientStub.prototype.say.should.have.been.calledWith('#irc', expected);
   });
 
