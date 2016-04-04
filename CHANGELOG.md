@@ -1,6 +1,11 @@
 # Changelog
 This project adheres to [Semantic Versioning](http://semver.org/).
 
+## [0.7.0] - 2016-04-04
+### Added
+- Added the config option `ircNickColor` to make it possible to
+disable nick colors for messages sent to IRC.
+
 ## [0.6.1] - 2016-04-04
 ### Fixed
 - Upgrade dependencies.
