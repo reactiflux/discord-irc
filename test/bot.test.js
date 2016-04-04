@@ -125,10 +125,56 @@ describe('Bot', function() {
     };
 
     this.bot.sendToIRC(message);
-    // Wrap in colors:
-    const expected = `\u000304${message.author.username}\u000f posted an attachment to ` +
-      `#${message.channel.name} on Discord: ${attachmentUrl}`;
+    const expected = `<\u000304${message.author.username}\u000f> ${attachmentUrl}`;
     ClientStub.prototype.say.should.have.been.calledWith('#irc', expected);
+  });
+
+  it('should send text message and attachment URL to IRC if both exist', function() {
+    const text = 'Look at this cute cat picture!';
+    const attachmentUrl = 'https://image/url.jpg';
+    const message = {
+      content: text,
+      attachments: [{
+        url: attachmentUrl
+      }],
+      mentions: [],
+      channel: {
+        name: 'discord'
+      },
+      author: {
+        username: 'otherauthor',
+        id: 'not bot id'
+      }
+    };
+
+    this.bot.sendToIRC(message);
+
+    ClientStub.prototype.say.should.have.been.calledWith('#irc',
+      `<\u000304${message.author.username}\u000f> ${text}`);
+
+    const expected = `<\u000304${message.author.username}\u000f> ${attachmentUrl}`;
+    ClientStub.prototype.say.should.have.been.calledWith('#irc', expected);
+  });
+
+  it('should not send an empty text message with an attachment to IRC', function() {
+    const message = {
+      content: '',
+      attachments: [{
+        url: 'https://image/url.jpg'
+      }],
+      mentions: [],
+      channel: {
+        name: 'discord'
+      },
+      author: {
+        username: 'otherauthor',
+        id: 'not bot id'
+      }
+    };
+
+    this.bot.sendToIRC(message);
+
+    ClientStub.prototype.say.should.have.been.calledOnce;
   });
 
   it('should not send its own messages to irc', function() {
