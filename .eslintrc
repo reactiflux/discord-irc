@@ -1,18 +1,8 @@
 {
-  "extends": "airbnb/base",
+  "extends": "webkom",
+  "parser": "babel-eslint",
   "rules": {
-    "func-names": 0,
-    "vars-on-top": 0,
-    "id-length": 0,
-    "comma-dangle": [2, "never"],
-    "object-curly-spacing": [2, "always"],
-    "prefer-spread": 2,
-    "constructor-super": 2,
-    "arrow-spacing": [2, { "before": true, "after": true }],
-    "space-before-function-paren": 0
-  },
-  "ecmaFeatures": {
-    "experimentalObjectRestSpread": true
+    "spaced-comment": 0 // disable because of she-bang bug in index.js
   },
   "env": {
     "mocha": true,

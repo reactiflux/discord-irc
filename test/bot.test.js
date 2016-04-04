@@ -200,7 +200,7 @@ describe('Bot', function() {
     const username = 'ircuser';
     const text = 'Hello, @testuser and @anotheruser, was our meeting scheduled @5pm?';
     const expected = `**<${username}>** Hello, <@${testuser.id}> and <@${anotheruser.id}>,` +
-     ` was our meeting scheduled @5pm?`;
+     ' was our meeting scheduled @5pm?';
 
     this.bot.sendToDiscord(username, '#irc', text);
     DiscordStub.prototype.sendMessage.should.have.been.calledWith(discordChannel, expected);
