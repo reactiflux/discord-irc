@@ -1,6 +1,10 @@
 # Changelog
 This project adheres to [Semantic Versioning](http://semver.org/).
 
+## [0.6.1] - 2016-04-04
+### Fixed
+- Upgrade dependencies.
+
 ## [0.6.0] - 2016-02-24
 ### Added
 - Highlight Discord users when they're mentioned on IRC (thanks to @rce).
