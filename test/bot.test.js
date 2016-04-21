@@ -51,6 +51,21 @@ describe('Bot', function() {
     DiscordStub.prototype.sendMessage.should.have.been.calledWith(discordChannel, formatted);
   });
 
+  it('should apply discordOptions formatting when sending messages to discord', function() {
+    const configWithDiscordOptions = {
+      ...config,
+      discordOptions: {
+        includeAuthor: false
+      }
+    };
+    this.bot = new Bot(configWithDiscordOptions);
+    this.bot.connect();
+    const username = 'testuser';
+    const text = 'test message';
+    this.bot.sendToDiscord(username, '#irc', text);
+    DiscordStub.prototype.sendMessage.should.have.been.calledWith(discordChannel, text);
+  });
+
   it('should lowercase channel names before sending to discord', function() {
     const username = 'testuser';
     const text = 'test message';
