@@ -1,6 +1,10 @@
 # Changelog
 This project adheres to [Semantic Versioning](http://semver.org/).
 
+## [0.8.1] - 2016-04-21
+### Fixed
+- Upgrade discord.js to 7.0.1.
+
 ## [0.8.0] - 2016-04-04
 Implemented by @rce:
 ### Added
