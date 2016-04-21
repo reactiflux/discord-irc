@@ -1,6 +1,10 @@
 # Changelog
 This project adheres to [Semantic Versioning](http://semver.org/).
 
+## [0.8.2] - 2016-04-21
+### Fixed
+- Enable auto reconnect for IRC and Discord.
+
 ## [0.8.1] - 2016-04-21
 ### Fixed
 - Upgrade discord.js to 7.0.1.
