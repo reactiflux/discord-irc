@@ -49,7 +49,7 @@ Create a discord bot [(how to here)](https://github.com/reactiflux/discord-irc/w
   {
     "nickname": "test",
     "server": "irc.bottest.org",
-    "discordToken: "botwantsin123",
+    "discordToken": "botwantsin123",
     "autoSendCommands": [ // Commands that will be sent on connect
       ["PRIVMSG", "NickServ", "IDENTIFY password"],
       ["MODE", "test", "+x"],
