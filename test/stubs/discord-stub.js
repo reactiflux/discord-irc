@@ -21,7 +21,7 @@ class DiscordStub extends events.EventEmitter {
     };
   }
 
-  login() {
+  loginWithToken() {
     return sinon.stub();
   }
 }
