@@ -19,7 +19,6 @@ or by cloning the repository:
 ```bash
 In the repository folder:
 $ npm install
-$ npm run build # Transpile ES6 to ES5 using Babel
 $ npm start -- --config /path/to/config.json # Note the extra double dash
 ```
 
