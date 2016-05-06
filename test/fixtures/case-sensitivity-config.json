@@ -1,8 +1,7 @@
 {
   "nickname": "Reactiflux",
   "server": "irc.freenode.net",
-  "discordEmail": "discord@test.com",
-  "discordPassword": "whatapassword",
+  "discordToken": "discord@test.com",
   "commandCharacters": ["!", "."],
   "autoSendCommands": [
     ["MODE", "test", "+x"],

@@ -19,7 +19,6 @@ or by cloning the repository:
 ```bash
 In the repository folder:
 $ npm install
-$ npm run build # Transpile ES6 to ES5 using Babel
 $ npm start -- --config /path/to/config.json # Note the extra double dash
 ```
 
@@ -31,7 +30,7 @@ discordIRC(config);
 ```
 
 ## Configuration
-Create a discord user and join the server you want to connect to IRC.
+Create a discord bot [(how to here)](https://github.com/reactiflux/discord-irc/wiki/Creating-a-discord-bot-&-getting-a-token) & register a nick for IRC.
 
 ### Example configuration
 ```js
@@ -40,8 +39,7 @@ Create a discord user and join the server you want to connect to IRC.
   {
     "nickname": "test2",
     "server": "irc.testbot.org",
-    "discordEmail": "user@mail.com",
-    "discordPassword": "letmein123",
+    "discordToken: "botwantsin123",
     "channelMapping": {
       "#other-discord": "#new-irc-channel"
     }
@@ -51,8 +49,7 @@ Create a discord user and join the server you want to connect to IRC.
   {
     "nickname": "test",
     "server": "irc.bottest.org",
-    "discordEmail": "user@mail.com",
-    "discordPassword": "letmein123",
+    "discordToken": "botwantsin123",
     "autoSendCommands": [ // Commands that will be sent on connect
       ["PRIVMSG", "NickServ", "IDENTIFY password"],
       ["MODE", "test", "+x"],

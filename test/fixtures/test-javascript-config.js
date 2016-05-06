@@ -2,8 +2,7 @@ module.exports = [
   {
     nickname: 'test',
     server: 'irc.freenode.net',
-    discordEmail: 'discord@test.com',
-    discordPassword: 'whatapassword',
+    discordToken: 'whatapassword',
     channelMapping: {
       '#discord': '#irc'
     }
@@ -11,8 +10,7 @@ module.exports = [
   {
     nickname: 'test2',
     server: 'irc.freenode.net',
-    discordEmail: 'discord@test.com',
-    discordPassword: 'whatapassword',
+    discordToken: 'whatapassword',
     channelMapping: {
       '#discord': '#irc'
     }

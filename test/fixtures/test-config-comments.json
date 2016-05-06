@@ -2,8 +2,7 @@
   {
     "nickname": "test",
     "server": "irc.freenode.net",
-    "discordEmail": "discord@test.com",
-    "discordPassword": /* comment */ "whatapassword",
+    "discordToken": /* comment */ "whatapassword",
     "channelMapping": {
       "#discord": "#irc" // Comment
     }
@@ -12,8 +11,7 @@
   {
     "nickname": "test2",
     "server": "irc.freenode.net",
-    "discordEmail": "discord@test.com",
-    "discordPassword": "whatapassword",
+    "discordToken": "whatapassword",
     "channelMapping": {
       "#discord": "#irc"
     }
