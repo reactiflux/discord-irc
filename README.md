@@ -30,7 +30,7 @@ discordIRC(config);
 ```
 
 ## Configuration
-Create a discord bot [(how to here)](https://github.com/reactiflux/discord-irc/wiki/Creating-a-discord-bot-&-getting-a-token) & register a nick for IRC.
+First you need to create a Discord bot user, which you can do by following the instructions [here](https://github.com/reactiflux/discord-irc/wiki/Creating-a-discord-bot-&-getting-a-token).
 
 ### Example configuration
 ```js
@@ -39,7 +39,7 @@ Create a discord bot [(how to here)](https://github.com/reactiflux/discord-irc/w
   {
     "nickname": "test2",
     "server": "irc.testbot.org",
-    "discordToken: "botwantsin123",
+    "discordToken": "botwantsin123",
     "channelMapping": {
       "#other-discord": "#new-irc-channel"
     }

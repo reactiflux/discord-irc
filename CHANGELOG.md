@@ -1,6 +1,11 @@
 # Changelog
 This project adheres to [Semantic Versioning](http://semver.org/).
 
+## [1.0.0] - 2016-05-06
+### Changed
+- Breaking: discord-irc now uses tokens for authentication, instead of
+email/password, thanks to @TheDoctorsLife. See the README for more instructions.
+
 ## [0.8.2] - 2016-04-21
 ### Fixed
 - Enable auto reconnect for IRC and Discord.
