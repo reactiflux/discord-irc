@@ -1,6 +1,10 @@
 # Changelog
 This project adheres to [Semantic Versioning](http://semver.org/).
 
+## [1.0.1] - 2016-06-19
+### Fixed
+- Upgraded dependencies.
+
 ## [1.0.0] - 2016-05-06
 ### Changed
 - Breaking: discord-irc now uses tokens for authentication, instead of
