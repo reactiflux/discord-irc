@@ -2,6 +2,7 @@
   "extends": "webkom",
   "parser": "babel-eslint",
   "rules": {
+    "global-require": 0,
     "spaced-comment": 0 // disable because of she-bang bug in index.js
   },
   "env": {
