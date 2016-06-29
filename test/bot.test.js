@@ -238,6 +238,18 @@ describe('Bot', function() {
     this.bot.parseText(message).should.equal('@testuser hi');
   });
 
+  it('should convert user nickname mentions from discord', function() {
+    const message = {
+      mentions: [{
+        id: 123,
+        username: 'testuser'
+      }],
+      content: '<@!123> hi'
+    };
+
+    this.bot.parseText(message).should.equal('@testuser hi');
+  });
+
   it('should convert user mentions from IRC', function() {
     const testuser = new discord.User({ username: 'testuser', id: '123' }, this.bot.discord);
     this.bot.discord.users.get.withArgs('username', testuser.username).returns(testuser);
