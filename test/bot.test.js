@@ -38,13 +38,11 @@ describe('Bot', function () {
     sandbox.restore();
   });
 
-  const createServerStub = function (nickname) {
-    return {
-      detailsOfUser() {
-        return { nick: nickname };
-      }
-    };
-  };
+  const createServerStub = (nickname = null) => ({
+    detailsOfUser() {
+      return { nick: nickname };
+    }
+  });
 
   it('should invert the channel mapping', function () {
     this.bot.invertedMapping['#irc'].should.equal('#discord');
