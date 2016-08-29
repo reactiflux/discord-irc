@@ -40,9 +40,9 @@ describe('Bot', function() {
   });
 
   const createServerStub = (nickname = null) => ({
-      detailsOfUser(username) {
-        return { nick: nickname };
-      }
+    detailsOfUser(username) {
+      return { nick: nickname };
+    }
   });
 
   it('should invert the channel mapping', function() {
@@ -249,24 +249,28 @@ describe('Bot', function() {
   });
 
   it('should convert user mentions from discord', function() {
+    const server = createServerStub();
     const message = {
       mentions: [{
         id: 123,
         username: 'testuser'
       }],
-      content: '<@123> hi'
+      content: '<@123> hi',
+      server
     };
 
     this.bot.parseText(message).should.equal('@testuser hi');
   });
 
   it('should convert user nickname mentions from discord', function() {
+    const server = createServerStub();
     const message = {
       mentions: [{
         id: 123,
         username: 'testuser'
       }],
-      content: '<@!123> hi'
+      content: '<@!123> hi',
+      server
     };
 
     this.bot.parseText(message).should.equal('@testuser hi');
