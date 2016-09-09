@@ -1,6 +1,11 @@
 # Changelog
 This project adheres to [Semantic Versioning](http://semver.org/).
 
+## [1.0.3] - 2016-09-09
+### Fixed
+- Replace changes in 1.0.2 with the #indev-old version
+of discord.js.
+
 ## [1.0.2] - 2016-09-09
 ### Fixed
 - Discord's API now requires bot tokens
