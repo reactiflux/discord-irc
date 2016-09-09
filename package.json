@@ -37,7 +37,7 @@
   "dependencies": {
     "check-env": "1.2.0",
     "commander": "2.9.0",
-    "discord.js": "8.1.0",
+    "discord.js": "github:hydrabolt/discord.js#indev-old",
     "irc": "0.5.0",
     "lodash": "4.15.0",
     "strip-json-comments": "2.0.1",
