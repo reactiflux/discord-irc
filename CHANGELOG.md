@@ -1,6 +1,12 @@
 # Changelog
 This project adheres to [Semantic Versioning](http://semver.org/).
 
+## [1.0.2] - 2016-09-09
+### Fixed
+- Discord's API now requires bot tokens
+to be prefixed with "Bot". This adds
+a hotfix that does exactly that.
+
 ## [1.0.1] - 2016-06-19
 ### Fixed
 - Upgraded dependencies.
