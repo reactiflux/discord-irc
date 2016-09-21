@@ -41,7 +41,7 @@ First you need to create a Discord bot user, which you can do by following the i
     "server": "irc.testbot.org",
     "discordToken": "botwantsin123",
     "channelMapping": {
-      "#other-discord": "#new-irc-channel"
+      "DiscordServerName,#other-discord": "#new-irc-channel"
     }
   },
 
@@ -56,7 +56,7 @@ First you need to create a Discord bot user, which you can do by following the i
       ["AUTH", "test", "password"]
     ],
     "channelMapping": { // Maps each Discord-channel to an IRC-channel, used to direct messages to the correct place
-      "#discord": "#irc channel-password" // Add channel keys after the channel name
+      "DiscordServerName,#discord": "#irc channel-password" // Add channel keys after the channel name
     },
     "ircOptions": { // Optional node-irc options
       "floodProtection": false, // On by default
