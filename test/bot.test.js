@@ -6,7 +6,7 @@ import irc from 'irc';
 import logger from 'winston';
 import discord from 'discord.js';
 import Bot from '../lib/bot';
-import DiscordStub, { getChannel } from './stubs/discord-stub';
+import createDiscordStub from './stubs/discord-stub';
 import ClientStub from './stubs/irc-client-stub';
 import config from './fixtures/single-test-config.json';
 
@@ -14,7 +14,6 @@ chai.should();
 chai.use(sinonChai);
 
 describe('Bot', function () {
-  const discordChannel = getChannel();
   const sandbox = sinon.sandbox.create({
     useFakeTimers: false,
     useFakeServer: false
@@ -24,10 +23,10 @@ describe('Bot', function () {
     sandbox.stub(logger, 'info');
     sandbox.stub(logger, 'debug');
     sandbox.stub(logger, 'error');
+    this.sendMessageStub = sandbox.stub();
+    this.findUserStub = sandbox.stub();
     irc.Client = ClientStub;
-    discord.Client = DiscordStub;
-    DiscordStub.prototype.sendMessage = sandbox.stub();
-    DiscordStub.prototype.users = { get: sandbox.stub() };
+    discord.Client = createDiscordStub(this.sendMessageStub, this.findUserStub);
     ClientStub.prototype.say = sandbox.stub();
     ClientStub.prototype.send = sandbox.stub();
     ClientStub.prototype.join = sandbox.stub();
@@ -48,7 +47,7 @@ describe('Bot', function () {
     const text = 'test message';
     const formatted = `**<${username}>** ${text}`;
     this.bot.sendToDiscord(username, '#irc', text);
-    DiscordStub.prototype.sendMessage.should.have.been.calledWith(discordChannel, formatted);
+    this.sendMessageStub.should.have.been.calledWith(formatted);
   });
 
   it('should lowercase channel names before sending to discord', function () {
@@ -56,13 +55,13 @@ describe('Bot', function () {
     const text = 'test message';
     const formatted = `**<${username}>** ${text}`;
     this.bot.sendToDiscord(username, '#IRC', text);
-    DiscordStub.prototype.sendMessage.should.have.been.calledWith(discordChannel, formatted);
+    this.sendMessageStub.should.have.been.calledWith(formatted);
   });
 
   it('should not send messages to discord if the channel isn\'t in the channel mapping',
   function () {
     this.bot.sendToDiscord('user', '#otherirc', 'message');
-    DiscordStub.prototype.sendMessage.should.not.have.been.called;
+    this.sendMessageStub.should.not.have.been.called;
   });
 
   it('should not color irc messages if the option is disabled', function () {
@@ -72,7 +71,7 @@ describe('Bot', function () {
     bot.connect();
     const message = {
       content: text,
-      mentions: [],
+      mentions: { users: [] },
       channel: {
         name: 'discord'
       },
@@ -91,7 +90,7 @@ describe('Bot', function () {
     const text = 'testmessage';
     const message = {
       content: text,
-      mentions: [],
+      mentions: { users: [] },
       channel: {
         name: 'discord'
       },
@@ -111,10 +110,10 @@ describe('Bot', function () {
     const attachmentUrl = 'https://image/url.jpg';
     const message = {
       content: '',
+      mentions: { users: [] },
       attachments: [{
         url: attachmentUrl
       }],
-      mentions: [],
       channel: {
         name: 'discord'
       },
@@ -137,7 +136,7 @@ describe('Bot', function () {
       attachments: [{
         url: attachmentUrl
       }],
-      mentions: [],
+      mentions: { users: [] },
       channel: {
         name: 'discord'
       },
@@ -162,7 +161,7 @@ describe('Bot', function () {
       attachments: [{
         url: 'https://image/url.jpg'
       }],
-      mentions: [],
+      mentions: { users: [] },
       channel: {
         name: 'discord'
       },
@@ -209,7 +208,7 @@ describe('Bot', function () {
     const text = '<#1234>';
     const message = {
       content: text,
-      mentions: [],
+      mentions: { users: [] },
       channel: {
         name: 'discord'
       },
@@ -228,10 +227,12 @@ describe('Bot', function () {
 
   it('should convert user mentions from discord', function () {
     const message = {
-      mentions: [{
-        id: 123,
-        username: 'testuser'
-      }],
+      mentions: {
+        users: [{
+          id: 123,
+          username: 'testuser'
+        }],
+      },
       content: '<@123> hi'
     };
 
@@ -240,10 +241,12 @@ describe('Bot', function () {
 
   it('should convert user nickname mentions from discord', function () {
     const message = {
-      mentions: [{
-        id: 123,
-        username: 'testuser'
-      }],
+      mentions: {
+        users: [{
+          id: 123,
+          username: 'testuser'
+        }],
+      },
       content: '<@!123> hi'
     };
 
@@ -251,15 +254,15 @@ describe('Bot', function () {
   });
 
   it('should convert user mentions from IRC', function () {
-    const testuser = new discord.User({ username: 'testuser', id: '123' }, this.bot.discord);
-    this.bot.discord.users.get.withArgs('username', testuser.username).returns(testuser);
+    const testUser = new discord.User(this.bot.discord, { username: 'testuser', id: '123' });
+    this.findUserStub.withArgs('username', testUser.username).returns(testUser);
 
     const username = 'ircuser';
     const text = 'Hello, @testuser!';
-    const expected = `**<${username}>** Hello, <@${testuser.id}>!`;
+    const expected = `**<${username}>** Hello, <@${testUser.id}>!`;
 
     this.bot.sendToDiscord(username, '#irc', text);
-    DiscordStub.prototype.sendMessage.should.have.been.calledWith(discordChannel, expected);
+    this.sendMessageStub.should.have.been.calledWith(expected);
   });
 
   it('should not convert user mentions from IRC if such user does not exist', function () {
@@ -268,27 +271,27 @@ describe('Bot', function () {
     const expected = `**<${username}>** See you there @5pm`;
 
     this.bot.sendToDiscord(username, '#irc', text);
-    DiscordStub.prototype.sendMessage.should.have.been.calledWith(discordChannel, expected);
+    this.sendMessageStub.should.have.been.calledWith(expected);
   });
 
   it('should convert multiple user mentions from IRC', function () {
-    const testuser = new discord.User({ username: 'testuser', id: '123' }, this.bot.discord);
-    this.bot.discord.users.get.withArgs('username', testuser.username).returns(testuser);
-    const anotheruser = new discord.User({ username: 'anotheruser', id: '124' }, this.bot.discord);
-    this.bot.discord.users.get.withArgs('username', anotheruser.username).returns(anotheruser);
+    const testUser = new discord.User(this.bot.discord, { username: 'testuser', id: '123' });
+    this.findUserStub.withArgs('username', testUser.username).returns(testUser);
+    const anotherUser = new discord.User(this.bot.discord, { username: 'anotheruser', id: '124' });
+    this.findUserStub.withArgs('username', anotherUser.username).returns(anotherUser);
 
     const username = 'ircuser';
     const text = 'Hello, @testuser and @anotheruser, was our meeting scheduled @5pm?';
-    const expected = `**<${username}>** Hello, <@${testuser.id}> and <@${anotheruser.id}>,` +
+    const expected = `**<${username}>** Hello, <@${testUser.id}> and <@${anotherUser.id}>,` +
      ' was our meeting scheduled @5pm?';
 
     this.bot.sendToDiscord(username, '#irc', text);
-    DiscordStub.prototype.sendMessage.should.have.been.calledWith(discordChannel, expected);
+    this.sendMessageStub.should.have.been.calledWith(expected);
   });
 
   it('should convert newlines from discord', function () {
     const message = {
-      mentions: [],
+      mentions: { users: [] },
       content: 'hi\nhi\r\nhi\r'
     };
 
@@ -299,7 +302,7 @@ describe('Bot', function () {
     const text = '!test command';
     const message = {
       content: text,
-      mentions: [],
+      mentions: { users: [] },
       channel: {
         name: 'discord'
       },

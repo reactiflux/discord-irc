@@ -6,7 +6,7 @@ import irc from 'irc';
 import discord from 'discord.js';
 import logger from 'winston';
 import Bot from '../lib/bot';
-import DiscordStub from './stubs/discord-stub';
+import createDiscordStub from './stubs/discord-stub';
 import ClientStub from './stubs/irc-client-stub';
 import config from './fixtures/single-test-config.json';
 
@@ -23,8 +23,10 @@ describe('Bot Events', function () {
     this.infoSpy = sandbox.stub(logger, 'info');
     this.debugSpy = sandbox.stub(logger, 'debug');
     this.errorSpy = sandbox.stub(logger, 'error');
+    this.sendMessageStub = sandbox.stub();
+    this.getUserStub = sandbox.stub();
     irc.Client = ClientStub;
-    discord.Client = DiscordStub;
+    discord.Client = createDiscordStub(this.sendMessageStub, this.getUserStub);
     ClientStub.prototype.send = sandbox.stub();
     ClientStub.prototype.join = sandbox.stub();
     this.bot = new Bot(config);
