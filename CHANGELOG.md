@@ -1,6 +1,12 @@
 # Changelog
 This project adheres to [Semantic Versioning](http://semver.org/).
 
+## [2.0.0] - 2016-09-25
+### Fixed
+- Upgrade to version 9.3 of discord.js.
+This removes support for Node.js versions older than v6,
+as that's the oldest discord.js supports.
+
 ## [1.0.3] - 2016-09-09
 ### Fixed
 - Replace changes in 1.0.2 with the #indev-old version
