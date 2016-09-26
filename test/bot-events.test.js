@@ -13,13 +13,13 @@ import config from './fixtures/single-test-config.json';
 chai.should();
 chai.use(sinonChai);
 
-describe('Bot Events', function() {
+describe('Bot Events', function () {
   const sandbox = sinon.sandbox.create({
     useFakeTimers: false,
     useFakeServer: false
   });
 
-  beforeEach(function() {
+  beforeEach(function () {
     this.infoSpy = sandbox.stub(logger, 'info');
     this.debugSpy = sandbox.stub(logger, 'debug');
     this.errorSpy = sandbox.stub(logger, 'error');
@@ -33,16 +33,16 @@ describe('Bot Events', function() {
     this.bot.connect();
   });
 
-  afterEach(function() {
+  afterEach(function () {
     sandbox.restore();
   });
 
-  it('should log on discord ready event', function() {
+  it('should log on discord ready event', function () {
     this.bot.discord.emit('ready');
     this.debugSpy.should.have.been.calledWithExactly('Connected to Discord');
   });
 
-  it('should try to send autoSendCommands on registered IRC event', function() {
+  it('should try to send autoSendCommands on registered IRC event', function () {
     this.bot.ircClient.emit('registered');
     ClientStub.prototype.send.should.have.been.calledTwice;
     ClientStub.prototype.send.getCall(0)
@@ -51,7 +51,7 @@ describe('Bot Events', function() {
       .args.should.deep.equal(config.autoSendCommands[1]);
   });
 
-  it('should error log on error events', function() {
+  it('should error log on error events', function () {
     const discordError = new Error('discord');
     const ircError = new Error('irc');
     this.bot.discord.emit('error', discordError);
@@ -62,7 +62,7 @@ describe('Bot Events', function() {
     this.errorSpy.getCall(1).args[1].should.equal(ircError);
   });
 
-  it('should send messages to irc if correct', function() {
+  it('should send messages to irc if correct', function () {
     const message = {
       type: 'message'
     };
@@ -71,7 +71,7 @@ describe('Bot Events', function() {
     this.bot.sendToIRC.should.have.been.calledWithExactly(message);
   });
 
-  it('should send messages to discord', function() {
+  it('should send messages to discord', function () {
     const channel = '#channel';
     const author = 'user';
     const text = 'hi';
@@ -79,7 +79,7 @@ describe('Bot Events', function() {
     this.bot.sendToDiscord.should.have.been.calledWithExactly(author, channel, text);
   });
 
-  it('should send notices to discord', function() {
+  it('should send notices to discord', function () {
     const channel = '#channel';
     const author = 'user';
     const text = 'hi';
@@ -88,7 +88,7 @@ describe('Bot Events', function() {
     this.bot.sendToDiscord.should.have.been.calledWithExactly(author, channel, formattedText);
   });
 
-  it('should send actions to discord', function() {
+  it('should send actions to discord', function () {
     const channel = '#channel';
     const author = 'user';
     const text = 'hi';
@@ -98,7 +98,7 @@ describe('Bot Events', function() {
     this.bot.sendToDiscord.should.have.been.calledWithExactly(author, channel, formattedText);
   });
 
-  it('should join channels when invited', function() {
+  it('should join channels when invited', function () {
     const channel = '#irc';
     const author = 'user';
     this.bot.ircClient.emit('invite', channel, author);
@@ -113,7 +113,7 @@ describe('Bot Events', function() {
     secondCall.args[1].should.equal(channel);
   });
 
-  it('should not join channels that aren\'t in the channel mapping', function() {
+  it('should not join channels that aren\'t in the channel mapping', function () {
     const channel = '#wrong';
     const author = 'user';
     this.bot.ircClient.emit('invite', channel, author);

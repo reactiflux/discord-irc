@@ -79,15 +79,12 @@ $ npm test
 ```
 
 ## Style Guide
-discord-irc uses a slightly modified version of the
-[Airbnb Style Guide](https://github.com/airbnb/javascript/tree/master/es5).
+discord-irc follows the [Airbnb Style Guide](https://github.com/airbnb/javascript).
 [ESLint](http://eslint.org/) is used to make sure this is followed correctly, which can be run with:
 
 ```bash
 $ npm run lint
 ```
-
-The deviations from the Airbnb Style Guide can be seen in  the [.eslintrc](.eslintrc) file.
 
 ## License
 
