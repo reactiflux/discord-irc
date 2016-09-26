@@ -11,7 +11,7 @@
     "reactiflux"
   ],
   "engines": {
-    "node": ">=0.12.7"
+    "node": ">=6.0.0"
   },
   "main": "dist/index.js",
   "bin": "dist/index.js",
