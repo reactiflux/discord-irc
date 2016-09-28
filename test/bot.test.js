@@ -252,6 +252,15 @@ describe('Bot', function () {
 
     this.bot.parseText(message).should.equal('@testuser hi');
   });
+  
+  it('should convert twitch emotes from discord', function () {
+    const message = {
+      mentions: {users: []},
+      content: '<:SCGWat:230473833046343680>'
+    };
+
+    this.bot.parseText(message).should.equal(':SCGWat:');
+  });
 
   it('should convert user mentions from IRC', function () {
     const testUser = new discord.User(this.bot.discord, { username: 'testuser', id: '123' });
