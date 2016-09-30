@@ -252,10 +252,10 @@ describe('Bot', function () {
 
     this.bot.parseText(message).should.equal('@testuser hi');
   });
-  
+
   it('should convert twitch emotes from discord', function () {
     const message = {
-      mentions: {users: []},
+      mentions: { users: [] },
       content: '<:SCGWat:230473833046343680>'
     };
 
