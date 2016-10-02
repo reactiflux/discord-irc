@@ -1,6 +1,10 @@
 # Changelog
 This project adheres to [Semantic Versioning](http://semver.org/).
 
+## [2.0.2] - 2016-10-02
+### Fixed
+- Display custom emojis correctly, thanks to @macdja38.
+
 ## [2.0.0] - 2016-09-25
 ### Fixed
 - Upgrade to version 9.3 of discord.js.
