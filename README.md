@@ -19,6 +19,7 @@ or by cloning the repository:
 ```bash
 In the repository folder:
 $ npm install
+$ npm run build
 $ npm start -- --config /path/to/config.json # Note the extra double dash
 ```
 
