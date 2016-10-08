@@ -39,7 +39,7 @@
     "commander": "2.9.0",
     "discord.js": "9.3.0",
     "irc": "0.5.0",
-    "lodash": "4.16.3",
+    "lodash": "4.16.4",
     "strip-json-comments": "2.0.1",
     "winston": "2.2.0"
   },
