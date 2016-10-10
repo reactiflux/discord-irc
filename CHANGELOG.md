@@ -1,6 +1,11 @@
 # Changelog
 This project adheres to [Semantic Versioning](http://semver.org/).
 
+## [2.1.0] - 2016-10-09
+## Added
+* Messages sent to IRC will now use the correct server nickname,
+instead of the user's global username (thanks to @DarkSpyro003).
+
 ## [2.0.2] - 2016-10-02
 ### Fixed
 - Display custom emojis correctly, thanks to @macdja38.
