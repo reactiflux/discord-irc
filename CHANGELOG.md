@@ -1,8 +1,12 @@
 # Changelog
 This project adheres to [Semantic Versioning](http://semver.org/).
 
+## [2.1.1] - 2016-10-21
+### Fixed
+* A bug where Discord attachment URLs weren't posted to IRC, thanks to @LordAlderaan for the report.
+
 ## [2.1.0] - 2016-10-09
-## Added
+### Added
 * Messages sent to IRC will now use the correct server nickname,
 instead of the user's global username (thanks to @DarkSpyro003).
 

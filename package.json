@@ -1,6 +1,6 @@
 {
   "name": "discord-irc",
-  "version": "2.1.0",
+  "version": "2.1.1",
   "description": "Connects IRC and Discord channels by sending messages back and forth.",
   "keywords": [
     "discord",
