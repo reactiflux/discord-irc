@@ -38,6 +38,12 @@ describe('Bot', function () {
     sandbox.restore();
   });
 
+  const createAttachments = (url) => {
+    const attachments = new discord.Collection();
+    attachments.set(1, { url });
+    return attachments;
+  };
+
   const createGuildStub = (nickname = null) => ({
     members: {
       find() {
@@ -124,9 +130,7 @@ describe('Bot', function () {
     const message = {
       content: '',
       mentions: { users: [] },
-      attachments: [{
-        url: attachmentUrl
-      }],
+      attachments: createAttachments(attachmentUrl),
       channel: {
         name: 'discord'
       },
@@ -148,9 +152,7 @@ describe('Bot', function () {
     const guild = createGuildStub();
     const message = {
       content: text,
-      attachments: [{
-        url: attachmentUrl
-      }],
+      attachments: createAttachments(attachmentUrl),
       mentions: { users: [] },
       channel: {
         name: 'discord'
@@ -175,9 +177,7 @@ describe('Bot', function () {
     const guild = createGuildStub();
     const message = {
       content: '',
-      attachments: [{
-        url: 'https://image/url.jpg'
-      }],
+      attachments: createAttachments('https://image/url.jpg'),
       mentions: { users: [] },
       channel: {
         name: 'discord'
