@@ -1,6 +1,11 @@
 # Changelog
 This project adheres to [Semantic Versioning](http://semver.org/).
 
+## [2.1.2] - 2016-11-01
+### Fixed
+* Use nickname, not username, in command prelude. 
+Thanks to @williamjacksn.
+
 ## [2.1.1] - 2016-10-21
 ### Fixed
 * A bug where Discord attachment URLs weren't posted to IRC, thanks to @LordAlderaan for the report.
