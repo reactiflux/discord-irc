@@ -27,7 +27,8 @@
     "build": "babel lib --out-dir dist",
     "prepublish": "npm run build",
     "lint": "eslint . --ignore-path .gitignore",
-    "coverage": "nyc --require babel-core/register _mocha -- $(find test -name '*.test.js') && nyc report --reporter=cobertura",
+    "coverage": "nyc --require babel-core/register _mocha -- $(find test -name '*.test.js')",
+    "report": "nyc report --reporter=text-lcov | coveralls",
     "test": "npm run lint && npm run coverage"
   },
   "author": {
@@ -50,6 +51,7 @@
     "babel-preset-node6": "^11.0.0",
     "babel-preset-stage-0": "^6.5.0",
     "chai": "^3.5.0",
+    "coveralls": "^2.11.14",
     "eslint": "^3.7.1",
     "eslint-config-airbnb-base": "^9.0.0",
     "eslint-plugin-import": "^2.0.1",

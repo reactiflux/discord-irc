@@ -1,4 +1,6 @@
-# discord-irc [![Build status](https://ci.frigg.io/badges/reactiflux/discord-irc/)](https://ci.frigg.io/reactiflux/discord-irc/last/) [![Coverage status](https://ci.frigg.io/badges/coverage/reactiflux/discord-irc/)](https://ci.frigg.io/reactiflux/discord-irc/last/)
+# discord-irc [![Build
+Status](https://travis-ci.org/reactiflux/discord-irc.svg?branch=master)](https://travis-ci.org/reactiflux/discord-irc) [![Coverage
+Status](https://coveralls.io/repos/github/reactiflux/discord-irc/badge.svg?branch=master)](https://coveralls.io/github/reactiflux/discord-irc?branch=master)
 
 > Connects [Discord](https://discordapp.com/) and IRC channels by sending messages back and forth.
 
