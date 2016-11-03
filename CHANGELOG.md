@@ -1,6 +1,10 @@
 # Changelog
 This project adheres to [Semantic Versioning](http://semver.org/).
 
+## [2.1.3] - 2016-11-02
+### Fixed
+* Send text messages only to text channels (thanks @dustinlacewell).
+
 ## [2.1.2] - 2016-11-01
 ### Fixed
 * Use nickname, not username, in command prelude. 
