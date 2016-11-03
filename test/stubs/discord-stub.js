@@ -11,6 +11,7 @@ export default function createDiscordStub(sendMessageStub, findUserStub) {
       };
 
       this.channels = {
+        filter: () => this.channels,
         get: this.getChannel,
         find: this.getChannel
       };
