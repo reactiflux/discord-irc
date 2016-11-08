@@ -53,7 +53,7 @@ describe('Bot', function () {
   });
 
   const createServerStub = (nickname = null) => ({
-    detailsOfUser(username) {
+    detailsOfUser() {
       return { nick: nickname };
     }
   });
@@ -187,7 +187,7 @@ describe('Bot', function () {
     ClientStub.prototype.say.should.have.been.calledWith('#irc', expected);
   });
 
-  it('should not send an empty text message with an attachment to IRC', function() {
+  it('should not send an empty text message with an attachment to IRC', function () {
     const server = createServerStub(null);
     const guild = createGuildStub();
     const message = {
@@ -210,7 +210,7 @@ describe('Bot', function () {
     ClientStub.prototype.say.should.have.been.calledOnce;
   });
 
-  it('should not send its own messages to irc', function() {
+  it('should not send its own messages to irc', function () {
     const server = createServerStub(null);
     const guild = createGuildStub();
     const message = {
@@ -227,7 +227,7 @@ describe('Bot', function () {
   });
 
   it('should not send messages to irc if the channel isn\'t in the channel mapping',
-  function() {
+  function () {
     const server = createServerStub(null);
     const guild = createGuildStub();
     const message = {

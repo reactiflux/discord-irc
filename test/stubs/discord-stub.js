@@ -3,19 +3,10 @@ import events from 'events';
 import sinon from 'sinon';
 
 const server = {
-  detailsOfUser(username) {
+  detailsOfUser() {
     return { nick: null };
   }
 };
-
-export function getChannel(key, value) {
-  if (key === 'name' && value !== 'discord') return null;
-  return {
-    name: 'discord',
-    id: 1234,
-    server
-  };
-}
 
 export default function createDiscordStub(sendMessageStub, findUserStub) {
   return class DiscordStub extends events.EventEmitter {
@@ -41,7 +32,8 @@ export default function createDiscordStub(sendMessageStub, findUserStub) {
       return {
         name: 'discord',
         id: 1234,
-        sendMessage: sendMessageStub
+        sendMessage: sendMessageStub,
+        server
       };
     }
 
