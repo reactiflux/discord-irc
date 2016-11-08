@@ -2,8 +2,8 @@
 import events from 'events';
 import sinon from 'sinon';
 
-const server = {
-  detailsOfUser() {
+const guild = {
+  find() {
     return { nick: null };
   }
 };
@@ -33,7 +33,7 @@ export default function createDiscordStub(sendMessageStub, findUserStub) {
         name: 'discord',
         id: 1234,
         sendMessage: sendMessageStub,
-        server
+        guild
       };
     }
 
