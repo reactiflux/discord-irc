@@ -1,6 +1,45 @@
 # Changelog
 This project adheres to [Semantic Versioning](http://semver.org/).
 
+## [2.1.3] - 2016-11-02
+### Fixed
+* Send text messages only to text channels (thanks @dustinlacewell).
+
+## [2.1.2] - 2016-11-01
+### Fixed
+* Use nickname, not username, in command prelude. 
+Thanks to @williamjacksn.
+
+## [2.1.1] - 2016-10-21
+### Fixed
+* A bug where Discord attachment URLs weren't posted to IRC, thanks to @LordAlderaan for the report.
+
+## [2.1.0] - 2016-10-09
+### Added
+* Messages sent to IRC will now use the correct server nickname,
+instead of the user's global username (thanks to @DarkSpyro003).
+
+## [2.0.2] - 2016-10-02
+### Fixed
+- Display custom emojis correctly, thanks to @macdja38.
+
+## [2.0.0] - 2016-09-25
+### Fixed
+- Upgrade to version 9.3 of discord.js.
+This removes support for Node.js versions older than v6,
+as that's the oldest discord.js supports.
+
+## [1.0.3] - 2016-09-09
+### Fixed
+- Replace changes in 1.0.2 with the #indev-old version
+of discord.js.
+
+## [1.0.2] - 2016-09-09
+### Fixed
+- Discord's API now requires bot tokens
+to be prefixed with "Bot". This adds
+a hotfix that does exactly that.
+
 ## [1.0.1] - 2016-06-19
 ### Fixed
 - Upgraded dependencies.

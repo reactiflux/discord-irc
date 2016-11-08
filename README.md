@@ -1,13 +1,13 @@
-# discord-irc [![Build status](https://ci.frigg.io/badges/reactiflux/discord-irc/)](https://ci.frigg.io/reactiflux/discord-irc/last/) [![Coverage status](https://ci.frigg.io/badges/coverage/reactiflux/discord-irc/)](https://ci.frigg.io/reactiflux/discord-irc/last/)
+# discord-irc [![Build Status](https://travis-ci.org/reactiflux/discord-irc.svg?branch=master)](https://travis-ci.org/reactiflux/discord-irc) [![Coverage Status](https://coveralls.io/repos/github/reactiflux/discord-irc/badge.svg?branch=master)](https://coveralls.io/github/reactiflux/discord-irc?branch=master)
 
 > Connects [Discord](https://discordapp.com/) and IRC channels by sending messages back and forth.
-
-A mostly feature complete port of [slack-irc](https://github.com/ekmartin/slack-irc).
 
 ## Example
 ![discord-irc](http://i.imgur.com/oI6iCrf.gif)
 
 ## Installation and usage
+**Note**: discord-irc requires Node.js version 6 or newer, as it depends on [discord.js](https://github.com/hydrabolt/discord.js).
+
 Either by installing through npm:
 ```bash
 $ npm install -g discord-irc
@@ -19,6 +19,7 @@ or by cloning the repository:
 ```bash
 In the repository folder:
 $ npm install
+$ npm run build
 $ npm start -- --config /path/to/config.json # Note the extra double dash
 ```
 
@@ -79,24 +80,9 @@ $ npm test
 ```
 
 ## Style Guide
-discord-irc uses a slightly modified version of the
-[Airbnb Style Guide](https://github.com/airbnb/javascript/tree/master/es5).
+discord-irc follows the [Airbnb Style Guide](https://github.com/airbnb/javascript).
 [ESLint](http://eslint.org/) is used to make sure this is followed correctly, which can be run with:
 
 ```bash
 $ npm run lint
 ```
-
-The deviations from the Airbnb Style Guide can be seen in  the [.eslintrc](.eslintrc) file.
-
-## License
-
-(The MIT License)
-
-Copyright (c) 2016 Martin Ek <mail@ekmartin.com>
-
-Permission is hereby granted, free of charge, to any person obtaining a copy of this software and associated documentation files (the 'Software'), to deal in the Software without restriction, including without limitation the rights to use, copy, modify, merge, publish, distribute, sublicense, and/or sell copies of the Software, and to permit persons to whom the Software is furnished to do so, subject to the following conditions:
-
-The above copyright notice and this permission notice shall be included in all copies or substantial portions of the Software.
-
-THE SOFTWARE IS PROVIDED 'AS IS', WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
