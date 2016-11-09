@@ -2,12 +2,6 @@
 import events from 'events';
 import sinon from 'sinon';
 
-const guild = {
-  find() {
-    return { nick: null };
-  }
-};
-
 export default function createDiscordStub(sendMessageStub, findUserStub) {
   return class DiscordStub extends events.EventEmitter {
     constructor() {
@@ -33,7 +27,11 @@ export default function createDiscordStub(sendMessageStub, findUserStub) {
         name: 'discord',
         id: 1234,
         sendMessage: sendMessageStub,
-        guild
+        guild: {
+          members: {
+            find: findUserStub
+          }
+        }
       };
     }
 
