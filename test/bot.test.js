@@ -385,4 +385,18 @@ describe('Bot', function () {
     const expected = `<${nickname}> ${text}`;
     ClientStub.prototype.say.should.have.been.calledWith('#irc', expected);
   });
+
+  it('should convert user nickname mentions from IRC', function () {
+    const testUser = new discord.User(this.bot.discord, { username: 'testuser', id: '123', nickname: 'somenickname' });
+    this.findUserStub.withArgs('username', testUser.username).returns(testUser);
+    this.findUserStub.withArgs('nickname', 'somenickname').returns(testUser);
+    this.findUserStub.withArgs('id', testUser.id).returns(testUser);
+
+    const username = 'ircuser';
+    const text = 'Hello, @somenickname!';
+    const expected = `**<${username}>** Hello, <@${testUser.id}>!`;
+
+    this.bot.sendToDiscord(username, '#irc', text);
+    this.sendMessageStub.should.have.been.calledWith(expected);
+  });
 });
