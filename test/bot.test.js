@@ -399,4 +399,18 @@ describe('Bot', function () {
     this.bot.sendToDiscord(username, '#irc', text);
     this.sendMessageStub.should.have.been.calledWith(expected);
   });
+
+  it('should not convert username mentions from IRC if nickname differs', function () {
+    const testUser = new discord.User(this.bot.discord, { username: 'testuser', id: '123', nickname: 'somenickname' });
+    this.findUserStub.withArgs('username', testUser.username).returns(testUser);
+    this.findUserStub.withArgs('nickname', 'somenickname').returns(testUser);
+    this.findUserStub.withArgs('id', testUser.id).returns(testUser);
+
+    const username = 'ircuser';
+    const text = 'Hello, @username!';
+    const expected = `**<${username}>** Hello, @username!`;
+
+    this.bot.sendToDiscord(username, '#irc', text);
+    this.sendMessageStub.should.have.been.calledWith(expected);
+  });
 });
