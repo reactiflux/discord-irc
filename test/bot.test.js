@@ -250,6 +250,7 @@ describe('Bot', function () {
   });
 
   it('should convert user mentions from discord', function () {
+    const guild = createGuildStub();
     const message = {
       mentions: {
         users: [{
@@ -257,13 +258,15 @@ describe('Bot', function () {
           username: 'testuser'
         }],
       },
-      content: '<@123> hi'
+      content: '<@123> hi',
+      guild
     };
 
     this.bot.parseText(message).should.equal('@testuser hi');
   });
 
   it('should convert user nickname mentions from discord', function () {
+    const guild = createGuildStub();
     const message = {
       mentions: {
         users: [{
@@ -271,7 +274,8 @@ describe('Bot', function () {
           username: 'testuser'
         }],
       },
-      content: '<@!123> hi'
+      content: '<@!123> hi',
+      guild
     };
 
     this.bot.parseText(message).should.equal('@testuser hi');
@@ -289,6 +293,7 @@ describe('Bot', function () {
   it('should convert user mentions from IRC', function () {
     const testUser = new discord.User(this.bot.discord, { username: 'testuser', id: '123' });
     this.findUserStub.withArgs('username', testUser.username).returns(testUser);
+    this.findUserStub.withArgs('id', testUser.id).returns(testUser);
 
     const username = 'ircuser';
     const text = 'Hello, @testuser!';
@@ -310,8 +315,10 @@ describe('Bot', function () {
   it('should convert multiple user mentions from IRC', function () {
     const testUser = new discord.User(this.bot.discord, { username: 'testuser', id: '123' });
     this.findUserStub.withArgs('username', testUser.username).returns(testUser);
+    this.findUserStub.withArgs('id', testUser.id).returns(testUser);
     const anotherUser = new discord.User(this.bot.discord, { username: 'anotheruser', id: '124' });
     this.findUserStub.withArgs('username', anotherUser.username).returns(anotherUser);
+    this.findUserStub.withArgs('id', anotherUser.id).returns(anotherUser);
 
     const username = 'ircuser';
     const text = 'Hello, @testuser and @anotheruser, was our meeting scheduled @5pm?';
@@ -377,5 +384,33 @@ describe('Bot', function () {
     bot.sendToIRC(message);
     const expected = `<${nickname}> ${text}`;
     ClientStub.prototype.say.should.have.been.calledWith('#irc', expected);
+  });
+
+  it('should convert user nickname mentions from IRC', function () {
+    const testUser = new discord.User(this.bot.discord, { username: 'testuser', id: '123', nickname: 'somenickname' });
+    this.findUserStub.withArgs('username', testUser.username).returns(testUser);
+    this.findUserStub.withArgs('nickname', 'somenickname').returns(testUser);
+    this.findUserStub.withArgs('id', testUser.id).returns(testUser);
+
+    const username = 'ircuser';
+    const text = 'Hello, @somenickname!';
+    const expected = `**<${username}>** Hello, <@${testUser.id}>!`;
+
+    this.bot.sendToDiscord(username, '#irc', text);
+    this.sendMessageStub.should.have.been.calledWith(expected);
+  });
+
+  it('should not convert username mentions from IRC if nickname differs', function () {
+    const testUser = new discord.User(this.bot.discord, { username: 'testuser', id: '123', nickname: 'somenickname' });
+    this.findUserStub.withArgs('username', testUser.username).returns(testUser);
+    this.findUserStub.withArgs('nickname', 'somenickname').returns(testUser);
+    this.findUserStub.withArgs('id', testUser.id).returns(testUser);
+
+    const username = 'ircuser';
+    const text = 'Hello, @username!';
+    const expected = `**<${username}>** Hello, @username!`;
+
+    this.bot.sendToDiscord(username, '#irc', text);
+    this.sendMessageStub.should.have.been.calledWith(expected);
   });
 });

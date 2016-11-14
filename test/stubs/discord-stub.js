@@ -26,7 +26,12 @@ export default function createDiscordStub(sendMessageStub, findUserStub) {
       return {
         name: 'discord',
         id: 1234,
-        sendMessage: sendMessageStub
+        sendMessage: sendMessageStub,
+        guild: {
+          members: {
+            find: findUserStub
+          }
+        }
       };
     }
 
