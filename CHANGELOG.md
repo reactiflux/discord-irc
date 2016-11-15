@@ -1,6 +1,12 @@
 # Changelog
 This project adheres to [Semantic Versioning](http://semver.org/).
 
+## [2.1.4] - 2016-11-14
+### Fixed
+* Added support for highlighting users by their nicknames,
+thanks to @DarkSpyro003.
+* Upgraded to discord.js v10.
+
 ## [2.1.3] - 2016-11-02
 ### Fixed
 * Send text messages only to text channels (thanks @dustinlacewell).
