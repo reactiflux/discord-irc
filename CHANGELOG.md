@@ -1,6 +1,10 @@
 # Changelog
 This project adheres to [Semantic Versioning](http://semver.org/).
 
+## [2.1.5] - 2016-11-17
+### Fixed
+* Upgraded node-irc to 0.5.1, fixing #129.
+
 ## [2.1.4] - 2016-11-14
 ### Fixed
 * Added support for highlighting users by their nicknames,
