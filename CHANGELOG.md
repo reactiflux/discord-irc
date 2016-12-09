@@ -1,6 +1,12 @@
 # Changelog
 This project adheres to [Semantic Versioning](http://semver.org/).
 
+## [2.1.6] - 2016-12-08
+### Fixed
+* Listen to warn events from Discord.
+* Listen to debug events from Discord (only in development).
+* Log info events upon connection, instead of debug
+
 ## [2.1.5] - 2016-11-17
 ### Fixed
 * Upgraded node-irc to 0.5.1, fixing #129.
@@ -17,7 +23,7 @@ thanks to @DarkSpyro003.
 
 ## [2.1.2] - 2016-11-01
 ### Fixed
-* Use nickname, not username, in command prelude. 
+* Use nickname, not username, in command prelude.
 Thanks to @williamjacksn.
 
 ## [2.1.1] - 2016-10-21
