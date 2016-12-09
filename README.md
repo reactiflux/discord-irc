@@ -66,7 +66,11 @@ First you need to create a Discord bot user, which you can do by following the i
     "ircNickColor": false, // Gives usernames a color in IRC for better readability (on by default)
     // Makes the bot hide the username prefix for messages that start
     // with one of these characters (commands):
-    "commandCharacters": ["!", "."]
+    "commandCharacters": ["!", "."],
+    // List of webhooks per channel
+    "webhooks": {
+      "#discord": "https://discordapp.com/api/webhooks/id/token"
+    }
   }
 ]
 ```
