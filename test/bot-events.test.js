@@ -47,7 +47,14 @@ describe('Bot Events', function () {
 
   it('should log on discord ready event', function () {
     this.bot.discord.emit('ready');
-    this.debugSpy.should.have.been.calledWithExactly('Connected to Discord');
+    this.infoSpy.should.have.been.calledWithExactly('Connected to Discord');
+  });
+
+  it('should log on irc registered event', function () {
+    const message = 'registered';
+    this.bot.ircClient.emit('registered', message);
+    this.infoSpy.should.have.been.calledWithExactly('Connected to IRC');
+    this.debugSpy.should.have.been.calledWithExactly('Registered event: ', message);
   });
 
   it('should try to send autoSendCommands on registered IRC event', function () {
