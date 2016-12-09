@@ -19,9 +19,17 @@ describe('Bot Events', function () {
     useFakeServer: false
   });
 
+  const createBot = () => {
+    const bot = new Bot(config);
+    bot.sendToIRC = sandbox.stub();
+    bot.sendToDiscord = sandbox.stub();
+    return bot;
+  };
+
   beforeEach(function () {
     this.infoSpy = sandbox.stub(logger, 'info');
     this.debugSpy = sandbox.stub(logger, 'debug');
+    this.warnSpy = sandbox.stub(logger, 'warn');
     this.errorSpy = sandbox.stub(logger, 'error');
     this.sendMessageStub = sandbox.stub();
     this.getUserStub = sandbox.stub();
@@ -29,9 +37,7 @@ describe('Bot Events', function () {
     discord.Client = createDiscordStub(this.sendMessageStub, this.getUserStub);
     ClientStub.prototype.send = sandbox.stub();
     ClientStub.prototype.join = sandbox.stub();
-    this.bot = new Bot(config);
-    this.bot.sendToIRC = sandbox.stub();
-    this.bot.sendToDiscord = sandbox.stub();
+    this.bot = createBot();
     this.bot.connect();
   });
 
@@ -62,6 +68,14 @@ describe('Bot Events', function () {
     this.errorSpy.getCall(0).args[1].should.equal(discordError);
     this.errorSpy.getCall(1).args[0].should.equal('Received error event from IRC');
     this.errorSpy.getCall(1).args[1].should.equal(ircError);
+  });
+
+  it('should warn log on warn events from discord', function () {
+    const discordError = new Error('discord');
+    this.bot.discord.emit('warn', discordError);
+    const [message, error] = this.warnSpy.firstCall.args;
+    message.should.equal('Received warn event from Discord');
+    error.should.equal(discordError);
   });
 
   it('should send messages to irc if correct', function () {
@@ -98,6 +112,22 @@ describe('Bot Events', function () {
     const message = {};
     this.bot.ircClient.emit('action', author, channel, text, message);
     this.bot.sendToDiscord.should.have.been.calledWithExactly(author, channel, formattedText);
+  });
+
+  it('should not listen to discord debug messages in production', function () {
+    logger.level = 'info';
+    const bot = createBot();
+    bot.connect();
+    const listeners = bot.discord.listeners('debug');
+    listeners.length.should.equal(0);
+  });
+
+  it('should listen to discord debug messages in development', function () {
+    logger.level = 'debug';
+    const bot = createBot();
+    bot.connect();
+    const listeners = bot.discord.listeners('debug');
+    listeners.length.should.equal(1);
   });
 
   it('should join channels when invited', function () {
