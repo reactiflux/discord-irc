@@ -1,0 +1,7 @@
+IMAGE: node:latest
+
+SCRIPT:
+  - npm install
+  - npm run lint
+  - npm run coverage
+
