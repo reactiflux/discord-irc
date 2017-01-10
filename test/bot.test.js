@@ -46,7 +46,7 @@ describe('Bot', function () {
 
   const createGuildStub = (nickname = null) => ({
     members: {
-      find() {
+      get() {
         return { nickname };
       }
     }
@@ -293,7 +293,7 @@ describe('Bot', function () {
   it('should convert user mentions from IRC', function () {
     const testUser = new discord.User(this.bot.discord, { username: 'testuser', id: '123' });
     this.findUserStub.withArgs('username', testUser.username).returns(testUser);
-    this.findUserStub.withArgs('id', testUser.id).returns(testUser);
+    this.findUserStub.withArgs(testUser.id).returns(testUser);
 
     const username = 'ircuser';
     const text = 'Hello, @testuser!';
@@ -315,10 +315,10 @@ describe('Bot', function () {
   it('should convert multiple user mentions from IRC', function () {
     const testUser = new discord.User(this.bot.discord, { username: 'testuser', id: '123' });
     this.findUserStub.withArgs('username', testUser.username).returns(testUser);
-    this.findUserStub.withArgs('id', testUser.id).returns(testUser);
+    this.findUserStub.withArgs(testUser.id).returns(testUser);
     const anotherUser = new discord.User(this.bot.discord, { username: 'anotheruser', id: '124' });
     this.findUserStub.withArgs('username', anotherUser.username).returns(anotherUser);
-    this.findUserStub.withArgs('id', anotherUser.id).returns(anotherUser);
+    this.findUserStub.withArgs(anotherUser.id).returns(anotherUser);
 
     const username = 'ircuser';
     const text = 'Hello, @testuser and @anotheruser, was our meeting scheduled @5pm?';
