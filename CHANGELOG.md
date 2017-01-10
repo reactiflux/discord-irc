@@ -1,6 +1,10 @@
 # Changelog
 This project adheres to [Semantic Versioning](http://semver.org/).
 
+## [2.1.6] - 2017-01-10
+### Fixed
+* Upgraded discord.js.
+
 ## [2.1.6] - 2016-12-08
 ### Fixed
 * Listen to warn events from Discord.
