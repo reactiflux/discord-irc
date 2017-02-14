@@ -42,7 +42,7 @@
     "irc": "0.5.2",
     "lodash": "^4.17.4",
     "strip-json-comments": "2.0.1",
-    "winston": "2.3.0"
+    "winston": "2.3.1"
   },
   "devDependencies": {
     "babel-cli": "^6.6.5",
