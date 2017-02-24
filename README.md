@@ -8,7 +8,14 @@
 ## Installation and usage
 **Note**: discord-irc requires Node.js version 6 or newer, as it depends on [discord.js](https://github.com/hydrabolt/discord.js).
 
-Either by installing through npm:
+Before you can run discord-irc you need to create a configuration file by
+following the instructions [here](https://github.com/reactiflux/discord-irc#configuration).
+After you've done that you can replace `/path/to/config.json` in the commands
+below with the path to your newly created configuration file - or just `config.json` if it's
+in the same directory as the one you're starting the bot from.
+
+When you've done that you can install and start the bot either through npm:
+
 ```bash
 $ npm install -g discord-irc
 $ discord-irc --config /path/to/config.json
