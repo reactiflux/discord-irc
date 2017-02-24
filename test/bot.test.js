@@ -413,4 +413,13 @@ describe('Bot', function () {
     this.bot.sendToDiscord(username, '#irc', text);
     this.sendMessageStub.should.have.been.calledWith(expected);
   });
+
+  it('should create webhooks clients for each webhook url in the config', function () {
+    this.bot.webhooks.should.have.property('#irc');
+  });
+
+  it('should extract id and token from webhook urls', function () {
+    this.bot.webhooks['#irc'].id.should.equal('id');
+    this.bot.webhooks['#irc'].token.should.equal('token');
+  });
 });
