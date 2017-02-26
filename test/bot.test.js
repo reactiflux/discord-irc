@@ -98,7 +98,7 @@ describe('Bot', function () {
     };
 
     bot.sendToIRC(message);
-    const expected = `<${message.author.username}> ${text}`;
+    const expected = `<${message.author.username.split('').join('\u200d')}> ${text}`;
     ClientStub.prototype.say.should.have.been.calledWith('#irc', expected);
   });
 
@@ -120,7 +120,7 @@ describe('Bot', function () {
 
     this.bot.sendToIRC(message);
     // Wrap in colors:
-    const expected = `<\u000304${message.author.username}\u000f> ${text}`;
+    const expected = `<\u000304${message.author.username.split('').join('\u200d')}\u000f> ${text}`;
     ClientStub.prototype.say.should.have.been.calledWith('#irc', expected);
   });
 
@@ -142,7 +142,7 @@ describe('Bot', function () {
     };
 
     this.bot.sendToIRC(message);
-    const expected = `<\u000304${message.author.username}\u000f> ${attachmentUrl}`;
+    const expected = `<\u000304${message.author.username.split('').join('\u200d')}\u000f> ${attachmentUrl}`;
     ClientStub.prototype.say.should.have.been.calledWith('#irc', expected);
   });
 
@@ -167,9 +167,9 @@ describe('Bot', function () {
     this.bot.sendToIRC(message);
 
     ClientStub.prototype.say.should.have.been.calledWith('#irc',
-      `<\u000304${message.author.username}\u000f> ${text}`);
+      `<\u000304${message.author.username.split('').join('\u200d')}\u000f> ${text}`);
 
-    const expected = `<\u000304${message.author.username}\u000f> ${attachmentUrl}`;
+    const expected = `<\u000304${message.author.username.split('').join('\u200d')}\u000f> ${attachmentUrl}`;
     ClientStub.prototype.say.should.have.been.calledWith('#irc', expected);
   });
 
@@ -243,7 +243,7 @@ describe('Bot', function () {
     };
 
     // Wrap it in colors:
-    const expected = `<\u000312${message.author.username}\u000f> #${message.channel.name}`;
+    const expected = `<\u000312${message.author.username.split('').join('\u200d')}\u000f> #${message.channel.name}`;
     this.bot.sendToIRC(message);
     ClientStub.prototype.say
       .should.have.been.calledWith('#irc', expected);
@@ -382,7 +382,7 @@ describe('Bot', function () {
     };
 
     bot.sendToIRC(message);
-    const expected = `<${nickname}> ${text}`;
+    const expected = `<${nickname.split('').join('\u200d')}> ${text}`;
     ClientStub.prototype.say.should.have.been.calledWith('#irc', expected);
   });
 
