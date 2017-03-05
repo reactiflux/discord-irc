@@ -73,7 +73,11 @@ First you need to create a Discord bot user, which you can do by following the i
     "ircNickColor": false, // Gives usernames a color in IRC for better readability (on by default)
     // Makes the bot hide the username prefix for messages that start
     // with one of these characters (commands):
-    "commandCharacters": ["!", "."]
+    "commandCharacters": ["!", "."],
+    // Prevents the user who uses both Discord and IRC from being notified by messages they sent themself.
+    // It's done by inserting an invisible character between the Discord nickname in the message that sent to IRC.
+    // (off by default)
+    "preventMentionToAuthor": true,
   }
 ]
 ```
