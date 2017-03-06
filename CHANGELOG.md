@@ -1,6 +1,12 @@
 # Changelog
 This project adheres to [Semantic Versioning](http://semver.org/).
 
+## [2.2.0] - 2017-03-06
+### Fixed
+* Added a zero width character between each letter of the IRC nicknames, to
+avoid unwanted highlights. Fixed by @Sanqui in
+[#193](https://github.com/reactiflux/discord-irc/pull/193).
+
 ## [2.1.6] - 2017-01-10
 ### Fixed
 * Upgraded discord.js.
