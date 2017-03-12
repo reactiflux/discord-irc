@@ -10,8 +10,6 @@ import createDiscordStub from './stubs/discord-stub';
 import ClientStub from './stubs/irc-client-stub';
 import config from './fixtures/single-test-config.json';
 
-const escapeUsername = username => username.split('').join('\u200d');
-
 chai.should();
 chai.use(sinonChai);
 
@@ -100,7 +98,7 @@ describe('Bot', function () {
     };
 
     bot.sendToIRC(message);
-    const expected = `<${escapeUsername(message.author.username)}> ${text}`;
+    const expected = `<${message.author.username}> ${text}`;
     ClientStub.prototype.say.should.have.been.calledWith('#irc', expected);
   });
 
@@ -122,7 +120,7 @@ describe('Bot', function () {
 
     this.bot.sendToIRC(message);
     // Wrap in colors:
-    const expected = `<\u000304${escapeUsername(message.author.username)}\u000f> ${text}`;
+    const expected = `<\u000304${message.author.username}\u000f> ${text}`;
     ClientStub.prototype.say.should.have.been.calledWith('#irc', expected);
   });
 
@@ -144,7 +142,7 @@ describe('Bot', function () {
     };
 
     this.bot.sendToIRC(message);
-    const expected = `<\u000304${escapeUsername(message.author.username)}\u000f> ${attachmentUrl}`;
+    const expected = `<\u000304${message.author.username}\u000f> ${attachmentUrl}`;
     ClientStub.prototype.say.should.have.been.calledWith('#irc', expected);
   });
 
@@ -169,9 +167,9 @@ describe('Bot', function () {
     this.bot.sendToIRC(message);
 
     ClientStub.prototype.say.should.have.been.calledWith('#irc',
-      `<\u000304${escapeUsername(message.author.username)}\u000f> ${text}`);
+      `<\u000304${message.author.username}\u000f> ${text}`);
 
-    const expected = `<\u000304${escapeUsername(message.author.username)}\u000f> ${attachmentUrl}`;
+    const expected = `<\u000304${message.author.username}\u000f> ${attachmentUrl}`;
     ClientStub.prototype.say.should.have.been.calledWith('#irc', expected);
   });
 
@@ -245,7 +243,7 @@ describe('Bot', function () {
     };
 
     // Wrap it in colors:
-    const expected = `<\u000312${escapeUsername(message.author.username)}\u000f> #${message.channel.name}`;
+    const expected = `<\u000312${message.author.username}\u000f> #${message.channel.name}`;
     this.bot.sendToIRC(message);
     ClientStub.prototype.say
       .should.have.been.calledWith('#irc', expected);
@@ -384,7 +382,7 @@ describe('Bot', function () {
     };
 
     bot.sendToIRC(message);
-    const expected = `<${escapeUsername(nickname)}> ${text}`;
+    const expected = `<${nickname}> ${text}`;
     ClientStub.prototype.say.should.have.been.calledWith('#irc', expected);
   });
 
