@@ -23,6 +23,7 @@ export default function createDiscordStub(sendMessageStub, findUserStub) {
 
     getChannel(key, value) {
       if (key === 'name' && value !== 'discord') return null;
+      if (key !== '1234' && value === undefined) return null;
       return {
         name: 'discord',
         id: 1234,

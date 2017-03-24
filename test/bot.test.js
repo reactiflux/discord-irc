@@ -249,6 +249,30 @@ describe('Bot', function () {
       .should.have.been.calledWith('#irc', expected);
   });
 
+  it('should use #deleted-channel when referenced channel fails to exist', function () {
+    const text = '<#1235>';
+    const guild = createGuildStub();
+    const message = {
+      content: text,
+      mentions: { users: [] },
+      channel: {
+        name: 'discord'
+      },
+      author: {
+        username: 'test',
+        id: 'not bot id'
+      },
+      guild
+    };
+
+    // Discord displays "#deleted-channel" if channel doesn't exist (e.g. <#1235>)
+    // Wrap it in colors:
+    const expected = `<\u000312${message.author.username}\u000f> #deleted-channel`;
+    this.bot.sendToIRC(message);
+    ClientStub.prototype.say
+      .should.have.been.calledWith('#irc', expected);
+  });
+
   it('should convert user mentions from discord', function () {
     const guild = createGuildStub();
     const message = {
