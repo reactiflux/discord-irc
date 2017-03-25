@@ -464,14 +464,27 @@ describe('Bot', function () {
     this.bot.parseText(message).should.equal('@deleted-role');
   });
 
-  it('should convert role mentions from IRC', function () {
-    const testRole = new discord.Role(this.bot.discord, { name: 'example-role', id: '12345' });
+  it('should convert role mentions from IRC if role mentionable', function () {
+    const testRole = new discord.Role(this.bot.discord, { name: 'example-role', id: '12345', mentionable: true });
     this.findRoleStub.withArgs('name', 'example-role').returns(testRole);
     this.findRoleStub.withArgs('12345').returns(testRole);
 
     const username = 'ircuser';
     const text = 'Hello, @example-role!';
     const expected = `**<${username}>** Hello, <@&${testRole.id}>!`;
+
+    this.bot.sendToDiscord(username, '#irc', text);
+    this.sendMessageStub.should.have.been.calledWith(expected);
+  });
+
+  it('should not convert role mentions from IRC if role not mentionable', function () {
+    const testRole = new discord.Role(this.bot.discord, { name: 'example-role', id: '12345' });
+    this.findRoleStub.withArgs('name', 'example-role').returns(testRole);
+    this.findRoleStub.withArgs('12345').returns(testRole);
+
+    const username = 'ircuser';
+    const text = 'Hello, @example-role!';
+    const expected = `**<${username}>** Hello, @example-role!`;
 
     this.bot.sendToDiscord(username, '#irc', text);
     this.sendMessageStub.should.have.been.calledWith(expected);
