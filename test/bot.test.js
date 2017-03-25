@@ -25,8 +25,9 @@ describe('Bot', function () {
     sandbox.stub(logger, 'error');
     this.sendMessageStub = sandbox.stub();
     this.findUserStub = sandbox.stub();
+    this.findRoleStub = sandbox.stub();
     irc.Client = ClientStub;
-    discord.Client = createDiscordStub(this.sendMessageStub, this.findUserStub);
+    discord.Client = createDiscordStub(this.sendMessageStub, this.findUserStub, this.findRoleStub);
     ClientStub.prototype.say = sandbox.stub();
     ClientStub.prototype.send = sandbox.stub();
     ClientStub.prototype.join = sandbox.stub();
@@ -44,22 +45,14 @@ describe('Bot', function () {
     return attachments;
   };
 
-  const getRole = (key, value) => {
-    if (key !== '12345' && value === undefined) return null;
-    return {
-      name: 'example-role',
-      id: 12345
-    };
-  };
-
-  const createGuildStub = (nickname = null) => ({
+  const createGuildStub = (findRoleStub, nickname = null) => ({
     members: {
       get() {
         return { nickname };
       }
     },
     roles: {
-      get: getRole
+      get: findRoleStub
     }
   });
 
@@ -377,7 +370,7 @@ describe('Bot', function () {
     const newConfig = { ...config, ircNickColor: false };
     const bot = new Bot(newConfig);
     const nickname = 'discord-nickname';
-    const guild = createGuildStub(nickname);
+    const guild = createGuildStub(null, nickname);
     bot.connect();
     const message = {
       content: text,
@@ -426,8 +419,12 @@ describe('Bot', function () {
   });
 
   it('should convert role mentions from discord', function () {
+    const testRole = new discord.Role(this.bot.discord, { name: 'example-role', id: '12345' });
+    this.findRoleStub.withArgs('name', 'example-role').returns(testRole);
+    this.findRoleStub.withArgs('12345').returns(testRole);
+
     const text = '<@&12345>';
-    const guild = createGuildStub();
+    const guild = createGuildStub(this.findRoleStub);
     const message = {
       content: text,
       mentions: { users: [] },
@@ -445,8 +442,11 @@ describe('Bot', function () {
   });
 
   it('should use @deleted-role when referenced role fails to exist', function () {
+    const testRole = new discord.Role(this.bot.discord, { name: 'example-role', id: '12345' });
+    this.findRoleStub.withArgs('12345').returns(testRole);
+
     const text = '<@&12346>';
-    const guild = createGuildStub();
+    const guild = createGuildStub(this.findRoleStub);
     const message = {
       content: text,
       mentions: { users: [] },
@@ -462,5 +462,18 @@ describe('Bot', function () {
 
     // Discord displays "@deleted-role" if role doesn't exist (e.g. <@&12346>)
     this.bot.parseText(message).should.equal('@deleted-role');
+  });
+
+  it('should convert role mentions from IRC', function () {
+    const testRole = new discord.Role(this.bot.discord, { name: 'example-role', id: '12345' });
+    this.findRoleStub.withArgs('name', 'example-role').returns(testRole);
+    this.findRoleStub.withArgs('12345').returns(testRole);
+
+    const username = 'ircuser';
+    const text = 'Hello, @example-role!';
+    const expected = `**<${username}>** Hello, <@&${testRole.id}>!`;
+
+    this.bot.sendToDiscord(username, '#irc', text);
+    this.sendMessageStub.should.have.been.calledWith(expected);
   });
 });
