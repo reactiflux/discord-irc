@@ -44,11 +44,22 @@ describe('Bot', function () {
     return attachments;
   };
 
+  const getRole = (key, value) => {
+    if (key !== '12345' && value === undefined) return null;
+    return {
+      name: 'example-role',
+      id: 12345
+    };
+  };
+
   const createGuildStub = (nickname = null) => ({
     members: {
       get() {
         return { nickname };
       }
+    },
+    roles: {
+      get: getRole
     }
   });
 
@@ -412,5 +423,44 @@ describe('Bot', function () {
 
     this.bot.sendToDiscord(username, '#irc', text);
     this.sendMessageStub.should.have.been.calledWith(expected);
+  });
+
+  it('should convert role mentions from discord', function () {
+    const text = '<@&12345>';
+    const guild = createGuildStub();
+    const message = {
+      content: text,
+      mentions: { users: [] },
+      channel: {
+        name: 'discord'
+      },
+      author: {
+        username: 'test',
+        id: 'not bot id'
+      },
+      guild
+    };
+
+    this.bot.parseText(message).should.equal('@example-role');
+  });
+
+  it('should use @deleted-role when referenced role fails to exist', function () {
+    const text = '<@&12346>';
+    const guild = createGuildStub();
+    const message = {
+      content: text,
+      mentions: { users: [] },
+      channel: {
+        name: 'discord'
+      },
+      author: {
+        username: 'test',
+        id: 'not bot id'
+      },
+      guild
+    };
+
+    // Discord displays "@deleted-role" if role doesn't exist (e.g. <@&12346>)
+    this.bot.parseText(message).should.equal('@deleted-role');
   });
 });
