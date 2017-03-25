@@ -46,4 +46,10 @@ describe('Channel Mapping', () => {
     bot.channelMapping['#discord'].should.equal('#irc');
     bot.channelMapping['#otherDiscord'].should.equal('#otherirc');
   });
+
+  it('should work with ID maps', () => {
+    const bot = new Bot(config);
+    bot.channelMapping['1234'].should.equal('#channelforid');
+    bot.invertedMapping['#channelforid'].should.equal('1234');
+  });
 });
