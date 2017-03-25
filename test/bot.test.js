@@ -9,6 +9,7 @@ import Bot from '../lib/bot';
 import createDiscordStub from './stubs/discord-stub';
 import ClientStub from './stubs/irc-client-stub';
 import config from './fixtures/single-test-config.json';
+import configMsgFormatDefault from './fixtures/msg-formats-default.json';
 
 chai.should();
 chai.use(sinonChai);
@@ -567,6 +568,53 @@ describe('Bot', function () {
     const expected = `**<${username}>** Hello, @example-role!`;
 
     this.bot.sendToDiscord(username, '#irc', text);
+    this.sendMessageStub.should.have.been.calledWith(expected);
+  });
+
+  it('should successfully send messages with default config', function () {
+    const bot = new Bot(configMsgFormatDefault);
+    bot.connect();
+
+    bot.sendToDiscord('testuser', '#irc', 'test message');
+    this.sendMessageStub.should.have.been.calledOnce;
+
+    const guild = createGuildStub();
+    const message = {
+      content: 'test message',
+      mentions: { users: [] },
+      channel: {
+        name: 'discord'
+      },
+      author: {
+        username: 'otherauthor',
+        id: 'not bot id'
+      },
+      guild
+    };
+
+    bot.sendToIRC(message);
+    this.sendMessageStub.should.have.been.calledOnce;
+  });
+
+  it('should not replace unmatched patterns', function () {
+    const formatDiscord = '{$unmatchedPattern} stays intact: {$author} {$text}';
+    const bot = new Bot({ ...configMsgFormatDefault, formatDiscord });
+
+    const username = 'testuser';
+    const msg = 'test message';
+    const expected = `{$unmatchedPattern} stays intact: ${username} ${msg}`;
+    bot.sendToDiscord(username, '#irc', msg);
+    this.sendMessageStub.should.have.been.calledWith(expected);
+  });
+
+  it('should respect custom formatting for Discord', function () {
+    const formatDiscord = '<{$author}> {$ircChannel} => {$discordChannel}: {$text}';
+    const bot = new Bot({ ...configMsgFormatDefault, formatDiscord });
+
+    const username = 'test';
+    const msg = 'test @user <#1234>';
+    const expected = `<test> #irc => #discord: ${msg}`;
+    bot.sendToDiscord(username, '#irc', msg);
     this.sendMessageStub.should.have.been.calledWith(expected);
   });
 });
