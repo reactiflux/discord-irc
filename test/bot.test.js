@@ -21,9 +21,9 @@ describe('Bot', function () {
   });
 
   beforeEach(function () {
-    sandbox.stub(logger, 'info');
-    sandbox.stub(logger, 'debug');
-    sandbox.stub(logger, 'error');
+    this.infoSpy = sandbox.stub(logger, 'info');
+    this.debugSpy = sandbox.stub(logger, 'debug');
+    this.errorSpy = sandbox.stub(logger, 'error');
     this.sendMessageStub = sandbox.stub();
     this.findUserStub = sandbox.stub();
     this.findRoleStub = sandbox.stub();
@@ -95,6 +95,13 @@ describe('Bot', function () {
   function () {
     this.bot.sendSpecialToDiscord('#otherirc', 'message');
     this.sendMessageStub.should.not.have.been.called;
+  });
+
+  it('should send special messages to discord',
+  function () {
+    this.bot.sendSpecialToDiscord('#irc', 'message');
+    this.sendMessageStub.should.have.been.calledWith('message');
+    this.debugSpy.should.have.been.calledWith('Sending special message to Discord', 'message', '#irc', '->', '#discord');
   });
 
   it('should not color irc messages if the option is disabled', function () {
