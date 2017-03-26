@@ -79,6 +79,12 @@ describe('Bot', function () {
 
   it('should not send messages to discord if the channel isn\'t in the channel mapping',
   function () {
+    this.bot.sendToDiscord('user', '#no-irc', 'message');
+    this.sendMessageStub.should.not.have.been.called;
+  });
+
+  it('should not send messages to discord if it isn\'t in the channel',
+  function () {
     this.bot.sendToDiscord('user', '#otherirc', 'message');
     this.sendMessageStub.should.not.have.been.called;
   });
@@ -92,6 +98,12 @@ describe('Bot', function () {
   });
 
   it('should not send special messages to discord if the channel isn\'t in the channel mapping',
+  function () {
+    this.bot.sendSpecialToDiscord('#no-irc', 'message');
+    this.sendMessageStub.should.not.have.been.called;
+  });
+
+  it('should not send special messages to discord if it isn\'t in the channel',
   function () {
     this.bot.sendSpecialToDiscord('#otherirc', 'message');
     this.sendMessageStub.should.not.have.been.called;
