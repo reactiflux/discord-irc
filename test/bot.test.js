@@ -91,6 +91,12 @@ describe('Bot', function () {
     this.sendMessageStub.should.have.been.calledWith(formatted);
   });
 
+  it('should not send special messages to discord if the channel isn\'t in the channel mapping',
+  function () {
+    this.bot.sendSpecialToDiscord('#otherirc', 'message');
+    this.sendMessageStub.should.not.have.been.called;
+  });
+
   it('should not color irc messages if the option is disabled', function () {
     const text = 'testmessage';
     const newConfig = { ...config, ircNickColor: false };

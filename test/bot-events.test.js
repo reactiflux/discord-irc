@@ -23,6 +23,7 @@ describe('Bot Events', function () {
     const bot = new Bot(config);
     bot.sendToIRC = sandbox.stub();
     bot.sendToDiscord = sandbox.stub();
+    bot.sendSpecialToDiscord = sandbox.stub();
     return bot;
   };
 
@@ -119,6 +120,34 @@ describe('Bot Events', function () {
     const message = {};
     this.bot.ircClient.emit('action', author, channel, text, message);
     this.bot.sendToDiscord.should.have.been.calledWithExactly(author, channel, formattedText);
+  });
+
+  it('should send join messages to discord', function () {
+    const channel = '#channel';
+    const nick = 'user';
+    const text = `*${nick}* has joined the channel`;
+    this.bot.ircClient.emit('join', channel, nick);
+    this.bot.sendSpecialToDiscord.should.have.been.calledWithExactly(channel, text);
+  });
+
+  it('should send part messages to discord', function () {
+    const channel = '#channel';
+    const nick = 'user';
+    const reason = 'Leaving';
+    const text = `*${nick}* has left the channel (${reason})`;
+    this.bot.ircClient.emit('part', channel, nick, reason);
+    this.bot.sendSpecialToDiscord.should.have.been.calledWithExactly(channel, text);
+  });
+
+  it('should send quit messages to discord', function () {
+    const channel1 = '#channel1';
+    const channel2 = '#channel2';
+    const nick = 'user';
+    const reason = 'Quit: Leaving';
+    const text = `*${nick}* has quit (${reason})`;
+    this.bot.ircClient.emit('quit', nick, reason, [channel1, channel2]);
+    this.bot.sendSpecialToDiscord.getCall(0).args.should.deep.equal([channel1, text]);
+    this.bot.sendSpecialToDiscord.getCall(1).args.should.deep.equal([channel2, text]);
   });
 
   it('should not listen to discord debug messages in production', function () {
