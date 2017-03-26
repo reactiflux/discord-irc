@@ -133,13 +133,23 @@ describe('Bot Events', function () {
     bot.sendSpecialToDiscord.should.have.been.calledWithExactly(channel, text);
   });
 
-  it('should not announce itself joining', function () {
+  it('should not announce itself joining by default', function () {
     const bot = createBot({ ...config, ircStatusNotices: true });
     bot.connect();
     const channel = '#channel';
     const nick = bot.nickname;
     bot.ircClient.emit('join', channel, nick);
     bot.sendSpecialToDiscord.should.not.have.been.called;
+  });
+
+  it('should be possible to get the bot to announce itself joining', function () {
+    const bot = createBot({ ...config, ircStatusNotices: true, announceSelfJoin: true });
+    bot.connect();
+    const channel = '#channel';
+    const nick = this.bot.nickname;
+    const text = `*${nick}* has joined the channel`;
+    bot.ircClient.emit('join', channel, nick);
+    bot.sendSpecialToDiscord.should.have.been.calledWithExactly(channel, text);
   });
 
   it('should send part messages to discord when config enabled', function () {
