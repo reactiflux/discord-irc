@@ -2,7 +2,7 @@
 import events from 'events';
 import sinon from 'sinon';
 
-export default function createDiscordStub(sendMessageStub, findUserStub) {
+export default function createDiscordStub(sendMessageStub, findUserStub, findRoleStub) {
   return class DiscordStub extends events.EventEmitter {
     constructor() {
       super();
@@ -32,6 +32,10 @@ export default function createDiscordStub(sendMessageStub, findUserStub) {
           members: {
             find: findUserStub,
             get: findUserStub
+          },
+          roles: {
+            find: findRoleStub,
+            get: findRoleStub
           }
         }
       };
