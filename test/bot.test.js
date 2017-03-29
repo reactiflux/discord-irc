@@ -78,6 +78,14 @@ describe('Bot', function () {
     this.sendMessageStub.should.not.have.been.called;
   });
 
+  it('should send to a discord channel ID appropriately', function () {
+    const username = 'testuser';
+    const text = 'test message';
+    const formatted = `**<${username}>** ${text}`;
+    this.bot.sendToDiscord(username, '#channelforid', text);
+    this.sendMessageStub.should.have.been.calledWith(formatted);
+  });
+
   it('should not color irc messages if the option is disabled', function () {
     const text = 'testmessage';
     const newConfig = { ...config, ircNickColor: false };
@@ -122,6 +130,54 @@ describe('Bot', function () {
     // Wrap in colors:
     const expected = `<\u000304${message.author.username}\u000f> ${text}`;
     ClientStub.prototype.say.should.have.been.calledWith('#irc', expected);
+  });
+
+  it('should send to IRC channel mapped by discord channel ID if available', function () {
+    const text = 'test message';
+    const guild = createGuildStub();
+    const message = {
+      content: text,
+      mentions: { users: [] },
+      channel: {
+        id: 1234,
+        name: 'namenotinmapping'
+      },
+      author: {
+        username: 'test',
+        id: 'not bot id'
+      },
+      guild
+    };
+
+    // Wrap it in colors:
+    const expected = `<\u000312${message.author.username}\u000f> test message`;
+    this.bot.sendToIRC(message);
+    ClientStub.prototype.say
+      .should.have.been.calledWith('#channelforid', expected);
+  });
+
+  it('should send to IRC channel mapped by discord channel name if ID not available', function () {
+    const text = 'test message';
+    const guild = createGuildStub();
+    const message = {
+      content: text,
+      mentions: { users: [] },
+      channel: {
+        id: 1235,
+        name: 'discord'
+      },
+      author: {
+        username: 'test',
+        id: 'not bot id'
+      },
+      guild
+    };
+
+    // Wrap it in colors:
+    const expected = `<\u000312${message.author.username}\u000f> test message`;
+    this.bot.sendToIRC(message);
+    ClientStub.prototype.say
+      .should.have.been.calledWith('#irc', expected);
   });
 
   it('should send attachment URL to IRC', function () {

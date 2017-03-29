@@ -9,6 +9,7 @@
   ],
   "channelMapping": {
     "#discord": "#irc channelKey",
-    "#notinchannel": "#otherIRC"
+    "#notinchannel": "#otherIRC",
+    "1234": "#channelforid"
   }
 }

@@ -38,12 +38,18 @@ describe('Channel Mapping', () => {
     const bot = new Bot(config);
     bot.channelMapping['#discord'].should.equal('#irc');
     bot.invertedMapping['#irc'].should.equal('#discord');
-    bot.channels[0].should.equal('#irc channelKey');
+    bot.channels.should.contain('#irc channelKey');
   });
 
   it('should lowercase IRC channel names', () => {
     const bot = new Bot(caseConfig);
     bot.channelMapping['#discord'].should.equal('#irc');
     bot.channelMapping['#otherDiscord'].should.equal('#otherirc');
+  });
+
+  it('should work with ID maps', () => {
+    const bot = new Bot(config);
+    bot.channelMapping['1234'].should.equal('#channelforid');
+    bot.invertedMapping['#channelforid'].should.equal('1234');
   });
 });
