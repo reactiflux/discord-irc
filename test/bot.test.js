@@ -597,8 +597,8 @@ describe('Bot', function () {
   });
 
   it('should not replace unmatched patterns', function () {
-    const formatDiscord = '{$unmatchedPattern} stays intact: {$author} {$text}';
-    const bot = new Bot({ ...configMsgFormatDefault, formatDiscord });
+    const format = { discord: '{$unmatchedPattern} stays intact: {$author} {$text}' };
+    const bot = new Bot({ ...configMsgFormatDefault, format });
     bot.connect();
 
     const username = 'testuser';
@@ -609,8 +609,8 @@ describe('Bot', function () {
   });
 
   it('should respect custom formatting for Discord', function () {
-    const formatDiscord = '<{$author}> {$ircChannel} => {$discordChannel}: {$text}';
-    const bot = new Bot({ ...configMsgFormatDefault, formatDiscord });
+    const format = { discord: '<{$author}> {$ircChannel} => {$discordChannel}: {$text}' };
+    const bot = new Bot({ ...configMsgFormatDefault, format });
     bot.connect();
 
     const username = 'test';
@@ -646,8 +646,8 @@ describe('Bot', function () {
   });
 
   it('should not replace unmatched patterns', function () {
-    const formatDiscord = '{$unmatchedPattern} stays intact: {$author} {$text}';
-    this.bot = new Bot({ ...configMsgFormatDefault, formatDiscord });
+    const format = { discord: '{$unmatchedPattern} stays intact: {$author} {$text}' };
+    this.bot = new Bot({ ...configMsgFormatDefault, format });
     this.bot.connect();
 
     const username = 'testuser';
@@ -658,8 +658,8 @@ describe('Bot', function () {
   });
 
   it('should respect custom formatting for Discord', function () {
-    const formatDiscord = '<{$author}> {$ircChannel} => {$discordChannel}: {$text}';
-    this.bot = new Bot({ ...configMsgFormatDefault, formatDiscord });
+    const format = { discord: '<{$author}> {$ircChannel} => {$discordChannel}: {$text}' };
+    this.bot = new Bot({ ...configMsgFormatDefault, format });
     this.bot.connect();
 
     const username = 'test';
@@ -670,8 +670,8 @@ describe('Bot', function () {
   });
 
   it('should respect custom formatting for regular IRC output', function () {
-    const formatIRCText = '<{$nickname}> {$discordChannel} => {$ircChannel}: {$text}';
-    this.bot = new Bot({ ...configMsgFormatDefault, formatIRCText });
+    const format = { ircText: '<{$nickname}> {$discordChannel} => {$ircChannel}: {$text}' };
+    this.bot = new Bot({ ...configMsgFormatDefault, format });
     this.bot.connect();
 
     const guild = createGuildStub();
@@ -694,8 +694,8 @@ describe('Bot', function () {
   });
 
   it('should respect custom formatting for commands in IRC output', function () {
-    const formatCommandPrelude = '{$nickname} from {$discordChannel} sent command to {$ircChannel}:';
-    this.bot = new Bot({ ...configMsgFormatDefault, formatCommandPrelude });
+    const format = { commandPrelude: '{$nickname} from {$discordChannel} sent command to {$ircChannel}:' };
+    this.bot = new Bot({ ...configMsgFormatDefault, format });
     this.bot.connect();
 
     const text = '!testcmd';
@@ -720,8 +720,8 @@ describe('Bot', function () {
   });
 
   it('should respect custom formatting for attachment URLs in IRC output', function () {
-    const formatURLAttachment = '<{$nickname}> {$discordChannel} => {$ircChannel}, attachment: {$attachmentURL}';
-    this.bot = new Bot({ ...configMsgFormatDefault, formatURLAttachment });
+    const format = { urlAttachment: '<{$nickname}> {$discordChannel} => {$ircChannel}, attachment: {$attachmentURL}' };
+    this.bot = new Bot({ ...configMsgFormatDefault, format });
     this.bot.connect();
 
     const attachmentUrl = 'https://image/url.jpg';
