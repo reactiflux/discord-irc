@@ -19,10 +19,12 @@ describe('Bot Events', function () {
     useFakeServer: false
   });
 
-  const createBot = () => {
-    const bot = new Bot(config);
+  const createBot = (optConfig = null) => {
+    const useConfig = optConfig || config;
+    const bot = new Bot(useConfig);
     bot.sendToIRC = sandbox.stub();
     bot.sendToDiscord = sandbox.stub();
+    bot.sendExactToDiscord = sandbox.stub();
     return bot;
   };
 
@@ -119,6 +121,73 @@ describe('Bot Events', function () {
     const message = {};
     this.bot.ircClient.emit('action', author, channel, text, message);
     this.bot.sendToDiscord.should.have.been.calledWithExactly(author, channel, formattedText);
+  });
+
+  it('should send join messages to discord when config enabled', function () {
+    const bot = createBot({ ...config, ircStatusNotices: true });
+    bot.connect();
+    const channel = '#channel';
+    const nick = 'user';
+    const text = `*${nick}* has joined the channel`;
+    bot.ircClient.emit('join', channel, nick);
+    bot.sendExactToDiscord.should.have.been.calledWithExactly(channel, text);
+  });
+
+  it('should not announce itself joining by default', function () {
+    const bot = createBot({ ...config, ircStatusNotices: true });
+    bot.connect();
+    const channel = '#channel';
+    const nick = bot.nickname;
+    bot.ircClient.emit('join', channel, nick);
+    bot.sendExactToDiscord.should.not.have.been.called;
+  });
+
+  it('should be possible to get the bot to announce itself joining', function () {
+    const bot = createBot({ ...config, ircStatusNotices: true, announceSelfJoin: true });
+    bot.connect();
+    const channel = '#channel';
+    const nick = this.bot.nickname;
+    const text = `*${nick}* has joined the channel`;
+    bot.ircClient.emit('join', channel, nick);
+    bot.sendExactToDiscord.should.have.been.calledWithExactly(channel, text);
+  });
+
+  it('should send part messages to discord when config enabled', function () {
+    const bot = createBot({ ...config, ircStatusNotices: true });
+    bot.connect();
+    const channel = '#channel';
+    const nick = 'user';
+    const reason = 'Leaving';
+    const text = `*${nick}* has left the channel (${reason})`;
+    bot.ircClient.emit('part', channel, nick, reason);
+    bot.sendExactToDiscord.should.have.been.calledWithExactly(channel, text);
+  });
+
+  it('should send quit messages to discord when config enabled', function () {
+    const bot = createBot({ ...config, ircStatusNotices: true });
+    bot.connect();
+    const channel1 = '#channel1';
+    const channel2 = '#channel2';
+    const nick = 'user';
+    const reason = 'Quit: Leaving';
+    const text = `*${nick}* has quit (${reason})`;
+    bot.ircClient.emit('quit', nick, reason, [channel1, channel2]);
+    bot.sendExactToDiscord.getCall(0).args.should.deep.equal([channel1, text]);
+    bot.sendExactToDiscord.getCall(1).args.should.deep.equal([channel2, text]);
+  });
+
+  it('should be possible to disable join/part/quit messages', function () {
+    const bot = createBot({ ...config, ircStatusNotices: false });
+    bot.connect();
+    const channel = '#channel';
+    const nick = 'user';
+    const reason = 'Leaving';
+
+    bot.ircClient.emit('join', channel, nick);
+    bot.ircClient.emit('part', channel, nick, reason);
+    bot.ircClient.emit('join', channel, nick);
+    bot.ircClient.emit('quit', nick, reason, [channel]);
+    bot.sendExactToDiscord.should.not.have.been.called;
   });
 
   it('should not listen to discord debug messages in production', function () {

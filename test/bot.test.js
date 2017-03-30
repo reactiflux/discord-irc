@@ -21,9 +21,9 @@ describe('Bot', function () {
   });
 
   beforeEach(function () {
-    sandbox.stub(logger, 'info');
-    sandbox.stub(logger, 'debug');
-    sandbox.stub(logger, 'error');
+    this.infoSpy = sandbox.stub(logger, 'info');
+    this.debugSpy = sandbox.stub(logger, 'debug');
+    this.errorSpy = sandbox.stub(logger, 'error');
     this.sendMessageStub = sandbox.stub();
     this.findUserStub = sandbox.stub();
     this.findRoleStub = sandbox.stub();
@@ -79,6 +79,12 @@ describe('Bot', function () {
 
   it('should not send messages to discord if the channel isn\'t in the channel mapping',
   function () {
+    this.bot.sendToDiscord('user', '#no-irc', 'message');
+    this.sendMessageStub.should.not.have.been.called;
+  });
+
+  it('should not send messages to discord if it isn\'t in the channel',
+  function () {
     this.bot.sendToDiscord('user', '#otherirc', 'message');
     this.sendMessageStub.should.not.have.been.called;
   });
@@ -89,6 +95,25 @@ describe('Bot', function () {
     const formatted = `**<${username}>** ${text}`;
     this.bot.sendToDiscord(username, '#channelforid', text);
     this.sendMessageStub.should.have.been.calledWith(formatted);
+  });
+
+  it('should not send special messages to discord if the channel isn\'t in the channel mapping',
+  function () {
+    this.bot.sendExactToDiscord('#no-irc', 'message');
+    this.sendMessageStub.should.not.have.been.called;
+  });
+
+  it('should not send special messages to discord if it isn\'t in the channel',
+  function () {
+    this.bot.sendExactToDiscord('#otherirc', 'message');
+    this.sendMessageStub.should.not.have.been.called;
+  });
+
+  it('should send special messages to discord',
+  function () {
+    this.bot.sendExactToDiscord('#irc', 'message');
+    this.sendMessageStub.should.have.been.calledWith('message');
+    this.debugSpy.should.have.been.calledWith('Sending special message to Discord', 'message', '#irc', '->', '#discord');
   });
 
   it('should not color irc messages if the option is disabled', function () {
