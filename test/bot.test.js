@@ -9,6 +9,7 @@ import Bot from '../lib/bot';
 import createDiscordStub from './stubs/discord-stub';
 import ClientStub from './stubs/irc-client-stub';
 import config from './fixtures/single-test-config.json';
+import configMsgFormatDefault from './fixtures/msg-formats-default.json';
 
 chai.should();
 chai.use(sinonChai);
@@ -568,5 +569,179 @@ describe('Bot', function () {
 
     this.bot.sendToDiscord(username, '#irc', text);
     this.sendMessageStub.should.have.been.calledWith(expected);
+  });
+
+  it('should successfully send messages with default config', function () {
+    const bot = new Bot(configMsgFormatDefault);
+    bot.connect();
+
+    bot.sendToDiscord('testuser', '#irc', 'test message');
+    this.sendMessageStub.should.have.been.calledOnce;
+
+    const guild = createGuildStub();
+    const message = {
+      content: 'test message',
+      mentions: { users: [] },
+      channel: {
+        name: 'discord'
+      },
+      author: {
+        username: 'otherauthor',
+        id: 'not bot id'
+      },
+      guild
+    };
+
+    bot.sendToIRC(message);
+    this.sendMessageStub.should.have.been.calledOnce;
+  });
+
+  it('should not replace unmatched patterns', function () {
+    const format = { discord: '{$unmatchedPattern} stays intact: {$author} {$text}' };
+    const bot = new Bot({ ...configMsgFormatDefault, format });
+    bot.connect();
+
+    const username = 'testuser';
+    const msg = 'test message';
+    const expected = `{$unmatchedPattern} stays intact: ${username} ${msg}`;
+    bot.sendToDiscord(username, '#irc', msg);
+    this.sendMessageStub.should.have.been.calledWith(expected);
+  });
+
+  it('should respect custom formatting for Discord', function () {
+    const format = { discord: '<{$author}> {$ircChannel} => {$discordChannel}: {$text}' };
+    const bot = new Bot({ ...configMsgFormatDefault, format });
+    bot.connect();
+
+    const username = 'test';
+    const msg = 'test @user <#1234>';
+    const expected = `<test> #irc => #discord: ${msg}`;
+    bot.sendToDiscord(username, '#irc', msg);
+    this.sendMessageStub.should.have.been.calledWith(expected);
+  });
+
+  it('should successfully send messages with default config', function () {
+    this.bot = new Bot(configMsgFormatDefault);
+    this.bot.connect();
+
+    this.bot.sendToDiscord('testuser', '#irc', 'test message');
+    this.sendMessageStub.should.have.been.calledOnce;
+
+    const guild = createGuildStub();
+    const message = {
+      content: 'test message',
+      mentions: { users: [] },
+      channel: {
+        name: 'discord'
+      },
+      author: {
+        username: 'otherauthor',
+        id: 'not bot id'
+      },
+      guild
+    };
+
+    this.bot.sendToIRC(message);
+    this.sendMessageStub.should.have.been.calledOnce;
+  });
+
+  it('should not replace unmatched patterns', function () {
+    const format = { discord: '{$unmatchedPattern} stays intact: {$author} {$text}' };
+    this.bot = new Bot({ ...configMsgFormatDefault, format });
+    this.bot.connect();
+
+    const username = 'testuser';
+    const msg = 'test message';
+    const expected = `{$unmatchedPattern} stays intact: ${username} ${msg}`;
+    this.bot.sendToDiscord(username, '#irc', msg);
+    this.sendMessageStub.should.have.been.calledWith(expected);
+  });
+
+  it('should respect custom formatting for Discord', function () {
+    const format = { discord: '<{$author}> {$ircChannel} => {$discordChannel}: {$text}' };
+    this.bot = new Bot({ ...configMsgFormatDefault, format });
+    this.bot.connect();
+
+    const username = 'test';
+    const msg = 'test @user <#1234>';
+    const expected = `<test> #irc => #discord: ${msg}`;
+    this.bot.sendToDiscord(username, '#irc', msg);
+    this.sendMessageStub.should.have.been.calledWith(expected);
+  });
+
+  it('should respect custom formatting for regular IRC output', function () {
+    const format = { ircText: '<{$nickname}> {$discordChannel} => {$ircChannel}: {$text}' };
+    this.bot = new Bot({ ...configMsgFormatDefault, format });
+    this.bot.connect();
+
+    const guild = createGuildStub();
+    const message = {
+      content: 'test message',
+      mentions: { users: [] },
+      channel: {
+        name: 'discord'
+      },
+      author: {
+        username: 'testauthor',
+        id: 'not bot id'
+      },
+      guild
+    };
+    const expected = '<testauthor> #discord => #irc: test message';
+
+    this.bot.sendToIRC(message);
+    ClientStub.prototype.say.should.have.been.calledWith('#irc', expected);
+  });
+
+  it('should respect custom formatting for commands in IRC output', function () {
+    const format = { commandPrelude: '{$nickname} from {$discordChannel} sent command to {$ircChannel}:' };
+    this.bot = new Bot({ ...configMsgFormatDefault, format });
+    this.bot.connect();
+
+    const text = '!testcmd';
+    const guild = createGuildStub();
+    const message = {
+      content: text,
+      mentions: { users: [] },
+      channel: {
+        name: 'discord'
+      },
+      author: {
+        username: 'testauthor',
+        id: 'not bot id'
+      },
+      guild
+    };
+    const expected = 'testauthor from #discord sent command to #irc:';
+
+    this.bot.sendToIRC(message);
+    ClientStub.prototype.say.getCall(0).args.should.deep.equal(['#irc', expected]);
+    ClientStub.prototype.say.getCall(1).args.should.deep.equal(['#irc', text]);
+  });
+
+  it('should respect custom formatting for attachment URLs in IRC output', function () {
+    const format = { urlAttachment: '<{$nickname}> {$discordChannel} => {$ircChannel}, attachment: {$attachmentURL}' };
+    this.bot = new Bot({ ...configMsgFormatDefault, format });
+    this.bot.connect();
+
+    const attachmentUrl = 'https://image/url.jpg';
+    const guild = createGuildStub();
+    const message = {
+      content: '',
+      mentions: { users: [] },
+      attachments: createAttachments(attachmentUrl),
+      channel: {
+        name: 'discord'
+      },
+      author: {
+        username: 'otherauthor',
+        id: 'not bot id'
+      },
+      guild
+    };
+
+    this.bot.sendToIRC(message);
+    const expected = `<otherauthor> #discord => #irc, attachment: ${attachmentUrl}`;
+    ClientStub.prototype.say.should.have.been.calledWith('#irc', expected);
   });
 });

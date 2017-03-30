@@ -1,0 +1,9 @@
+{
+  "nickname": "Reactiflux",
+  "server": "irc.freenode.net",
+  "discordToken": "whatapassword",
+  "commandCharacters": ["!", "."],
+  "channelMapping": {
+    "#discord": "#irc"
+  }
+}
