@@ -23,7 +23,7 @@ IRC and Discord using the format options object
 [#202](https://github.com/reactiflux/discord-irc/pull/202).
 
 ### Fixed
-* Parse role mentions appropariately, as with channel and user mentions
+* Parse role mentions appropriately, as with channel and user mentions
 [#203](https://github.com/reactiflux/discord-irc/pull/203).
 
 * Make the bot not crash when a channel mentioned by ID fails to exist
