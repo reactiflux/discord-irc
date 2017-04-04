@@ -1,6 +1,38 @@
 # Changelog
 This project adheres to [Semantic Versioning](http://semver.org/).
 
+## [2.3.0] - 2017-04-03
+A huge thank you to [Throne3d](https://github.com/Throne3d),
+[rahatarmanahmed](https://github.com/rahatarmanahmed) and
+[Ratismal](https://github.com/Ratismal) for all the fixes and features
+in this release.
+
+### Added
+* Bridge IRC join/part/quit messages to Discord
+(enable by setting ircStatusNotices to true) -
+[#207](https://github.com/reactiflux/discord-irc/pull/207).
+
+* Convert text styles between IRC and Discord
+[#205](https://github.com/reactiflux/discord-irc/pull/205).
+
+* Allow users to configure the patterns of messages on
+IRC and Discord using the format options object
+[#204](https://github.com/reactiflux/discord-irc/pull/204).
+
+* Add Discord channel ID matching  to the channel mapping
+[#202](https://github.com/reactiflux/discord-irc/pull/202).
+
+### Fixed
+* Parse role mentions appropariately, as with channel and user mentions
+[#203](https://github.com/reactiflux/discord-irc/pull/203).
+
+* Make the bot not crash when a channel mentioned by ID fails to exist
+[#201](https://github.com/reactiflux/discord-irc/pull/201).
+
+### Changed
+* Convert username mentions even if nickname is set -
+[#208](https://github.com/reactiflux/discord-irc/pull/208).
+
 ## [2.2.1] - 2017-03-12
 ### Fixed
 * Reverts the changes in 2.2.0 due to incompatibilities with different clients.
