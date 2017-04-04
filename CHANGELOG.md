@@ -2,9 +2,9 @@
 This project adheres to [Semantic Versioning](http://semver.org/).
 
 ## [2.3.0] - 2017-04-03
-A huge thank you to [Throne3d](https://github.com/Throne3d),
-[rahatarmanahmed](https://github.com/rahatarmanahmed) and
-[Ratismal](https://github.com/Ratismal) for all the fixes and features
+A huge thank you to [@Throne3d](https://github.com/Throne3d),
+[@rahatarmanahmed](https://github.com/rahatarmanahmed), [@mraof](https://github.com/mraof)
+and [@Ratismal](https://github.com/Ratismal) for all the fixes and features
 in this release.
 
 ### Added
