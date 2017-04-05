@@ -131,7 +131,8 @@ describe('Bot Events', function () {
     // nick => '' means the user is not a special user
     const nicks = { [bot.nickname]: '', user: '', user2: '@', user3: '+' };
     bot.ircClient.emit('names', channel, nicks);
-    bot.channelUsers.should.deep.equal({ '#channel': [bot.nickname, 'user', 'user2', 'user3'] });
+    const channelNicks = new Set([bot.nickname, 'user', 'user2', 'user3']);
+    bot.channelUsers.should.deep.equal({ '#channel': channelNicks });
   });
 
   it('should send join messages to discord when config enabled', function () {
@@ -143,7 +144,8 @@ describe('Bot Events', function () {
     const text = `*${nick}* has joined the channel`;
     bot.ircClient.emit('join', channel, nick);
     bot.sendExactToDiscord.should.have.been.calledWithExactly(channel, text);
-    bot.channelUsers.should.deep.equal({ '#channel': [bot.nickname, nick] });
+    const channelNicks = new Set([bot.nickname, nick]);
+    bot.channelUsers.should.deep.equal({ '#channel': channelNicks });
   });
 
   it('should not announce itself joining by default', function () {
@@ -154,7 +156,8 @@ describe('Bot Events', function () {
     const nick = bot.nickname;
     bot.ircClient.emit('join', channel, nick);
     bot.sendExactToDiscord.should.not.have.been.called;
-    bot.channelUsers.should.deep.equal({ '#channel': [bot.nickname] });
+    const channelNicks = new Set([bot.nickname]);
+    bot.channelUsers.should.deep.equal({ '#channel': channelNicks });
   });
 
   it('should announce the bot itself when config enabled', function () {
@@ -175,13 +178,15 @@ describe('Bot Events', function () {
     const channel = '#channel';
     const nick = 'user';
     bot.ircClient.emit('names', channel, { [bot.nickname]: '', [nick]: '' });
-    bot.channelUsers.should.deep.equal({ '#channel': [bot.nickname, nick] });
+    const originalNicks = new Set([bot.nickname, nick]);
+    bot.channelUsers.should.deep.equal({ '#channel': originalNicks });
     const reason = 'Leaving';
     const text = `*${nick}* has left the channel (${reason})`;
     bot.ircClient.emit('part', channel, nick, reason);
     bot.sendExactToDiscord.should.have.been.calledWithExactly(channel, text);
     // it should remove the nickname from the channelUsers list
-    bot.channelUsers.should.deep.equal({ '#channel': [bot.nickname] });
+    const channelNicks = new Set([bot.nickname]);
+    bot.channelUsers.should.deep.equal({ '#channel': channelNicks });
   });
 
   it('should not announce itself leaving a channel', function () {
@@ -189,7 +194,8 @@ describe('Bot Events', function () {
     bot.connect();
     const channel = '#channel';
     bot.ircClient.emit('names', channel, { [bot.nickname]: '', user: '' });
-    bot.channelUsers.should.deep.equal({ '#channel': [bot.nickname, 'user'] });
+    const originalNicks = new Set([bot.nickname, 'user']);
+    bot.channelUsers.should.deep.equal({ '#channel': originalNicks });
     const reason = 'Leaving';
     bot.ircClient.emit('part', channel, bot.nickname, reason);
     bot.sendExactToDiscord.should.not.have.been.called;
