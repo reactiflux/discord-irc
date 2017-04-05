@@ -1,6 +1,10 @@
 # Changelog
 This project adheres to [Semantic Versioning](http://semver.org/).
 
+## [2.3.1] - 2017-04-05
+### Fixed
+* Fix IRC quit messages sending to all channels by tracking users - [#214](https://github.com/reactiflux/discord-irc/pull/214#pullrequestreview-31156291).
+
 ## [2.3.0] - 2017-04-03
 A huge thank you to [@Throne3d](https://github.com/Throne3d),
 [@rahatarmanahmed](https://github.com/rahatarmanahmed), [@mraof](https://github.com/mraof)
