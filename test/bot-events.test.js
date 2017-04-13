@@ -135,6 +135,16 @@ describe('Bot Events', function () {
     bot.channelUsers.should.deep.equal({ '#channel': channelNicks });
   });
 
+  it('should lowercase the channelUsers mapping', function () {
+    const bot = createBot({ ...config, ircStatusNotices: true });
+    bot.connect();
+    const channel = '#channelName';
+    const nicks = { [bot.nickname]: '' };
+    bot.ircClient.emit('names', channel, nicks);
+    const channelNicks = new Set([bot.nickname]);
+    bot.channelUsers.should.deep.equal({ '#channelname': channelNicks });
+  });
+
   it('should send join messages to discord when config enabled', function () {
     const bot = createBot({ ...config, ircStatusNotices: true });
     bot.connect();
@@ -220,6 +230,22 @@ describe('Bot Events', function () {
     bot.sendExactToDiscord.should.have.been.calledTwice;
     bot.sendExactToDiscord.getCall(0).args.should.deep.equal([channel1, text]);
     bot.sendExactToDiscord.getCall(1).args.should.deep.equal([channel3, text]);
+  });
+
+  it('should not crash with join/part/quit messages and weird channel casing', function () {
+    const bot = createBot({ ...config, ircStatusNotices: true });
+    bot.connect();
+
+    function wrap() {
+      const nick = 'user';
+      const reason = 'Leaving';
+      bot.ircClient.emit('names', '#Channel', { [bot.nickname]: '' });
+      bot.ircClient.emit('join', '#cHannel', nick);
+      bot.ircClient.emit('part', '#chAnnel', nick, reason);
+      bot.ircClient.emit('join', '#chaNnel', nick);
+      bot.ircClient.emit('quit', nick, reason, ['#chanNel']);
+    }
+    (wrap).should.not.throw();
   });
 
   it('should be possible to disable join/part/quit messages', function () {
