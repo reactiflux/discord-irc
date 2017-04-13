@@ -64,7 +64,8 @@ First you need to create a Discord bot user, which you can do by following the i
       ["AUTH", "test", "password"]
     ],
     "channelMapping": { // Maps each Discord-channel to an IRC-channel, used to direct messages to the correct place
-      "#discord": "#irc channel-password" // Add channel keys after the channel name
+      "#discord": "#irc channel-password", // Add channel keys after the channel name
+      "1234567890": "#channel" // Use a discord channel ID instead of its name (so you can rename it or to disambiguate)
     },
     "ircOptions": { // Optional node-irc options
       "floodProtection": false, // On by default
@@ -80,6 +81,8 @@ First you need to create a Discord bot user, which you can do by following the i
 ```
 
 The `ircOptions` object is passed directly to node-irc ([available options](http://node-irc.readthedocs.org/en/latest/API.html#irc.Client)).
+
+To retrieve a discord channel ID, write `\#channel` on the relevant server – it should produce something of the form `<#1234567890>`, which you can then use in the `channelMapping` config.
 
 ## Tests
 Run the tests with:
