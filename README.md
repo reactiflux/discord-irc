@@ -71,6 +71,16 @@ First you need to create a Discord bot user, which you can do by following the i
       "floodProtection": false, // On by default
       "floodProtectionDelay": 1000 // 500 by default
     },
+    "format": { // Optional custom formatting options
+      // Patterns, represented by {$patternName}, are replaced when sending messages
+      "commandPrelude": "Command sent by {$nickname}", // Message sent before a command
+      "ircText": "<{$displayUsername}> {$text}", // When sending a message to IRC
+      "urlAttachment": "<{$displayUsername}> {$attachmentURL}", // When sending a Discord attachment to IRC
+      "discord": "**<{$author}>** {$withMentions}" // When sending a message to Discord
+      // Other patterns that can be used:
+      // {$discordChannel} (e.g. #general)
+      // {$ircChannel} (e.g. #irc)
+    },
     "ircNickColor": false, // Gives usernames a color in IRC for better readability (on by default)
     // Makes the bot hide the username prefix for messages that start
     // with one of these characters (commands):
