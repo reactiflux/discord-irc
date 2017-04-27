@@ -1,6 +1,11 @@
 # Changelog
 This project adheres to [Semantic Versioning](http://semver.org/).
 
+## [2.3.2] - 2017-04-27
+### Fixed
+* Fix ircStatucNotices when channels are not lowercase -
+[#219](https://github.com/reactiflux/discord-irc/pull/219).
+
 ## [2.3.1] - 2017-04-05
 ### Fixed
 * Fix IRC quit messages sending to all channels by tracking users - [#214](https://github.com/reactiflux/discord-irc/pull/214#pullrequestreview-31156291).
