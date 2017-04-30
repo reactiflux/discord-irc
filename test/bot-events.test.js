@@ -263,6 +263,19 @@ describe('Bot Events', function () {
     bot.sendExactToDiscord.should.not.have.been.called;
   });
 
+  it('should warn if it receives a part/quit before a names event', function () {
+    const bot = createBot({ ...config, ircStatusNotices: true });
+    bot.connect();
+    const channel = '#channel';
+    const reason = 'Leaving';
+
+    bot.ircClient.emit('part', channel, 'user1', reason);
+    bot.ircClient.emit('quit', 'user2', reason, [channel]);
+    this.warnSpy.should.have.been.calledTwice;
+    this.warnSpy.getCall(0).args.should.deep.equal([`No channelUsers found for ${channel} when user1 parted.`]);
+    this.warnSpy.getCall(1).args.should.deep.equal([`No channelUsers found for ${channel} when user2 quit, ignoring.`]);
+  });
+
   it('should not listen to discord debug messages in production', function () {
     logger.level = 'info';
     const bot = createBot();
