@@ -1,6 +1,11 @@
 # Changelog
 This project adheres to [Semantic Versioning](http://semver.org/).
 
+## [2.3.3] - 2017-04-29
+### Fixed
+* Warn if a part/quit is received and no channelUsers is set -
+[#218](https://github.com/reactiflux/discord-irc/pull/218).
+
 ## [2.3.2] - 2017-04-27
 ### Fixed
 * Fix ircStatucNotices when channels are not lowercase -
