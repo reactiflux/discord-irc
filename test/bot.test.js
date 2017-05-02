@@ -9,6 +9,7 @@ import Bot from '../lib/bot';
 import createDiscordStub from './stubs/discord-stub';
 import ClientStub from './stubs/irc-client-stub';
 import config from './fixtures/single-test-config.json';
+import configMsgFormatDefault from './fixtures/msg-formats-default.json';
 
 chai.should();
 chai.use(sinonChai);
@@ -20,13 +21,14 @@ describe('Bot', function () {
   });
 
   beforeEach(function () {
-    sandbox.stub(logger, 'info');
-    sandbox.stub(logger, 'debug');
-    sandbox.stub(logger, 'error');
+    this.infoSpy = sandbox.stub(logger, 'info');
+    this.debugSpy = sandbox.stub(logger, 'debug');
+    this.errorSpy = sandbox.stub(logger, 'error');
     this.sendMessageStub = sandbox.stub();
     this.findUserStub = sandbox.stub();
+    this.findRoleStub = sandbox.stub();
     irc.Client = ClientStub;
-    discord.Client = createDiscordStub(this.sendMessageStub, this.findUserStub);
+    discord.Client = createDiscordStub(this.sendMessageStub, this.findUserStub, this.findRoleStub);
     ClientStub.prototype.say = sandbox.stub();
     ClientStub.prototype.send = sandbox.stub();
     ClientStub.prototype.join = sandbox.stub();
@@ -44,11 +46,14 @@ describe('Bot', function () {
     return attachments;
   };
 
-  const createGuildStub = (nickname = null) => ({
+  const createGuildStub = (findRoleStub, nickname = null) => ({
     members: {
       get() {
         return { nickname };
       }
+    },
+    roles: {
+      get: findRoleStub
     }
   });
 
@@ -74,8 +79,41 @@ describe('Bot', function () {
 
   it('should not send messages to discord if the channel isn\'t in the channel mapping',
   function () {
+    this.bot.sendToDiscord('user', '#no-irc', 'message');
+    this.sendMessageStub.should.not.have.been.called;
+  });
+
+  it('should not send messages to discord if it isn\'t in the channel',
+  function () {
     this.bot.sendToDiscord('user', '#otherirc', 'message');
     this.sendMessageStub.should.not.have.been.called;
+  });
+
+  it('should send to a discord channel ID appropriately', function () {
+    const username = 'testuser';
+    const text = 'test message';
+    const formatted = `**<${username}>** ${text}`;
+    this.bot.sendToDiscord(username, '#channelforid', text);
+    this.sendMessageStub.should.have.been.calledWith(formatted);
+  });
+
+  it('should not send special messages to discord if the channel isn\'t in the channel mapping',
+  function () {
+    this.bot.sendExactToDiscord('#no-irc', 'message');
+    this.sendMessageStub.should.not.have.been.called;
+  });
+
+  it('should not send special messages to discord if it isn\'t in the channel',
+  function () {
+    this.bot.sendExactToDiscord('#otherirc', 'message');
+    this.sendMessageStub.should.not.have.been.called;
+  });
+
+  it('should send special messages to discord',
+  function () {
+    this.bot.sendExactToDiscord('#irc', 'message');
+    this.sendMessageStub.should.have.been.calledWith('message');
+    this.debugSpy.should.have.been.calledWith('Sending special message to Discord', 'message', '#irc', '->', '#discord');
   });
 
   it('should not color irc messages if the option is disabled', function () {
@@ -122,6 +160,54 @@ describe('Bot', function () {
     // Wrap in colors:
     const expected = `<\u000304${message.author.username}\u000f> ${text}`;
     ClientStub.prototype.say.should.have.been.calledWith('#irc', expected);
+  });
+
+  it('should send to IRC channel mapped by discord channel ID if available', function () {
+    const text = 'test message';
+    const guild = createGuildStub();
+    const message = {
+      content: text,
+      mentions: { users: [] },
+      channel: {
+        id: 1234,
+        name: 'namenotinmapping'
+      },
+      author: {
+        username: 'test',
+        id: 'not bot id'
+      },
+      guild
+    };
+
+    // Wrap it in colors:
+    const expected = `<\u000312${message.author.username}\u000f> test message`;
+    this.bot.sendToIRC(message);
+    ClientStub.prototype.say
+      .should.have.been.calledWith('#channelforid', expected);
+  });
+
+  it('should send to IRC channel mapped by discord channel name if ID not available', function () {
+    const text = 'test message';
+    const guild = createGuildStub();
+    const message = {
+      content: text,
+      mentions: { users: [] },
+      channel: {
+        id: 1235,
+        name: 'discord'
+      },
+      author: {
+        username: 'test',
+        id: 'not bot id'
+      },
+      guild
+    };
+
+    // Wrap it in colors:
+    const expected = `<\u000312${message.author.username}\u000f> test message`;
+    this.bot.sendToIRC(message);
+    ClientStub.prototype.say
+      .should.have.been.calledWith('#irc', expected);
   });
 
   it('should send attachment URL to IRC', function () {
@@ -249,6 +335,30 @@ describe('Bot', function () {
       .should.have.been.calledWith('#irc', expected);
   });
 
+  it('should use #deleted-channel when referenced channel fails to exist', function () {
+    const text = '<#1235>';
+    const guild = createGuildStub();
+    const message = {
+      content: text,
+      mentions: { users: [] },
+      channel: {
+        name: 'discord'
+      },
+      author: {
+        username: 'test',
+        id: 'not bot id'
+      },
+      guild
+    };
+
+    // Discord displays "#deleted-channel" if channel doesn't exist (e.g. <#1235>)
+    // Wrap it in colors:
+    const expected = `<\u000312${message.author.username}\u000f> #deleted-channel`;
+    this.bot.sendToIRC(message);
+    ClientStub.prototype.say
+      .should.have.been.calledWith('#irc', expected);
+  });
+
   it('should convert user mentions from discord', function () {
     const guild = createGuildStub();
     const message = {
@@ -366,7 +476,7 @@ describe('Bot', function () {
     const newConfig = { ...config, ircNickColor: false };
     const bot = new Bot(newConfig);
     const nickname = 'discord-nickname';
-    const guild = createGuildStub(nickname);
+    const guild = createGuildStub(null, nickname);
     bot.connect();
     const message = {
       content: text,
@@ -400,18 +510,264 @@ describe('Bot', function () {
     this.sendMessageStub.should.have.been.calledWith(expected);
   });
 
-  it('should not convert username mentions from IRC if nickname differs', function () {
+  it('should convert username mentions from IRC even if nickname differs', function () {
     const testUser = new discord.User(this.bot.discord, { username: 'testuser', id: '123', nickname: 'somenickname' });
     this.findUserStub.withArgs('username', testUser.username).returns(testUser);
     this.findUserStub.withArgs('nickname', 'somenickname').returns(testUser);
     this.findUserStub.withArgs('id', testUser.id).returns(testUser);
 
     const username = 'ircuser';
-    const text = 'Hello, @username!';
-    const expected = `**<${username}>** Hello, @username!`;
+    const text = 'Hello, @testuser!';
+    const expected = `**<${username}>** Hello, <@${testUser.id}>!`;
 
     this.bot.sendToDiscord(username, '#irc', text);
     this.sendMessageStub.should.have.been.calledWith(expected);
+  });
+
+  it('should convert role mentions from discord', function () {
+    const testRole = new discord.Role(this.bot.discord, { name: 'example-role', id: '12345' });
+    this.findRoleStub.withArgs('name', 'example-role').returns(testRole);
+    this.findRoleStub.withArgs('12345').returns(testRole);
+
+    const text = '<@&12345>';
+    const guild = createGuildStub(this.findRoleStub);
+    const message = {
+      content: text,
+      mentions: { users: [] },
+      channel: {
+        name: 'discord'
+      },
+      author: {
+        username: 'test',
+        id: 'not bot id'
+      },
+      guild
+    };
+
+    this.bot.parseText(message).should.equal('@example-role');
+  });
+
+  it('should use @deleted-role when referenced role fails to exist', function () {
+    const testRole = new discord.Role(this.bot.discord, { name: 'example-role', id: '12345' });
+    this.findRoleStub.withArgs('12345').returns(testRole);
+
+    const text = '<@&12346>';
+    const guild = createGuildStub(this.findRoleStub);
+    const message = {
+      content: text,
+      mentions: { users: [] },
+      channel: {
+        name: 'discord'
+      },
+      author: {
+        username: 'test',
+        id: 'not bot id'
+      },
+      guild
+    };
+
+    // Discord displays "@deleted-role" if role doesn't exist (e.g. <@&12346>)
+    this.bot.parseText(message).should.equal('@deleted-role');
+  });
+
+  it('should convert role mentions from IRC if role mentionable', function () {
+    const testRole = new discord.Role(this.bot.discord, { name: 'example-role', id: '12345', mentionable: true });
+    this.findRoleStub.withArgs('name', 'example-role').returns(testRole);
+    this.findRoleStub.withArgs('12345').returns(testRole);
+
+    const username = 'ircuser';
+    const text = 'Hello, @example-role!';
+    const expected = `**<${username}>** Hello, <@&${testRole.id}>!`;
+
+    this.bot.sendToDiscord(username, '#irc', text);
+    this.sendMessageStub.should.have.been.calledWith(expected);
+  });
+
+  it('should not convert role mentions from IRC if role not mentionable', function () {
+    const testRole = new discord.Role(this.bot.discord, { name: 'example-role', id: '12345' });
+    this.findRoleStub.withArgs('name', 'example-role').returns(testRole);
+    this.findRoleStub.withArgs('12345').returns(testRole);
+
+    const username = 'ircuser';
+    const text = 'Hello, @example-role!';
+    const expected = `**<${username}>** Hello, @example-role!`;
+
+    this.bot.sendToDiscord(username, '#irc', text);
+    this.sendMessageStub.should.have.been.calledWith(expected);
+  });
+
+  it('should successfully send messages with default config', function () {
+    const bot = new Bot(configMsgFormatDefault);
+    bot.connect();
+
+    bot.sendToDiscord('testuser', '#irc', 'test message');
+    this.sendMessageStub.should.have.been.calledOnce;
+
+    const guild = createGuildStub();
+    const message = {
+      content: 'test message',
+      mentions: { users: [] },
+      channel: {
+        name: 'discord'
+      },
+      author: {
+        username: 'otherauthor',
+        id: 'not bot id'
+      },
+      guild
+    };
+
+    bot.sendToIRC(message);
+    this.sendMessageStub.should.have.been.calledOnce;
+  });
+
+  it('should not replace unmatched patterns', function () {
+    const format = { discord: '{$unmatchedPattern} stays intact: {$author} {$text}' };
+    const bot = new Bot({ ...configMsgFormatDefault, format });
+    bot.connect();
+
+    const username = 'testuser';
+    const msg = 'test message';
+    const expected = `{$unmatchedPattern} stays intact: ${username} ${msg}`;
+    bot.sendToDiscord(username, '#irc', msg);
+    this.sendMessageStub.should.have.been.calledWith(expected);
+  });
+
+  it('should respect custom formatting for Discord', function () {
+    const format = { discord: '<{$author}> {$ircChannel} => {$discordChannel}: {$text}' };
+    const bot = new Bot({ ...configMsgFormatDefault, format });
+    bot.connect();
+
+    const username = 'test';
+    const msg = 'test @user <#1234>';
+    const expected = `<test> #irc => #discord: ${msg}`;
+    bot.sendToDiscord(username, '#irc', msg);
+    this.sendMessageStub.should.have.been.calledWith(expected);
+  });
+
+  it('should successfully send messages with default config', function () {
+    this.bot = new Bot(configMsgFormatDefault);
+    this.bot.connect();
+
+    this.bot.sendToDiscord('testuser', '#irc', 'test message');
+    this.sendMessageStub.should.have.been.calledOnce;
+
+    const guild = createGuildStub();
+    const message = {
+      content: 'test message',
+      mentions: { users: [] },
+      channel: {
+        name: 'discord'
+      },
+      author: {
+        username: 'otherauthor',
+        id: 'not bot id'
+      },
+      guild
+    };
+
+    this.bot.sendToIRC(message);
+    this.sendMessageStub.should.have.been.calledOnce;
+  });
+
+  it('should not replace unmatched patterns', function () {
+    const format = { discord: '{$unmatchedPattern} stays intact: {$author} {$text}' };
+    this.bot = new Bot({ ...configMsgFormatDefault, format });
+    this.bot.connect();
+
+    const username = 'testuser';
+    const msg = 'test message';
+    const expected = `{$unmatchedPattern} stays intact: ${username} ${msg}`;
+    this.bot.sendToDiscord(username, '#irc', msg);
+    this.sendMessageStub.should.have.been.calledWith(expected);
+  });
+
+  it('should respect custom formatting for Discord', function () {
+    const format = { discord: '<{$author}> {$ircChannel} => {$discordChannel}: {$text}' };
+    this.bot = new Bot({ ...configMsgFormatDefault, format });
+    this.bot.connect();
+
+    const username = 'test';
+    const msg = 'test @user <#1234>';
+    const expected = `<test> #irc => #discord: ${msg}`;
+    this.bot.sendToDiscord(username, '#irc', msg);
+    this.sendMessageStub.should.have.been.calledWith(expected);
+  });
+
+  it('should respect custom formatting for regular IRC output', function () {
+    const format = { ircText: '<{$nickname}> {$discordChannel} => {$ircChannel}: {$text}' };
+    this.bot = new Bot({ ...configMsgFormatDefault, format });
+    this.bot.connect();
+
+    const guild = createGuildStub();
+    const message = {
+      content: 'test message',
+      mentions: { users: [] },
+      channel: {
+        name: 'discord'
+      },
+      author: {
+        username: 'testauthor',
+        id: 'not bot id'
+      },
+      guild
+    };
+    const expected = '<testauthor> #discord => #irc: test message';
+
+    this.bot.sendToIRC(message);
+    ClientStub.prototype.say.should.have.been.calledWith('#irc', expected);
+  });
+
+  it('should respect custom formatting for commands in IRC output', function () {
+    const format = { commandPrelude: '{$nickname} from {$discordChannel} sent command to {$ircChannel}:' };
+    this.bot = new Bot({ ...configMsgFormatDefault, format });
+    this.bot.connect();
+
+    const text = '!testcmd';
+    const guild = createGuildStub();
+    const message = {
+      content: text,
+      mentions: { users: [] },
+      channel: {
+        name: 'discord'
+      },
+      author: {
+        username: 'testauthor',
+        id: 'not bot id'
+      },
+      guild
+    };
+    const expected = 'testauthor from #discord sent command to #irc:';
+
+    this.bot.sendToIRC(message);
+    ClientStub.prototype.say.getCall(0).args.should.deep.equal(['#irc', expected]);
+    ClientStub.prototype.say.getCall(1).args.should.deep.equal(['#irc', text]);
+  });
+
+  it('should respect custom formatting for attachment URLs in IRC output', function () {
+    const format = { urlAttachment: '<{$nickname}> {$discordChannel} => {$ircChannel}, attachment: {$attachmentURL}' };
+    this.bot = new Bot({ ...configMsgFormatDefault, format });
+    this.bot.connect();
+
+    const attachmentUrl = 'https://image/url.jpg';
+    const guild = createGuildStub();
+    const message = {
+      content: '',
+      mentions: { users: [] },
+      attachments: createAttachments(attachmentUrl),
+      channel: {
+        name: 'discord'
+      },
+      author: {
+        username: 'otherauthor',
+        id: 'not bot id'
+      },
+      guild
+    };
+
+    this.bot.sendToIRC(message);
+    const expected = `<otherauthor> #discord => #irc, attachment: ${attachmentUrl}`;
+    ClientStub.prototype.say.should.have.been.calledWith('#irc', expected);
   });
 
   it('should create webhooks clients for each webhook url in the config', function () {

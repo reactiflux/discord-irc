@@ -2,7 +2,7 @@
 import events from 'events';
 import sinon from 'sinon';
 
-export default function createDiscordStub(sendMessageStub, findUserStub) {
+export default function createDiscordStub(sendMessageStub, findUserStub, findRoleStub) {
   return class DiscordStub extends events.EventEmitter {
     constructor() {
       super();
@@ -23,6 +23,7 @@ export default function createDiscordStub(sendMessageStub, findUserStub) {
 
     getChannel(key, value) {
       if (key === 'name' && value !== 'discord') return null;
+      if (key !== '1234' && value === undefined) return null;
       return {
         name: 'discord',
         id: 1234,
@@ -31,6 +32,10 @@ export default function createDiscordStub(sendMessageStub, findUserStub) {
           members: {
             find: findUserStub,
             get: findUserStub
+          },
+          roles: {
+            find: findRoleStub,
+            get: findRoleStub
           }
         }
       };

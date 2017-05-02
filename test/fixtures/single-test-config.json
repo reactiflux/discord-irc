@@ -9,7 +9,8 @@
   ],
   "channelMapping": {
     "#discord": "#irc channelKey",
-    "#notinchannel": "#otherIRC"
+    "#notinchannel": "#otherIRC",
+    "1234": "#channelforid"
   },
   "webhooks": {
     "#irc": "https://discordapp.com/api/webhooks/id/token"

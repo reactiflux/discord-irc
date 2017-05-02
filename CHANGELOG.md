@@ -1,6 +1,64 @@
 # Changelog
 This project adheres to [Semantic Versioning](http://semver.org/).
 
+## [2.3.3] - 2017-04-29
+### Fixed
+* Warn if a part/quit is received and no channelUsers is set -
+[#218](https://github.com/reactiflux/discord-irc/pull/218).
+
+## [2.3.2] - 2017-04-27
+### Fixed
+* Fix ircStatucNotices when channels are not lowercase -
+[#219](https://github.com/reactiflux/discord-irc/pull/219).
+
+## [2.3.1] - 2017-04-05
+### Fixed
+* Fix IRC quit messages sending to all channels by tracking users - [#214](https://github.com/reactiflux/discord-irc/pull/214#pullrequestreview-31156291).
+
+## [2.3.0] - 2017-04-03
+A huge thank you to [@Throne3d](https://github.com/Throne3d),
+[@rahatarmanahmed](https://github.com/rahatarmanahmed), [@mraof](https://github.com/mraof)
+and [@Ratismal](https://github.com/Ratismal) for all the fixes and features
+in this release.
+
+### Added
+* Bridge IRC join/part/quit messages to Discord
+(enable by setting ircStatusNotices to true) -
+[#207](https://github.com/reactiflux/discord-irc/pull/207).
+
+* Convert text styles between IRC and Discord
+[#205](https://github.com/reactiflux/discord-irc/pull/205).
+
+* Allow users to configure the patterns of messages on
+IRC and Discord using the format options object
+[#204](https://github.com/reactiflux/discord-irc/pull/204).
+
+* Add Discord channel ID matching  to the channel mapping
+[#202](https://github.com/reactiflux/discord-irc/pull/202).
+
+### Fixed
+* Parse role mentions appropriately, as with channel and user mentions
+[#203](https://github.com/reactiflux/discord-irc/pull/203).
+
+* Make the bot not crash when a channel mentioned by ID fails to exist
+[#201](https://github.com/reactiflux/discord-irc/pull/201).
+
+### Changed
+* Convert username mentions even if nickname is set -
+[#208](https://github.com/reactiflux/discord-irc/pull/208).
+
+## [2.2.1] - 2017-03-12
+### Fixed
+* Reverts the changes in 2.2.0 due to incompatibilities with different clients.
+See https://github.com/reactiflux/discord-irc/issues/196 for more
+information.
+
+## [2.2.0] - 2017-03-06
+### Fixed
+* Added a zero width character between each letter of the IRC nicknames, to
+avoid unwanted highlights. Fixed by @Sanqui in
+[#193](https://github.com/reactiflux/discord-irc/pull/193).
+
 ## [2.1.6] - 2017-01-10
 ### Fixed
 * Upgraded discord.js.
