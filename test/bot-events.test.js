@@ -113,6 +113,15 @@ describe('Bot Events', function () {
     this.bot.sendToDiscord.should.have.been.calledWithExactly(author, channel, formattedText);
   });
 
+  it('should send name change event to discord', function () {
+    const channel = '#channel';
+    const oldnick = 'user1';
+    const newnick = 'user2';
+    const formattedText = `*${oldnick}* is now known as ${newnick}`;
+    this.bot.ircClient.emit('nick', oldnick, newnick, [channel]);
+    this.bot.sendExactToDiscord.should.have.been.calledWithExactly(channel, formattedText);
+  });
+
   it('should send actions to discord', function () {
     const channel = '#channel';
     const author = 'user';
