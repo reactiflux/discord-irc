@@ -121,34 +121,21 @@ describe('Bot Events', function () {
     this.bot.sendExactToDiscord.should.not.have.been.called;
   });
 
-  it('should send name change event to discord (untracked user)', function () {
+  it('should send name change event to discord', function () {
     const channel1 = '#channel1';
     const channel2 = '#channel2';
-    const oldnick = 'user1';
-    const newnick = 'user2';
+    const oldNick = 'user1';
+    const newNick = 'user2';
     const bot = createBot({ ...config, ircStatusNotices: true });
     bot.connect();
-    const formattedText = `*${oldnick}* is now known as ${newnick}`;
-    bot.ircClient.emit('nick', oldnick, newnick, [channel1, channel2]);
-    bot.sendExactToDiscord.should.have.been.calledTwice;
-    bot.sendExactToDiscord.getCall(0).args.should.deep.equal([channel1, formattedText]);
-    bot.sendExactToDiscord.getCall(1).args.should.deep.equal([channel2, formattedText]);
-  });
-
-  it('should send name change event to discord (tracked user)', function () {
-    const channel = '#channel';
-    const oldnick = 'user1';
-    const newnick = 'user2';
-    const bot = createBot({ ...config, ircStatusNotices: true });
-    bot.connect();
-    bot.ircClient.emit('names', channel, { [bot.nickname]: '', [oldnick]: '' });
-    const channelNicksPre = new Set([bot.nickname, oldnick]);
-    bot.channelUsers.should.deep.equal({ '#channel': channelNicksPre });
-    const formattedText = `*${oldnick}* is now known as ${newnick}`;
-    const channelNicksAfter = new Set([bot.nickname, newnick]);
-    bot.ircClient.emit('nick', oldnick, newnick, [channel]);
-    bot.sendExactToDiscord.should.have.been.calledWithExactly(channel, formattedText);
-    bot.channelUsers.should.deep.equal({ '#channel': channelNicksAfter });
+    bot.ircClient.emit('names', '#channel1', { [bot.nickname]: '', [oldNick]: '' });
+    const channelNicksPre = new Set([bot.nickname, oldNick]);
+    bot.channelUsers.should.deep.equal({ '#channel1': channelNicksPre });
+    const formattedText = `*${oldNick}* is now known as ${newNick}`;
+    const channelNicksAfter = new Set([bot.nickname, newNick]);
+    bot.ircClient.emit('nick', oldNick, newNick, [channel1, channel2]);
+    bot.sendExactToDiscord.should.have.been.calledWithExactly(channel1, formattedText);
+    bot.channelUsers.should.deep.equal({ '#channel1': channelNicksAfter });
   });
 
   it('should send actions to discord', function () {
