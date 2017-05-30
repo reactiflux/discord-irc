@@ -448,7 +448,7 @@ describe('Bot', function () {
     this.bot.parseText(message).should.equal('hi hi hi ');
   });
 
-  it('should hide usernames for commands', function () {
+  it('should hide usernames for commands to IRC', function () {
     const text = '!test command';
     const guild = createGuildStub();
     const message = {
@@ -469,6 +469,15 @@ describe('Bot', function () {
       '#irc', 'Command sent from Discord by test:'
     ]);
     ClientStub.prototype.say.getCall(1).args.should.deep.equal(['#irc', text]);
+  });
+
+  it('should hide usernames for commands to Discord', function () {
+    const username = 'ircuser';
+    const text = '!command';
+
+    this.bot.sendToDiscord(username, '#irc', text);
+    this.sendMessageStub.getCall(0).args.should.deep.equal(['Command sent from IRC by ircuser:']);
+    this.sendMessageStub.getCall(1).args.should.deep.equal([text]);
   });
 
   it('should use nickname instead of username when available', function () {
@@ -682,7 +691,7 @@ describe('Bot', function () {
     this.sendMessageStub.should.have.been.calledWith(expected);
   });
 
-  it('should respect custom formatting for Discord', function () {
+  it('should respect custom formatting for regular Discord output', function () {
     const format = { discord: '<{$author}> {$ircChannel} => {$discordChannel}: {$text}' };
     this.bot = new Bot({ ...configMsgFormatDefault, format });
     this.bot.connect();
@@ -692,6 +701,19 @@ describe('Bot', function () {
     const expected = `<test> #irc => #discord: ${msg}`;
     this.bot.sendToDiscord(username, '#irc', msg);
     this.sendMessageStub.should.have.been.calledWith(expected);
+  });
+
+  it('should respect custom formatting for commands in Discord output', function () {
+    const format = { commandPrelude: '{$nickname} from {$ircChannel} sent command to {$discordChannel}:' };
+    this.bot = new Bot({ ...configMsgFormatDefault, format });
+    this.bot.connect();
+
+    const username = 'test';
+    const msg = '!testcmd';
+    const expected = 'test from #irc sent command to #discord:';
+    this.bot.sendToDiscord(username, '#irc', msg);
+    this.sendMessageStub.getCall(0).args.should.deep.equal([expected]);
+    this.sendMessageStub.getCall(1).args.should.deep.equal([msg]);
   });
 
   it('should respect custom formatting for regular IRC output', function () {

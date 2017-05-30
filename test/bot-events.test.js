@@ -113,6 +113,35 @@ describe('Bot Events', function () {
     this.bot.sendToDiscord.should.have.been.calledWithExactly(author, channel, formattedText);
   });
 
+  it('should not send name change event to discord', function () {
+    const channel = '#channel';
+    const oldnick = 'user1';
+    const newnick = 'user2';
+    this.bot.ircClient.emit('nick', oldnick, newnick, [channel]);
+    this.bot.sendExactToDiscord.should.not.have.been.called;
+  });
+
+  it('should send name change event to discord', function () {
+    const channel1 = '#channel1';
+    const channel2 = '#channel2';
+    const channel3 = '#channel3';
+    const oldNick = 'user1';
+    const newNick = 'user2';
+    const user3 = 'user3';
+    const bot = createBot({ ...config, ircStatusNotices: true });
+    const staticChannel = new Set([bot.nickname, user3]);
+    bot.connect();
+    bot.ircClient.emit('names', channel1, { [bot.nickname]: '', [oldNick]: '' });
+    bot.ircClient.emit('names', channel2, { [bot.nickname]: '', [user3]: '' });
+    const channelNicksPre = new Set([bot.nickname, oldNick]);
+    bot.channelUsers.should.deep.equal({ '#channel1': channelNicksPre, '#channel2': staticChannel });
+    const formattedText = `*${oldNick}* is now known as ${newNick}`;
+    const channelNicksAfter = new Set([bot.nickname, newNick]);
+    bot.ircClient.emit('nick', oldNick, newNick, [channel1, channel2, channel3]);
+    bot.sendExactToDiscord.should.have.been.calledWithExactly(channel1, formattedText);
+    bot.channelUsers.should.deep.equal({ '#channel1': channelNicksAfter, '#channel2': staticChannel });
+  });
+
   it('should send actions to discord', function () {
     const channel = '#channel';
     const author = 'user';
