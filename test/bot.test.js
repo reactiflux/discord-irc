@@ -8,6 +8,7 @@ import discord from 'discord.js';
 import Bot from '../lib/bot';
 import createDiscordStub from './stubs/discord-stub';
 import ClientStub from './stubs/irc-client-stub';
+import createWebhookStub from './stubs/webhook-stub';
 import config from './fixtures/single-test-config.json';
 import configMsgFormatDefault from './fixtures/msg-formats-default.json';
 
@@ -32,6 +33,8 @@ describe('Bot', function () {
     ClientStub.prototype.say = sandbox.stub();
     ClientStub.prototype.send = sandbox.stub();
     ClientStub.prototype.join = sandbox.stub();
+    this.sendWebhookMessageStub = sandbox.stub();
+    discord.WebhookClient = createWebhookStub(this.sendWebhookMessageStub);
     this.bot = new Bot(config);
     this.bot.connect();
   });
@@ -793,11 +796,29 @@ describe('Bot', function () {
   });
 
   it('should create webhooks clients for each webhook url in the config', function () {
-    this.bot.webhooks.should.have.property('#irc');
+    this.bot.webhooks.should.have.property('#withwebhook');
   });
 
   it('should extract id and token from webhook urls', function () {
-    this.bot.webhooks['#irc'].id.should.equal('id');
-    this.bot.webhooks['#irc'].token.should.equal('token');
+    this.bot.webhooks['#withwebhook'].id.should.equal('id');
+    this.bot.webhooks['#withwebhook'].token.should.equal('token');
+  });
+
+  it('should find the matching webhook when it exists', function () {
+    this.bot.findWebhook('#ircwebhook').should.not.equal(null);
+  });
+
+  it('should prefer webhooks to send a message when possible', function () {
+    const newConfig = { ...config, webhooks: { '#discord': 'https://discordapp.com/api/webhooks/id/token' } };
+    const bot = new Bot(newConfig);
+    bot.connect();
+    bot.sendToDiscord('nick', '#irc', 'text');
+    this.sendWebhookMessageStub.should.have.been.called;
+  });
+
+  it('should find the user\'s avatar when the irc nick is also a discord username', function () {
+    const testUser = new discord.User(this.bot.discord, { username: 'avatarUser', id: '123', avatar: '123' });
+    this.findUserStub.withArgs('username', testUser.username).returns(testUser);
+    this.bot.getDiscordAvatar('avatarUser').should.not.equal(null);
   });
 });

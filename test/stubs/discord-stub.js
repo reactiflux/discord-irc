@@ -19,6 +19,11 @@ export default function createDiscordStub(sendMessageStub, findUserStub, findRol
       this.users = {
         find: findUserStub
       };
+      this.options = {
+        http: {
+          host: 'host'
+        }
+      };
     }
 
     getChannel(key, value) {
