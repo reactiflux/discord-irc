@@ -98,6 +98,15 @@ The `ircOptions` object is passed directly to node-irc ([available options](http
 
 To retrieve a discord channel ID, write `\#channel` on the relevant server – it should produce something of the form `<#1234567890>`, which you can then use in the `channelMapping` config.
 
+### Webhooks
+Webhooks allow nickname and avatar override, so messages coming from IRC will appear almost as regular Discord messages.
+
+See [here (part 1 only)](https://support.discordapp.com/hc/en-us/articles/228383668-Intro-to-Webhooks) to create a webhook for a channel.
+
+Example result:
+
+![discord-webhook](http://i.imgur.com/lNeJIUI.jpg)
+
 ## Tests
 Run the tests with:
 ```bash
