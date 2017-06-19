@@ -362,4 +362,23 @@ describe('Bot Events', function () {
     secondCall.args[0].should.equal('Channel not found in config, not joining:');
     secondCall.args[1].should.equal(channel);
   });
+
+  it('should ignore irc events for ignored nicks', function () {
+    const bot = createBot({ ...config, ircStatusNotices: true, ignoreIrcNicks: ['ignored'] });
+    bot.connect();
+    const channel = '#channel';
+    bot.ircClient.emit('names', channel, { [bot.nickname]: '' });
+
+    const nick = 'ignored';
+    const altnick = 'notignored';
+    const reason = 'Leaving';
+
+    bot.ircClient.emit('join', channel, nick);
+    bot.ircClient.emit('part', channel, nick, reason);
+    bot.ircClient.emit('join', channel, nick);
+    bot.ircClient.emit('quit', nick, reason, [channel]);
+    bot.ircClient.emit('join', channel, nick);
+    bot.ircClient.emit('nick', nick, altnick, [channel]);
+    bot.sendExactToDiscord.should.not.have.been.called;
+  });
 });

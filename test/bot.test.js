@@ -842,4 +842,47 @@ describe('Bot', function () {
     this.sendMessageStub.should.have.been.calledOnce;
     this.sendMessageStub.getCall(0).args.should.deep.equal([msg]);
   });
+
+  it('should ignore discord bots if config enabled', function () {
+    this.bot = new Bot({ ...config, ignoreBots: true });
+    this.bot.connect();
+
+    const guild = createGuildStub();
+    const botmsg = {
+      content: 'bot',
+      mentions: { users: [] },
+      channel: { name: 'discord' },
+      author: {
+        username: 'examplebot',
+        id: 'examplebotid',
+        bot: true
+      },
+      guild
+    };
+
+    const normalmsg = {
+      content: 'notbot',
+      mentions: { users: [] },
+      channel: { name: 'discord' },
+      author: {
+        username: 'exampleuser',
+        id: 'exampleuserid',
+        bot: false
+      },
+      guild
+    };
+
+    this.bot.sendToIRC(botmsg);
+    this.bot.sendToIRC(normalmsg);
+    ClientStub.prototype.say.should.have.been.calledOnce;
+  });
+
+  it('should ignore IRC nicks specified in config', function () {
+    this.bot = new Bot({ ...config, ignoreIrcNicks: ['ignored'] });
+    this.bot.connect();
+
+    this.bot.sendToDiscord('ignored', '#irc', 'unwanted message');
+    this.bot.sendToDiscord('otheruser', '#irc', 'wanted message');
+    this.sendMessageStub.should.have.been.calledOnce;
+  });
 });
