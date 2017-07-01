@@ -26,7 +26,7 @@ describe('Formatting', () => {
 
     it('should convert nested markdown', () => {
       formatFromDiscordToIRC('**bold *italics***')
-      .should.equal('\x02bold \x16italics\x16\x02');
+        .should.equal('\x02bold \x16italics\x16\x02');
     });
   });
 
@@ -53,12 +53,12 @@ describe('Formatting', () => {
 
     it('should convert nested IRC format', () => {
       formatFromIRCToDiscord('\x02bold \x16italics\x16\x02')
-      .should.equal('**bold *italics***');
+        .should.equal('**bold *italics***');
     });
 
     it('should convert nested IRC format', () => {
       formatFromIRCToDiscord('\x02bold \x1funderline\x1f\x02')
-      .should.equal('**bold __underline__**');
+        .should.equal('**bold __underline__**');
     });
   });
 });

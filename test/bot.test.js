@@ -29,8 +29,10 @@ describe('Bot', function () {
     this.findRoleStub = sandbox.stub();
     this.findEmojiStub = sandbox.stub();
     irc.Client = ClientStub;
-    discord.Client = createDiscordStub(this.sendMessageStub, this.findUserStub, this.findRoleStub,
-                                       this.findEmojiStub);
+    discord.Client = createDiscordStub(
+      this.sendMessageStub, this.findUserStub, this.findRoleStub, this.findEmojiStub
+    );
+
     ClientStub.prototype.say = sandbox.stub();
     ClientStub.prototype.send = sandbox.stub();
     ClientStub.prototype.join = sandbox.stub();
@@ -80,16 +82,16 @@ describe('Bot', function () {
   });
 
   it('should not send messages to discord if the channel isn\'t in the channel mapping',
-  function () {
-    this.bot.sendToDiscord('user', '#no-irc', 'message');
-    this.sendMessageStub.should.not.have.been.called;
-  });
+    function () {
+      this.bot.sendToDiscord('user', '#no-irc', 'message');
+      this.sendMessageStub.should.not.have.been.called;
+    });
 
   it('should not send messages to discord if it isn\'t in the channel',
-  function () {
-    this.bot.sendToDiscord('user', '#otherirc', 'message');
-    this.sendMessageStub.should.not.have.been.called;
-  });
+    function () {
+      this.bot.sendToDiscord('user', '#otherirc', 'message');
+      this.sendMessageStub.should.not.have.been.called;
+    });
 
   it('should send to a discord channel ID appropriately', function () {
     const username = 'testuser';
@@ -100,23 +102,23 @@ describe('Bot', function () {
   });
 
   it('should not send special messages to discord if the channel isn\'t in the channel mapping',
-  function () {
-    this.bot.sendExactToDiscord('#no-irc', 'message');
-    this.sendMessageStub.should.not.have.been.called;
-  });
+    function () {
+      this.bot.sendExactToDiscord('#no-irc', 'message');
+      this.sendMessageStub.should.not.have.been.called;
+    });
 
   it('should not send special messages to discord if it isn\'t in the channel',
-  function () {
-    this.bot.sendExactToDiscord('#otherirc', 'message');
-    this.sendMessageStub.should.not.have.been.called;
-  });
+    function () {
+      this.bot.sendExactToDiscord('#otherirc', 'message');
+      this.sendMessageStub.should.not.have.been.called;
+    });
 
   it('should send special messages to discord',
-  function () {
-    this.bot.sendExactToDiscord('#irc', 'message');
-    this.sendMessageStub.should.have.been.calledWith('message');
-    this.debugSpy.should.have.been.calledWith('Sending special message to Discord', 'message', '#irc', '->', '#discord');
-  });
+    function () {
+      this.bot.sendExactToDiscord('#irc', 'message');
+      this.sendMessageStub.should.have.been.calledWith('message');
+      this.debugSpy.should.have.been.calledWith('Sending special message to Discord', 'message', '#irc', '->', '#discord');
+    });
 
   it('should not color irc messages if the option is disabled', function () {
     const text = 'testmessage';
@@ -297,22 +299,22 @@ describe('Bot', function () {
   });
 
   it('should not send messages to irc if the channel isn\'t in the channel mapping',
-  function () {
-    const guild = createGuildStub();
-    const message = {
-      channel: {
-        name: 'wrongdiscord'
-      },
-      author: {
-        username: 'otherauthor',
-        id: 'not bot id'
-      },
-      guild
-    };
+    function () {
+      const guild = createGuildStub();
+      const message = {
+        channel: {
+          name: 'wrongdiscord'
+        },
+        author: {
+          username: 'otherauthor',
+          id: 'not bot id'
+        },
+        guild
+      };
 
-    this.bot.sendToIRC(message);
-    ClientStub.prototype.say.should.not.have.been.called;
-  });
+      this.bot.sendToIRC(message);
+      ClientStub.prototype.say.should.not.have.been.called;
+    });
 
   it('should parse text from discord when sending messages', function () {
     const text = '<#1234>';
