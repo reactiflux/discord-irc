@@ -1,6 +1,30 @@
 # Changelog
 This project adheres to [Semantic Versioning](http://semver.org/).
 
+## [2.4.0] - 2017-07-01
+This project now uses [irc-upd](https://github.com/Throne3d/node-irc) as a dependency, instead of the old [irc](https://github.com/martynsmith/node-irc) package – this fork should be better maintained and will solve some bugs, detailed below.
+
+### Added
+* Allow commandCharacters to work for messages sent to Discord - [#221](https://github.com/reactiflux/discord-irc/pull/221).
+
+* Send nick changes from IRC to Discord with `ircStatusNotices` - [#235](https://github.com/reactiflux/discord-irc/pull/235), [#241](https://github.com/reactiflux/discord-irc/pull/241).
+
+* Translate custom emoji references from IRC to Discord - [#256](https://github.com/reactiflux/discord-irc/pull/256).
+
+### Fixed
+* Use `ircClient.nick` instead of `nickname` when checking if the `ircStatusNotices` event is for the bot, to prevent a potential crash - [#257](https://github.com/reactiflux/discord-irc/pull/257).
+
+* Use the updated `irc-upd` library instead of `irc`, causing IRC messages to now be split by byte instead of character (fixing [#199](https://github.com/reactiflux/discord-irc/issues/199)) and adding support for certain Unicode characters in nicknames (fixing [#200](https://github.com/reactiflux/discord-irc/issues/200)) - [#258](https://github.com/reactiflux/discord-irc/pull/258).
+
+* Update dependencies:
+
+  - discord.js to 11.1.0
+  - check-env to 1.3.0
+  - chai to ^4.0.2
+  - nyc to ^11.0.3
+  - commander to 2.10.0
+  - eslint to ^4.1.1
+
 ## [2.3.3] - 2017-04-29
 ### Fixed
 * Warn if a part/quit is received and no channelUsers is set -
