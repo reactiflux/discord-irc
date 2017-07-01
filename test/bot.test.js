@@ -27,8 +27,10 @@ describe('Bot', function () {
     this.sendMessageStub = sandbox.stub();
     this.findUserStub = sandbox.stub();
     this.findRoleStub = sandbox.stub();
+    this.findEmojiStub = sandbox.stub();
     irc.Client = ClientStub;
-    discord.Client = createDiscordStub(this.sendMessageStub, this.findUserStub, this.findRoleStub);
+    discord.Client = createDiscordStub(this.sendMessageStub, this.findUserStub, this.findRoleStub,
+                                       this.findEmojiStub);
     ClientStub.prototype.say = sandbox.stub();
     ClientStub.prototype.send = sandbox.stub();
     ClientStub.prototype.join = sandbox.stub();
@@ -435,6 +437,22 @@ describe('Bot', function () {
     const expected = `**<${username}>** Hello, <@${testUser.id}> and <@${anotherUser.id}>,` +
      ' was our meeting scheduled @5pm?';
 
+    this.bot.sendToDiscord(username, '#irc', text);
+    this.sendMessageStub.should.have.been.calledWith(expected);
+  });
+
+  it('should convert emoji mentions from IRC', function () {
+    const testEmoji = new discord.Emoji(this.bot.discord, { id: '987', name: 'testemoji', require_colons: true });
+    // require_colons gets translated to requiresColons
+    this.findEmojiStub.callsFake((prop) => {
+      // prop is a function, proposition
+      if (prop(testEmoji)) return testEmoji;
+      return null;
+    });
+
+    const username = 'ircuser';
+    const text = 'Here is a broken :emojitest:, a working :testemoji: and another :emoji: that won\'t parse';
+    const expected = `**<${username}>** Here is a broken :emojitest:, a working <:testemoji:987> and another :emoji: that won't parse`;
     this.bot.sendToDiscord(username, '#irc', text);
     this.sendMessageStub.should.have.been.calledWith(expected);
   });
