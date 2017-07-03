@@ -811,4 +811,35 @@ describe('Bot', function () {
     const expected = `<otherauthor> #discord => #irc, attachment: ${attachmentUrl}`;
     ClientStub.prototype.say.should.have.been.calledWith('#irc', expected);
   });
+
+  it('should not bother with command prelude if falsy', function () {
+    const format = { commandPrelude: null };
+    this.bot = new Bot({ ...configMsgFormatDefault, format });
+    this.bot.connect();
+
+    const text = '!testcmd';
+    const guild = createGuildStub();
+    const message = {
+      content: text,
+      mentions: { users: [] },
+      channel: {
+        name: 'discord'
+      },
+      author: {
+        username: 'testauthor',
+        id: 'not bot id'
+      },
+      guild
+    };
+
+    this.bot.sendToIRC(message);
+    ClientStub.prototype.say.should.have.been.calledOnce;
+    ClientStub.prototype.say.getCall(0).args.should.deep.equal(['#irc', text]);
+
+    const username = 'test';
+    const msg = '!testcmd';
+    this.bot.sendToDiscord(username, '#irc', msg);
+    this.sendMessageStub.should.have.been.calledOnce;
+    this.sendMessageStub.getCall(0).args.should.deep.equal([msg]);
+  });
 });
