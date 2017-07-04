@@ -2,7 +2,7 @@
 import chai from 'chai';
 import sinonChai from 'sinon-chai';
 import sinon from 'sinon';
-import irc from 'irc';
+import irc from 'irc-upd';
 import discord from 'discord.js';
 import logger from 'winston';
 import Bot from '../lib/bot';
@@ -303,6 +303,18 @@ describe('Bot Events', function () {
     this.warnSpy.should.have.been.calledTwice;
     this.warnSpy.getCall(0).args.should.deep.equal([`No channelUsers found for ${channel} when user1 parted.`]);
     this.warnSpy.getCall(1).args.should.deep.equal([`No channelUsers found for ${channel} when user2 quit, ignoring.`]);
+  });
+
+  it('should not crash if it uses a different name from config', function () {
+    // this can happen when a user with the same name is already connected
+    const bot = createBot({ ...config, nickname: 'testbot' });
+    bot.connect();
+    const newName = 'testbot1';
+    bot.ircClient.nick = newName;
+    function wrap() {
+      bot.ircClient.emit('join', '#channel', newName);
+    }
+    (wrap).should.not.throw;
   });
 
   it('should not listen to discord debug messages in production', function () {

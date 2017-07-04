@@ -1,5 +1,5 @@
 import chai from 'chai';
-import irc from 'irc';
+import irc from 'irc-upd';
 import discord from 'discord.js';
 import Bot from '../lib/bot';
 import config from './fixtures/single-test-config.json';
