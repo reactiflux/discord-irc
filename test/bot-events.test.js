@@ -33,10 +33,10 @@ describe('Bot Events', function () {
     this.debugSpy = sandbox.stub(logger, 'debug');
     this.warnSpy = sandbox.stub(logger, 'warn');
     this.errorSpy = sandbox.stub(logger, 'error');
-    this.sendMessageStub = sandbox.stub();
+    this.sendStub = sandbox.stub();
     this.getUserStub = sandbox.stub();
     irc.Client = ClientStub;
-    discord.Client = createDiscordStub(this.sendMessageStub, this.getUserStub);
+    discord.Client = createDiscordStub(this.sendStub, this.getUserStub);
     ClientStub.prototype.send = sandbox.stub();
     ClientStub.prototype.join = sandbox.stub();
     this.bot = createBot();
