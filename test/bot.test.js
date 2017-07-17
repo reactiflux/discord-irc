@@ -569,7 +569,19 @@ describe('Bot', function () {
 
     const username = 'ircuser';
     const text = 'Hello, @testuser!';
-    const expected = `**<${username}>** Hello, <@${testUser.id}>!`;
+    const expected = `**<${username}>** Hello, ${testUser}!`;
+
+    this.bot.sendToDiscord(username, '#irc', text);
+    this.sendStub.should.have.been.calledWith(expected);
+  });
+
+  it('should convert username-discriminator mentions from IRC properly', function () {
+    const user1 = this.addUser({ username: 'user', id: '123', discriminator: '9876' });
+    const user2 = this.addUser({ username: 'user', id: '124', discriminator: '5555', nickname: 'secondUser' });
+
+    const username = 'ircuser';
+    const text = 'hello @user#9876 and @user#5555 and @fakeuser#1234';
+    const expected = `**<${username}>** hello ${user1} and ${user2} and @fakeuser#1234`;
 
     this.bot.sendToDiscord(username, '#irc', text);
     this.sendStub.should.have.been.calledWith(expected);
@@ -632,6 +644,35 @@ describe('Bot', function () {
     const username = 'ircuser';
     const text = 'Hello, @example-role!';
     const expected = `**<${username}>** Hello, @example-role!`;
+
+    this.bot.sendToDiscord(username, '#irc', text);
+    this.sendStub.should.have.been.calledWith(expected);
+  });
+
+  it('should convert overlapping mentions from IRC properly and case-insensitively', function () {
+    const user = this.addUser({ username: 'user', id: '111' });
+    const nickUser = this.addUser({ username: 'user2', id: '112', nickname: 'userTest' });
+    const nickUserCase = this.addUser({ username: 'user3', id: '113', nickname: 'userTEST' });
+    const role = this.addRole({ name: 'userTestRole', id: '12345', mentionable: true });
+
+    const username = 'ircuser';
+    const text = 'hello @User, @user, @userTest, @userTEST, @userTestRole and @usertestrole';
+    const expected = `**<${username}>** hello ${user}, ${user}, ${nickUser}, ${nickUserCase}, ${role} and ${role}`;
+
+    this.bot.sendToDiscord(username, '#irc', text);
+    this.sendStub.should.have.been.calledWith(expected);
+  });
+
+  it('should convert partial matches from IRC properly', function () {
+    const user = this.addUser({ username: 'user', id: '111' });
+    const longUser = this.addUser({ username: 'user-punc', id: '112' });
+    const nickUser = this.addUser({ username: 'user2', id: '113', nickname: 'nick' });
+    const nickUserCase = this.addUser({ username: 'user3', id: '114', nickname: 'NiCK' });
+    const role = this.addRole({ name: 'role', id: '12345', mentionable: true });
+
+    const username = 'ircuser';
+    const text = '@user-ific @usermore, @user\'s friend @user-punc, @nicks and @NiCKs @roles';
+    const expected = `**<${username}>** ${user}-ific ${user}more, ${user}'s friend ${longUser}, ${nickUser}s and ${nickUserCase}s ${role}s`;
 
     this.bot.sendToDiscord(username, '#irc', text);
     this.sendStub.should.have.been.calledWith(expected);
