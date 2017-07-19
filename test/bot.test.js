@@ -45,7 +45,7 @@ describe('Bot', function () {
 
     this.addUser = function (user, member = null) {
       const userObj = new discord.User(this.bot.discord, user);
-      const guildMember = Object.assign(member || user, { user: userObj });
+      const guildMember = Object.assign({}, member || user, { user: userObj });
       guildMember.nick = guildMember.nickname; // nick => nickname in Discord API
       const memberObj = new discord.GuildMember(this.guild, guildMember);
       this.guild.members.set(userObj.id, memberObj);
@@ -139,7 +139,6 @@ describe('Bot', function () {
     const text = 'testmessage';
     const newConfig = { ...config, ircNickColor: false };
     const bot = new Bot(newConfig);
-    const guild = this.guild;
     bot.connect();
     const message = {
       content: text,
@@ -151,7 +150,7 @@ describe('Bot', function () {
         username: 'otherauthor',
         id: 'not bot id'
       },
-      guild
+      guild: this.guild
     };
 
     bot.sendToIRC(message);
@@ -161,7 +160,6 @@ describe('Bot', function () {
 
   it('should send correct messages to irc', function () {
     const text = 'testmessage';
-    const guild = this.guild;
     const message = {
       content: text,
       mentions: { users: [] },
@@ -172,7 +170,7 @@ describe('Bot', function () {
         username: 'otherauthor',
         id: 'not bot id'
       },
-      guild
+      guild: this.guild
     };
 
     this.bot.sendToIRC(message);
@@ -183,7 +181,6 @@ describe('Bot', function () {
 
   it('should send to IRC channel mapped by discord channel ID if available', function () {
     const text = 'test message';
-    const guild = this.guild;
     const message = {
       content: text,
       mentions: { users: [] },
@@ -195,7 +192,7 @@ describe('Bot', function () {
         username: 'test',
         id: 'not bot id'
       },
-      guild
+      guild: this.guild
     };
 
     // Wrap it in colors:
@@ -207,7 +204,6 @@ describe('Bot', function () {
 
   it('should send to IRC channel mapped by discord channel name if ID not available', function () {
     const text = 'test message';
-    const guild = this.guild;
     const message = {
       content: text,
       mentions: { users: [] },
@@ -219,7 +215,7 @@ describe('Bot', function () {
         username: 'test',
         id: 'not bot id'
       },
-      guild
+      guild: this.guild
     };
 
     // Wrap it in colors:
@@ -231,7 +227,6 @@ describe('Bot', function () {
 
   it('should send attachment URL to IRC', function () {
     const attachmentUrl = 'https://image/url.jpg';
-    const guild = this.guild;
     const message = {
       content: '',
       mentions: { users: [] },
@@ -243,7 +238,7 @@ describe('Bot', function () {
         username: 'otherauthor',
         id: 'not bot id'
       },
-      guild
+      guild: this.guild
     };
 
     this.bot.sendToIRC(message);
@@ -254,7 +249,6 @@ describe('Bot', function () {
   it('should send text message and attachment URL to IRC if both exist', function () {
     const text = 'Look at this cute cat picture!';
     const attachmentUrl = 'https://image/url.jpg';
-    const guild = this.guild;
     const message = {
       content: text,
       attachments: createAttachments(attachmentUrl),
@@ -266,7 +260,7 @@ describe('Bot', function () {
         username: 'otherauthor',
         id: 'not bot id'
       },
-      guild
+      guild: this.guild
     };
 
     this.bot.sendToIRC(message);
@@ -279,7 +273,6 @@ describe('Bot', function () {
   });
 
   it('should not send an empty text message with an attachment to IRC', function () {
-    const guild = this.guild;
     const message = {
       content: '',
       attachments: createAttachments('https://image/url.jpg'),
@@ -291,7 +284,7 @@ describe('Bot', function () {
         username: 'otherauthor',
         id: 'not bot id'
       },
-      guild
+      guild: this.guild
     };
 
     this.bot.sendToIRC(message);
@@ -300,13 +293,12 @@ describe('Bot', function () {
   });
 
   it('should not send its own messages to irc', function () {
-    const guild = this.guild;
     const message = {
       author: {
         username: 'bot',
         id: this.bot.discord.user.id
       },
-      guild
+      guild: this.guild
     };
 
     this.bot.sendToIRC(message);
@@ -315,7 +307,6 @@ describe('Bot', function () {
 
   it('should not send messages to irc if the channel isn\'t in the channel mapping',
     function () {
-      const guild = this.guild;
       const message = {
         channel: {
           name: 'wrongdiscord'
@@ -324,7 +315,7 @@ describe('Bot', function () {
           username: 'otherauthor',
           id: 'not bot id'
         },
-        guild
+        guild: this.guild
       };
 
       this.bot.sendToIRC(message);
@@ -333,7 +324,6 @@ describe('Bot', function () {
 
   it('should parse text from discord when sending messages', function () {
     const text = '<#1234>';
-    const guild = this.guild;
     const message = {
       content: text,
       mentions: { users: [] },
@@ -344,7 +334,7 @@ describe('Bot', function () {
         username: 'test',
         id: 'not bot id'
       },
-      guild
+      guild: this.guild
     };
 
     // Wrap it in colors:
@@ -356,7 +346,6 @@ describe('Bot', function () {
 
   it('should use #deleted-channel when referenced channel fails to exist', function () {
     const text = '<#1235>';
-    const guild = this.guild;
     const message = {
       content: text,
       mentions: { users: [] },
@@ -367,7 +356,7 @@ describe('Bot', function () {
         username: 'test',
         id: 'not bot id'
       },
-      guild
+      guild: this.guild
     };
 
     // Discord displays "#deleted-channel" if channel doesn't exist (e.g. <#1235>)
@@ -379,7 +368,6 @@ describe('Bot', function () {
   });
 
   it('should convert user mentions from discord', function () {
-    const guild = this.guild;
     const message = {
       mentions: {
         users: [{
@@ -388,14 +376,13 @@ describe('Bot', function () {
         }],
       },
       content: '<@123> hi',
-      guild
+      guild: this.guild
     };
 
     this.bot.parseText(message).should.equal('@testuser hi');
   });
 
   it('should convert user nickname mentions from discord', function () {
-    const guild = this.guild;
     const message = {
       mentions: {
         users: [{
@@ -404,7 +391,7 @@ describe('Bot', function () {
         }],
       },
       content: '<@!123> hi',
-      guild
+      guild: this.guild
     };
 
     this.bot.parseText(message).should.equal('@testuser hi');
@@ -473,7 +460,6 @@ describe('Bot', function () {
 
   it('should hide usernames for commands to IRC', function () {
     const text = '!test command';
-    const guild = this.guild;
     const message = {
       content: text,
       mentions: { users: [] },
@@ -484,7 +470,7 @@ describe('Bot', function () {
         username: 'test',
         id: 'not bot id'
       },
-      guild
+      guild: this.guild
     };
 
     this.bot.sendToIRC(message);
@@ -509,7 +495,6 @@ describe('Bot', function () {
     const bot = new Bot(newConfig);
     const id = 'not bot id';
     const nickname = 'discord-nickname';
-    const guild = this.guild;
     this.guild.members.set(id, { nickname });
     bot.connect();
     const message = {
@@ -522,7 +507,7 @@ describe('Bot', function () {
         username: 'otherauthor',
         id
       },
-      guild
+      guild: this.guild
     };
 
     bot.sendToIRC(message);
@@ -555,7 +540,6 @@ describe('Bot', function () {
   it('should convert role mentions from discord', function () {
     this.addRole({ name: 'example-role', id: '12345' });
     const text = '<@&12345>';
-    const guild = this.guild;
     const message = {
       content: text,
       mentions: { users: [] },
@@ -566,7 +550,7 @@ describe('Bot', function () {
         username: 'test',
         id: 'not bot id'
       },
-      guild
+      guild: this.guild
     };
 
     this.bot.parseText(message).should.equal('@example-role');
@@ -576,7 +560,6 @@ describe('Bot', function () {
     this.addRole({ name: 'example-role', id: '12345' });
 
     const text = '<@&12346>';
-    const guild = this.guild;
     const message = {
       content: text,
       mentions: { users: [] },
@@ -587,7 +570,7 @@ describe('Bot', function () {
         username: 'test',
         id: 'not bot id'
       },
-      guild
+      guild: this.guild
     };
 
     // Discord displays "@deleted-role" if role doesn't exist (e.g. <@&12346>)
@@ -622,8 +605,6 @@ describe('Bot', function () {
 
     bot.sendToDiscord('testuser', '#irc', 'test message');
     this.sendStub.should.have.been.calledOnce;
-
-    const guild = this.guild;
     const message = {
       content: 'test message',
       mentions: { users: [] },
@@ -634,7 +615,7 @@ describe('Bot', function () {
         username: 'otherauthor',
         id: 'not bot id'
       },
-      guild
+      guild: this.guild
     };
 
     bot.sendToIRC(message);
@@ -671,8 +652,6 @@ describe('Bot', function () {
 
     this.bot.sendToDiscord('testuser', '#irc', 'test message');
     this.sendStub.should.have.been.calledOnce;
-
-    const guild = this.guild;
     const message = {
       content: 'test message',
       mentions: { users: [] },
@@ -683,7 +662,7 @@ describe('Bot', function () {
         username: 'otherauthor',
         id: 'not bot id'
       },
-      guild
+      guild: this.guild
     };
 
     this.bot.sendToIRC(message);
@@ -731,8 +710,6 @@ describe('Bot', function () {
     const format = { ircText: '<{$nickname}> {$discordChannel} => {$ircChannel}: {$text}' };
     this.bot = new Bot({ ...configMsgFormatDefault, format });
     this.bot.connect();
-
-    const guild = this.guild;
     const message = {
       content: 'test message',
       mentions: { users: [] },
@@ -743,7 +720,7 @@ describe('Bot', function () {
         username: 'testauthor',
         id: 'not bot id'
       },
-      guild
+      guild: this.guild
     };
     const expected = '<testauthor> #discord => #irc: test message';
 
@@ -757,7 +734,6 @@ describe('Bot', function () {
     this.bot.connect();
 
     const text = '!testcmd';
-    const guild = this.guild;
     const message = {
       content: text,
       mentions: { users: [] },
@@ -768,7 +744,7 @@ describe('Bot', function () {
         username: 'testauthor',
         id: 'not bot id'
       },
-      guild
+      guild: this.guild
     };
     const expected = 'testauthor from #discord sent command to #irc:';
 
@@ -783,7 +759,6 @@ describe('Bot', function () {
     this.bot.connect();
 
     const attachmentUrl = 'https://image/url.jpg';
-    const guild = this.guild;
     const message = {
       content: '',
       mentions: { users: [] },
@@ -795,7 +770,7 @@ describe('Bot', function () {
         username: 'otherauthor',
         id: 'not bot id'
       },
-      guild
+      guild: this.guild
     };
 
     this.bot.sendToIRC(message);
@@ -809,7 +784,6 @@ describe('Bot', function () {
     this.bot.connect();
 
     const text = '!testcmd';
-    const guild = this.guild;
     const message = {
       content: text,
       mentions: { users: [] },
@@ -820,7 +794,7 @@ describe('Bot', function () {
         username: 'testauthor',
         id: 'not bot id'
       },
-      guild
+      guild: this.guild
     };
 
     this.bot.sendToIRC(message);
