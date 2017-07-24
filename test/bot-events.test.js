@@ -146,10 +146,10 @@ describe('Bot Events', function () {
     const channel = '#channel';
     const author = 'user';
     const text = 'hi';
-    const formattedText = '_hi_';
+    const formattedText = 'hi';
     const message = {};
     this.bot.ircClient.emit('action', author, channel, text, message);
-    this.bot.sendToDiscord.should.have.been.calledWithExactly(author, channel, formattedText);
+    this.bot.sendToDiscord.should.have.been.calledWithExactly(author, channel, formattedText, true);
   });
 
   it('should keep track of users through names event when irc status notices enabled', function () {
