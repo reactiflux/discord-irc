@@ -1,6 +1,20 @@
 # Changelog
 This project adheres to [Semantic Versioning](http://semver.org/).
 
+## [2.4.1] - 2017-07-16
+
+### Added
+* Falsy command preludes are no longer sent (previously would choose default prelude) - [#260](https://github.com/reactiflux/discord-irc/pull/260)
+
+### Fixed
+* Update link to IRC library in README so it points to the new irc-upd library - [#264](https://github.com/reactiflux/discord-irc/pull/264)
+
+* Update dependency commander to 2.11.0 - [#262](https://github.com/reactiflux/discord-irc/pull/262)
+
+* Fix deprecation warning on `TextChannel#sendMessage` - [#267](https://github.com/reactiflux/discord-irc/pull/267)
+
+* Fix reconnection by updating dependency irc-upd to 0.6.2 - [#270](https://github.com/reactiflux/discord-irc/pull/270)
+
 ## [2.4.0] - 2017-07-01
 This project now uses [irc-upd](https://github.com/Throne3d/node-irc) as a dependency, instead of the old [irc](https://github.com/martynsmith/node-irc) package – this fork should be better maintained and will solve some bugs, detailed below.
 

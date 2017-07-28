@@ -1,54 +1,30 @@
 /* eslint-disable class-methods-use-this */
 import events from 'events';
 import sinon from 'sinon';
+import discord from 'discord.js';
 
-export default function createDiscordStub(sendMessageStub, findUserStub, findRoleStub,
-  findEmojiStub) {
+export default function createDiscordStub(sendStub, guild, discordUsers) {
   return class DiscordStub extends events.EventEmitter {
     constructor() {
       super();
       this.user = {
         id: 'testid'
       };
+      this.channels = this.guildChannels();
 
-      this.channels = {
-        filter: () => this.channels,
-        get: this.getChannel,
-        find: this.getChannel
-      };
-
-      this.users = {
-        find: findUserStub
-      };
-      this.options = {
-        http: {
-          host: 'host'
-        }
-      };
+      this.users = discordUsers;
     }
 
-    getChannel(key, value) {
-      if (key === 'name' && value !== 'discord') return null;
-      if (key !== '1234' && value === undefined) return null;
-      return {
+    guildChannels() {
+      const channels = new discord.Collection();
+      channels.set('1234', {
         name: 'discord',
-        id: 1234,
-        sendMessage: sendMessageStub,
-        guild: {
-          members: {
-            find: findUserStub,
-            get: findUserStub,
-            filter: findUserStub
-          },
-          roles: {
-            find: findRoleStub,
-            get: findRoleStub
-          },
-          emojis: {
-            find: findEmojiStub
-          }
-        }
-      };
+        id: '1234',
+        type: 'text',
+        send: sendStub,
+        guild
+      });
+      return channels;
     }
 
     login() {
