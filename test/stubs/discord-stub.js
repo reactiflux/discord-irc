@@ -37,7 +37,8 @@ export default function createDiscordStub(sendMessageStub, findUserStub, findRol
         guild: {
           members: {
             find: findUserStub,
-            get: findUserStub
+            get: findUserStub,
+            filter: findUserStub
           },
           roles: {
             find: findRoleStub,

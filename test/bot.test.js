@@ -846,7 +846,7 @@ describe('Bot', function () {
     this.sendMessageStub.getCall(0).args.should.deep.equal([msg]);
   });
 
-    it('should create webhooks clients for each webhook url in the config', function () {
+  it('should create webhooks clients for each webhook url in the config', function () {
     this.bot.webhooks.should.have.property('#withwebhook');
   });
 
@@ -867,9 +867,11 @@ describe('Bot', function () {
     this.sendWebhookMessageStub.should.have.been.called;
   });
 
-  it('should find the user\'s avatar when the irc nick is also a discord username', function () {
-    const testUser = new discord.User(this.bot.discord, { username: 'avatarUser', id: '123', avatar: '123' });
-    this.findUserStub.withArgs('username', testUser.username).returns(testUser);
-    this.bot.getDiscordAvatar('avatarUser').should.not.equal(null);
+  it('should search for the user\'s avatar when sending via webhook', function () {
+    const newConfig = { ...config, webhooks: { '#discord': 'https://discordapp.com/api/webhooks/id/token' } };
+    const bot = new Bot(newConfig);
+    bot.connect();
+    bot.sendToDiscord('nick', '#irc', 'text');
+    this.findUserStub.should.have.been.called;
   });
 });
