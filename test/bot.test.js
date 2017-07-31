@@ -836,32 +836,37 @@ describe('Bot', function () {
     const newConfig = { ...config, webhooks: { '#discord': 'https://discordapp.com/api/webhooks/id/token' } };
     const bot = new Bot(newConfig);
     bot.connect();
-    this.guild.members.set(1, { username: 'Nick', nickname: 'Different', avatarURL: 'avatarURL' });
-    this.bot.getDiscordAvatar('Nick', '#irc').should.equal('avatarURL');
+    const user = new discord.User(this.bot.discord, { username: 'Nick', avatar: 'avatarURL' });
+    this.guild.members.set(1, { user, nickname: 'Different' });
+    this.bot.getDiscordAvatar('Nick', '#irc').should.equal('/avatars/<@undefined>/avatarURL.png?size=2048');
   });
 
   it('should find a matching username, case insensitive, when looking for an avatar', function () {
     const newConfig = { ...config, webhooks: { '#discord': 'https://discordapp.com/api/webhooks/id/token' } };
     const bot = new Bot(newConfig);
     bot.connect();
-    this.guild.members.set(1, { username: 'nick', nickname: 'Different', avatarURL: 'avatarURL' });
-    this.bot.getDiscordAvatar('Nick', '#irc').should.equal('avatarURL');
+    const user = new discord.User(this.bot.discord, { username: 'nick', avatar: 'avatarURL' });
+    this.guild.members.set(1, { user, nickname: 'Different' });
+    this.bot.getDiscordAvatar('Nick', '#irc').should.equal('/avatars/<@undefined>/avatarURL.png?size=2048');
   });
 
   it('should find a matching nickname, case sensitive, when looking for an avatar', function () {
     const newConfig = { ...config, webhooks: { '#discord': 'https://discordapp.com/api/webhooks/id/token' } };
     const bot = new Bot(newConfig);
     bot.connect();
-    this.guild.members.set(1, { username: 'Nick', nickname: 'Different', avatarURL: 'avatarURL' });
-    this.bot.getDiscordAvatar('Different', '#irc').should.equal('avatarURL');
+    const user = new discord.User(this.bot.discord, { username: 'Nick', avatar: 'avatarURL' });
+    this.guild.members.set(1, { user, nickname: 'Different' });
+    this.bot.getDiscordAvatar('Different', '#irc').should.equal('/avatars/<@undefined>/avatarURL.png?size=2048');
   });
 
   it('should not return an avatar with two matching usernames when looking for an avatar', function () {
     const newConfig = { ...config, webhooks: { '#discord': 'https://discordapp.com/api/webhooks/id/token' } };
     const bot = new Bot(newConfig);
     bot.connect();
-    this.guild.members.set(1, { username: 'common', nickname: 'Different', avatarURL: 'avatarURL' });
-    this.guild.members.set(2, { username: 'Nick', nickname: 'common', avatarURL: 'avatarURL' });
+    const user1 = new discord.User(this.bot.discord, { username: 'common', avatar: 'avatarURL' });
+    const user2 = new discord.User(this.bot.discord, { username: 'Nick', avatar: 'avatarURL' });
+    this.guild.members.set(1, { user: user1, nickname: 'Different' });
+    this.guild.members.set(2, { user: user2, nickname: 'common' });
     chai.should().equal(this.bot.getDiscordAvatar('common', '#irc'), null);
   });
 });
