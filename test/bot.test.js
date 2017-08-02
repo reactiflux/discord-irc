@@ -848,7 +848,7 @@ describe('Bot', function () {
     this.bot.connect();
 
     const guild = createGuildStub();
-    const botmsg = {
+    const botMessage = {
       content: 'bot',
       mentions: { users: [] },
       channel: { name: 'discord' },
@@ -860,7 +860,7 @@ describe('Bot', function () {
       guild
     };
 
-    const normalmsg = {
+    const normalMessage = {
       content: 'notbot',
       mentions: { users: [] },
       channel: { name: 'discord' },
@@ -872,8 +872,8 @@ describe('Bot', function () {
       guild
     };
 
-    this.bot.sendToIRC(botmsg);
-    this.bot.sendToIRC(normalmsg);
+    this.bot.sendToIRC(botMessage);
+    this.bot.sendToIRC(normalMessage);
     ClientStub.prototype.say.should.have.been.calledOnce;
   });
 

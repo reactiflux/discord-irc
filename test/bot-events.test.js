@@ -370,7 +370,7 @@ describe('Bot Events', function () {
     bot.ircClient.emit('names', channel, { [bot.nickname]: '' });
 
     const nick = 'ignored';
-    const altnick = 'notignored';
+    const altNick = 'notignored';
     const reason = 'Leaving';
 
     bot.ircClient.emit('join', channel, nick);
@@ -378,7 +378,7 @@ describe('Bot Events', function () {
     bot.ircClient.emit('join', channel, nick);
     bot.ircClient.emit('quit', nick, reason, [channel]);
     bot.ircClient.emit('join', channel, nick);
-    bot.ircClient.emit('nick', nick, altnick, [channel]);
+    bot.ircClient.emit('nick', nick, altNick, [channel]);
     bot.sendExactToDiscord.should.not.have.been.called;
   });
 });
