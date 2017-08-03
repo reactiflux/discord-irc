@@ -817,7 +817,6 @@ describe('Bot', function () {
 
   it('should extract id and token from webhook urls', function () {
     this.bot.webhooks['#withwebhook'].id.should.equal('id');
-    this.bot.webhooks['#withwebhook'].token.should.equal('token');
   });
 
   it('should find the matching webhook when it exists', function () {
