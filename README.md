@@ -100,7 +100,8 @@ To retrieve a discord channel ID, write `\#channel` on the relevant server – i
 
 ### Encodings
 
-If you encounter trouble with some characters being corrupted from some clients (particularly umlauted characters, such as `ä` or `ö`), try installing the optional dependencies `iconv` and `node-icu-charset-detector`, then adding `"encoding": "utf-8"` to your `ircOptions` object.
+If you encounter trouble with some characters being corrupted from some clients (particularly umlauted characters, such as `ä` or `ö`), try installing the optional dependencies `iconv` and `node-icu-charset-detector`.
+The bot will produce a warning when started if the IRC library is unable to convert between encodings.
 
 Further information can be found in [the installation section of irc-upd](https://github.com/Throne3d/node-irc#character-set-detection).
 
