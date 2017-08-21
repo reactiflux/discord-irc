@@ -1,6 +1,16 @@
 # Changelog
 This project adheres to [Semantic Versioning](http://semver.org/).
 
+## [2.4.2] - 2017-08-21
+
+### Fixed
+* Tests: Use globbing instead of `find` so tests work on Windows - [#279](https://github.com/reactiflux/discord-irc/pull/279)
+
+### Changed
+* Update dependency irc-upd to [0.7.0](https://github.com/Throne3d/node-irc/releases/tag/v0.7.0); adds optional auto-renick functionality - [#284](https://github.com/reactiflux/discord-irc/pull/284)
+
+* Tests: Use Discord objects to simplify code - [#272](https://github.com/reactiflux/discord-irc/pull/272)
+
 ## [2.4.1] - 2017-07-16
 
 ### Added
