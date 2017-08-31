@@ -77,6 +77,7 @@ First you need to create a Discord bot user, which you can do by following the i
       "ircText": "<{$displayUsername}> {$text}", // When sending a message to IRC
       "urlAttachment": "<{$displayUsername}> {$attachmentURL}", // When sending a Discord attachment to IRC
       "discord": "**<{$author}>** {$withMentions}" // When sending a message to Discord
+      "discordMe": "_**{$author}** {$withMentions}_" // When sending a /me action message to Discord
       // Other patterns that can be used:
       // {$discordChannel} (e.g. #general)
       // {$ircChannel} (e.g. #irc)
