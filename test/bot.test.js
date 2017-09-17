@@ -480,6 +480,30 @@ describe('Bot', function () {
     ClientStub.prototype.say.getCall(1).args.should.deep.equal(['#irc', text]);
   });
 
+  it('should support multi-character command prefixes', function () {
+    const bot = new Bot({ ...config, commandCharacters: ['@@'] });
+    const text = '@@test command';
+    const message = {
+      content: text,
+      mentions: { users: [] },
+      channel: {
+        name: 'discord'
+      },
+      author: {
+        username: 'test',
+        id: 'not bot id'
+      },
+      guild: this.guild
+    };
+    bot.connect();
+
+    bot.sendToIRC(message);
+    ClientStub.prototype.say.getCall(0).args.should.deep.equal([
+      '#irc', 'Command sent from Discord by test:'
+    ]);
+    ClientStub.prototype.say.getCall(1).args.should.deep.equal(['#irc', text]);
+  });
+
   it('should hide usernames for commands to Discord', function () {
     const username = 'ircuser';
     const text = '!command';
@@ -806,28 +830,5 @@ describe('Bot', function () {
     this.bot.sendToDiscord(username, '#irc', msg);
     this.sendStub.should.have.been.calledOnce;
     this.sendStub.getCall(0).args.should.deep.equal([msg]);
-  });
-  
-  it('should support multi-character command prefixes', function () {
-    const bot = new Bot({ ...config, commandCharacters: ['@@'] });
-    const text = '@@test command';
-    const message = {
-      content: text,
-      mentions: { users: [] },
-      channel: {
-        name: 'discord'
-      },
-      author: {
-        username: 'test',
-        id: 'not bot id'
-      },
-      guild: this.guild
-    };
-
-    this.bot.sendToIRC(message);
-    ClientStub.prototype.say.getCall(0).args.should.deep.equal([
-      '#irc', 'Command sent from Discord by test:'
-    ]);
-    ClientStub.prototype.say.getCall(1).args.should.deep.equal(['#irc', text]);
   });
 });
