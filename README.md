@@ -1,6 +1,6 @@
 # discord-irc [![Build Status](https://travis-ci.org/reactiflux/discord-irc.svg?branch=master)](https://travis-ci.org/reactiflux/discord-irc) [![Coverage Status](https://coveralls.io/repos/github/reactiflux/discord-irc/badge.svg?branch=master)](https://coveralls.io/github/reactiflux/discord-irc?branch=master)
 
-> Connects [Discord](https://discordapp.com/) and IRC channels by sending messages back and forth.
+> Connects [Discord](https://discordapp.com/) and [IRC](https://www.ietf.org/rfc/rfc1459.txt) channels by sending messages back and forth.
 
 ## Example
 ![discord-irc](http://i.imgur.com/oI6iCrf.gif)
