@@ -37,6 +37,10 @@ import config from './config.json';
 discordIRC(config);
 ```
 
+When installing the library, you may encounter an error relating to the installation of `iconv` or `node-icu-charset-detector`.
+These are optional dependencies which allow you to set the target encoding of messages sent to Discord, as detailed below in the README.
+Without these dependencies and the relevant setting, messages that aren't sent in UTF-8 may be corrupted when copied to Discord.
+
 ## Configuration
 First you need to create a Discord bot user, which you can do by following the instructions [here](https://github.com/reactiflux/discord-irc/wiki/Creating-a-discord-bot-&-getting-a-token).
 
@@ -93,6 +97,13 @@ First you need to create a Discord bot user, which you can do by following the i
 The `ircOptions` object is passed directly to irc-upd ([available options](https://node-irc-upd.readthedocs.io/en/latest/API.html#irc.Client)).
 
 To retrieve a discord channel ID, write `\#channel` on the relevant server – it should produce something of the form `<#1234567890>`, which you can then use in the `channelMapping` config.
+
+### Encodings
+
+If you encounter trouble with some characters being corrupted from some clients (particularly umlauted characters, such as `ä` or `ö`), try installing the optional dependencies `iconv` and `node-icu-charset-detector`.
+The bot will produce a warning when started if the IRC library is unable to convert between encodings.
+
+Further information can be found in [the installation section of irc-upd](https://github.com/Throne3d/node-irc#character-set-detection).
 
 ## Tests
 Run the tests with:
