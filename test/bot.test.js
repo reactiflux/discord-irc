@@ -831,4 +831,10 @@ describe('Bot', function () {
     this.sendStub.should.have.been.calledOnce;
     this.sendStub.getCall(0).args.should.deep.equal([msg]);
   });
+
+  it('should not send messages to discord if IRC user is ignored',
+    function () {
+      this.bot.sendToDiscord('irc_ignored_user', '#irc', 'message');
+      this.sendStub.should.not.have.been.called;
+    });
 });
