@@ -90,8 +90,10 @@ First you need to create a Discord bot user, which you can do by following the i
     // with one of these characters (commands):
     "commandCharacters": ["!", "."],
     "ircStatusNotices": true // Enables notifications in Discord when people join/part in the relevant IRC channel
-    "ircIgnoreUsers": ["irc_nick1", "irc_nick2"] // Ignore specified IRC nicks and do not send their messages to Discord.
-    "discordIgnoreUsers": ["discord_nick1", "discord_nick2"] // Ignore specified Discord nicks and do not send their messages to IRC.
+    "ignoreUsers": {
+      "irc": ["irc_nick1", "irc_nick2"] // Ignore specified IRC nicks and do not send their messages to Discord.
+      "discord": ["discord_nick1", "discord_nick2"] // Ignore specified Discord nicks and do not send their messages to IRC.
+    }
   }
 ]
 ```
