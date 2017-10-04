@@ -96,17 +96,21 @@ describe('Bot', function () {
     this.sendStub.should.have.been.calledWith(formatted);
   });
 
-  it('should not send messages to discord if the channel isn\'t in the channel mapping',
+  it(
+    'should not send messages to discord if the channel isn\'t in the channel mapping',
     function () {
       this.bot.sendToDiscord('user', '#no-irc', 'message');
       this.sendStub.should.not.have.been.called;
-    });
+    }
+  );
 
-  it('should not send messages to discord if it isn\'t in the channel',
+  it(
+    'should not send messages to discord if it isn\'t in the channel',
     function () {
       this.bot.sendToDiscord('user', '#otherirc', 'message');
       this.sendStub.should.not.have.been.called;
-    });
+    }
+  );
 
   it('should send to a discord channel ID appropriately', function () {
     const username = 'testuser';
@@ -116,24 +120,30 @@ describe('Bot', function () {
     this.sendStub.should.have.been.calledWith(formatted);
   });
 
-  it('should not send special messages to discord if the channel isn\'t in the channel mapping',
+  it(
+    'should not send special messages to discord if the channel isn\'t in the channel mapping',
     function () {
       this.bot.sendExactToDiscord('#no-irc', 'message');
       this.sendStub.should.not.have.been.called;
-    });
+    }
+  );
 
-  it('should not send special messages to discord if it isn\'t in the channel',
+  it(
+    'should not send special messages to discord if it isn\'t in the channel',
     function () {
       this.bot.sendExactToDiscord('#otherirc', 'message');
       this.sendStub.should.not.have.been.called;
-    });
+    }
+  );
 
-  it('should send special messages to discord',
+  it(
+    'should send special messages to discord',
     function () {
       this.bot.sendExactToDiscord('#irc', 'message');
       this.sendStub.should.have.been.calledWith('message');
       this.debugSpy.should.have.been.calledWith('Sending special message to Discord', 'message', '#irc', '->', '#discord');
-    });
+    }
+  );
 
   it('should not color irc messages if the option is disabled', function () {
     const text = 'testmessage';
@@ -265,8 +275,10 @@ describe('Bot', function () {
 
     this.bot.sendToIRC(message);
 
-    ClientStub.prototype.say.should.have.been.calledWith('#irc',
-      `<\u000304${message.author.username}\u000f> ${text}`);
+    ClientStub.prototype.say.should.have.been.calledWith(
+      '#irc',
+      `<\u000304${message.author.username}\u000f> ${text}`
+    );
 
     const expected = `<\u000304${message.author.username}\u000f> ${attachmentUrl}`;
     ClientStub.prototype.say.should.have.been.calledWith('#irc', expected);
@@ -305,7 +317,8 @@ describe('Bot', function () {
     ClientStub.prototype.say.should.not.have.been.called;
   });
 
-  it('should not send messages to irc if the channel isn\'t in the channel mapping',
+  it(
+    'should not send messages to irc if the channel isn\'t in the channel mapping',
     function () {
       const message = {
         channel: {
@@ -320,7 +333,8 @@ describe('Bot', function () {
 
       this.bot.sendToIRC(message);
       ClientStub.prototype.say.should.not.have.been.called;
-    });
+    }
+  );
 
   it('should parse text from discord when sending messages', function () {
     const text = '<#1234>';
@@ -832,13 +846,16 @@ describe('Bot', function () {
     this.sendStub.getCall(0).args.should.deep.equal([msg]);
   });
 
-  it('should not send messages to Discord if IRC user is ignored',
+  it(
+    'should not send messages to Discord if IRC user is ignored',
     function () {
       this.bot.sendToDiscord('irc_ignored_user', '#irc', 'message');
       this.sendStub.should.not.have.been.called;
-    });
+    }
+  );
 
-  it('should not send messages to IRC if Discord user is ignored',
+  it(
+    'should not send messages to IRC if Discord user is ignored',
     function () {
       const message = {
         content: 'text',
@@ -855,5 +872,6 @@ describe('Bot', function () {
 
       this.bot.sendToIRC(message);
       ClientStub.prototype.say.should.not.have.been.called;
-    });
+    }
+  );
 });

@@ -158,7 +158,9 @@ describe('Bot Events', function () {
     bot.channelUsers.should.be.an('object');
     const channel = '#channel';
     // nick => '' means the user is not a special user
-    const nicks = { [bot.nickname]: '', user: '', user2: '@', user3: '+' };
+    const nicks = {
+      [bot.nickname]: '', user: '', user2: '@', user3: '+'
+    };
     bot.ircClient.emit('names', channel, nicks);
     const channelNicks = new Set([bot.nickname, 'user', 'user2', 'user3']);
     bot.channelUsers.should.deep.equal({ '#channel': channelNicks });
