@@ -831,4 +831,29 @@ describe('Bot', function () {
     this.sendStub.should.have.been.calledOnce;
     this.sendStub.getCall(0).args.should.deep.equal([msg]);
   });
+
+  it('should not send messages to Discord if IRC user is ignored',
+    function () {
+      this.bot.sendToDiscord('irc_ignored_user', '#irc', 'message');
+      this.sendStub.should.not.have.been.called;
+    });
+
+  it('should not send messages to IRC if Discord user is ignored',
+    function () {
+      const message = {
+        content: 'text',
+        mentions: { users: [] },
+        channel: {
+          name: 'discord'
+        },
+        author: {
+          username: 'discord_ignored_user',
+          id: 'some id'
+        },
+        guild: this.guild
+      };
+
+      this.bot.sendToIRC(message);
+      ClientStub.prototype.say.should.not.have.been.called;
+    });
 });

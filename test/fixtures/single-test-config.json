@@ -11,5 +11,9 @@
     "#discord": "#irc channelKey",
     "#notinchannel": "#otherIRC",
     "1234": "#channelforid"
+  },
+  "ignoreUsers": {
+    "irc": ["irc_ignored_user"],
+    "discord": ["discord_ignored_user"]
   }
 }
