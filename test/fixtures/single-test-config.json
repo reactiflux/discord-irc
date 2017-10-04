@@ -12,5 +12,6 @@
     "#notinchannel": "#otherIRC",
     "1234": "#channelforid"
   },
-  "ircIgnoreUsers": ["irc_ignored_user"]
+  "ircIgnoreUsers": ["irc_ignored_user"],
+  "discordIgnoreUsers": ["discord_ignored_user"]
 }
