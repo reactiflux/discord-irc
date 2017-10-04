@@ -3,6 +3,9 @@
   "server": "irc.freenode.net",
   "discordToken": "whatapassword",
   "commandCharacters": ["!", "."],
+  "ircOptions": {
+    "encoding": "utf-8"
+  },
   "autoSendCommands": [
     ["MODE", "test", "+x"],
     ["AUTH", "test", "password"]
