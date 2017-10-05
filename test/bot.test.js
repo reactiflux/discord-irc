@@ -577,7 +577,12 @@ describe('Bot', function () {
 
   it('should convert username-discriminator mentions from IRC properly', function () {
     const user1 = this.addUser({ username: 'user', id: '123', discriminator: '9876' });
-    const user2 = this.addUser({ username: 'user', id: '124', discriminator: '5555', nickname: 'secondUser' });
+    const user2 = this.addUser({
+      username: 'user',
+      id: '124',
+      discriminator: '5555',
+      nickname: 'secondUser'
+    });
 
     const username = 'ircuser';
     const text = 'hello @user#9876 and @user#5555 and @fakeuser#1234';
