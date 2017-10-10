@@ -25,7 +25,7 @@
   "scripts": {
     "start": "node dist/index.js",
     "build": "babel lib --out-dir dist",
-    "prepublish": "npm run build",
+    "prepare": "npm run build",
     "lint": "eslint . --ignore-path .gitignore",
     "coverage": "nyc --require babel-core/register _mocha -- test/*.test.js",
     "report": "nyc report --reporter=text-lcov | coveralls",
