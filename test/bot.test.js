@@ -849,8 +849,15 @@ describe('Bot', function () {
   it(
     'should not send messages to Discord if IRC user is ignored',
     function () {
-      this.bot.sendToDiscord('irc_ignored_user', '#irc', 'message');
-      this.sendStub.should.not.have.been.called;
+      const message = {
+        prefix: 'irc_ignored_nick!irc_ignored_user@irc.ignored.host'
+      };
+
+      if (!this.bot.ignoredIrcUser('irc_ignored_nick', '#irc', message)) {
+        this.bot.sendToDiscord('irc_ignored_nick', '#irc', 'message');
+      } else {
+        this.sendStub.should.not.have.been.called;
+      }
     }
   );
 
@@ -870,8 +877,11 @@ describe('Bot', function () {
         guild: this.guild
       };
 
-      this.bot.sendToIRC(message);
-      ClientStub.prototype.say.should.not.have.been.called;
+      if (!this.bot.ignoredDiscordUser(message)) {
+        this.bot.sendToIRC(message);
+      } else {
+        ClientStub.prototype.say.should.not.have.been.called;
+      }
     }
   );
 });
