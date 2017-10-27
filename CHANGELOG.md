@@ -1,8 +1,39 @@
 # Changelog
 This project adheres to [Semantic Versioning](http://semver.org/).
 
-## [2.4.2] - 2017-08-21
+## [2.5.0] - 2017-10-27
+### Added
+* Support multi-character command prefixes - [#301](https://github.com/reactiflux/discord-irc/pull/301)
 
+* Enable auto-renicking by default, so the bot tries to get the target nickname after it fails - [#302](https://github.com/reactiflux/discord-irc/pull/302)
+
+* Add the ability to ignore IRC/Discord users by nickname - [#322](https://github.com/reactiflux/discord-irc/pull/322)
+
+### Fixed
+* Improve IRC → Discord mentions around non-word characters and nickname prefix matches - [#273](https://github.com/reactiflux/discord-irc/pull/273)
+
+* Default to UTF-8 encoding when bridging messages to prevent character corruption - [#315](https://github.com/reactiflux/discord-irc/pull/315)
+
+* Fix a crash when using the bot in a group DM - [#316](https://github.com/reactiflux/discord-irc/pull/316)
+
+* Use a `prepare` script for transpiling instead of `prepublish`, fixing `npm` installation direct from the GitHub repository - [#323](https://github.com/reactiflux/discord-irc/pull/323)
+
+* Update dependencies:
+
+  - discord.js to 11.2.1
+  - sinon to ^4.0.1
+  - irc-upd to 0.8.0 - [#313](https://github.com/reactiflux/discord-irc/pull/313)
+  - simple-markdown to ^0.3.1
+  - coveralls to ^0.3.0
+  - mocha to ^4.0.0
+  - winston to 2.4.0
+
+### Changed
+* Add a link to the IRC spec in the README - [#307](https://github.com/reactiflux/discord-irc/pull/307)
+
+* Drop testing for Node 7, add testing for Node 8 - [#329](https://github.com/reactiflux/discord-irc/pull/329)
+
+## [2.4.2] - 2017-08-21
 ### Fixed
 * Tests: Use globbing instead of `find` so tests work on Windows - [#279](https://github.com/reactiflux/discord-irc/pull/279)
 
@@ -12,7 +43,6 @@ This project adheres to [Semantic Versioning](http://semver.org/).
 * Tests: Use Discord objects to simplify code - [#272](https://github.com/reactiflux/discord-irc/pull/272)
 
 ## [2.4.1] - 2017-07-16
-
 ### Added
 * Falsy command preludes are no longer sent (previously would choose default prelude) - [#260](https://github.com/reactiflux/discord-irc/pull/260)
 
