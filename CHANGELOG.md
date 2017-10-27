@@ -24,7 +24,7 @@ This project adheres to [Semantic Versioning](http://semver.org/).
   - sinon to ^4.0.1
   - irc-upd to 0.8.0 - [#313](https://github.com/reactiflux/discord-irc/pull/313)
   - simple-markdown to ^0.3.1
-  - coveralls to ^0.3.0
+  - coveralls to ^3.0.0
   - mocha to ^4.0.0
   - winston to 2.4.0
 
