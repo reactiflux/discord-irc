@@ -12,8 +12,8 @@ describe('Formatting', () => {
     });
 
     it('should convert italic markdown', () => {
-      formatFromDiscordToIRC('*text*').should.equal('\x16text\x16');
-      formatFromDiscordToIRC('_text_').should.equal('\x16text\x16');
+      formatFromDiscordToIRC('*text*').should.equal('\x1dtext\x1d');
+      formatFromDiscordToIRC('_text_').should.equal('\x1dtext\x1d');
     });
 
     it('should convert underline markdown', () => {
@@ -26,7 +26,7 @@ describe('Formatting', () => {
 
     it('should convert nested markdown', () => {
       formatFromDiscordToIRC('**bold *italics***')
-        .should.equal('\x02bold \x16italics\x16\x02');
+        .should.equal('\x02bold \x1ditalics\x1d\x02');
     });
   });
 
