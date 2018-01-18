@@ -1,6 +1,10 @@
 # Changelog
 This project adheres to [Semantic Versioning](http://semver.org/).
 
+## [2.5.1] - 2018-01-18
+### Fixed
+* Upgraded dependencies.
+
 ## [2.5.0] - 2017-10-27
 ### Added
 * Support multi-character command prefixes - [#301](https://github.com/reactiflux/discord-irc/pull/301)
