@@ -37,13 +37,13 @@
   "license": "MIT",
   "dependencies": {
     "check-env": "1.3.0",
-    "commander": "2.12.2",
-    "discord.js": "11.2.1",
-    "irc-colors": "^1.4.1",
-    "irc-formatting": "^1.0.0-rc3",
+    "commander": "2.13.0",
+    "discord.js": "11.3.0",
+    "irc-colors": "1.4.1",
+    "irc-formatting": "1.0.0-rc3",
     "irc-upd": "0.8.1",
     "lodash": "^4.17.4",
-    "simple-markdown": "^0.3.1",
+    "simple-markdown": "0.3.2",
     "strip-json-comments": "2.0.1",
     "winston": "2.4.0"
   },
@@ -58,7 +58,7 @@
     "eslint": "^4.8.0",
     "eslint-config-airbnb-base": "^12.0.1",
     "eslint-plugin-import": "^2.7.0",
-    "mocha": "^4.0.0",
+    "mocha": "^5.0.0",
     "nyc": "^11.0.3",
     "sinon": "^4.0.1",
     "sinon-chai": "^2.8.0"
