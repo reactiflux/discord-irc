@@ -93,7 +93,8 @@ First you need to create a Discord bot user, which you can do by following the i
     "ignoreUsers": {
       "irc": ["irc_nick1", "irc_nick2"], // Ignore specified IRC nicks and do not send their messages to Discord.
       "discord": ["discord_nick1", "discord_nick2"] // Ignore specified Discord nicks and do not send their messages to IRC.
-    }
+    },
+    "discordStatus": "IRC"
   }
 ]
 ```
