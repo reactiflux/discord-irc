@@ -11,6 +11,11 @@ export default function createDiscordStub(sendStub, guild, discordUsers) {
         id: 'testid'
       };
       this.channels = this.guildChannels();
+      this.options = {
+        http: {
+          cdn: ''
+        }
+      };
 
       this.users = discordUsers;
     }

@@ -93,6 +93,10 @@ First you need to create a Discord bot user, which you can do by following the i
     "ignoreUsers": {
       "irc": ["irc_nick1", "irc_nick2"], // Ignore specified IRC nicks and do not send their messages to Discord.
       "discord": ["discord_nick1", "discord_nick2"] // Ignore specified Discord nicks and do not send their messages to IRC.
+    },
+    // List of webhooks per channel
+    "webhooks": {
+      "#discord": "https://discordapp.com/api/webhooks/id/token"
     }
   }
 ]
@@ -101,6 +105,15 @@ First you need to create a Discord bot user, which you can do by following the i
 The `ircOptions` object is passed directly to irc-upd ([available options](https://node-irc-upd.readthedocs.io/en/latest/API.html#irc.Client)).
 
 To retrieve a discord channel ID, write `\#channel` on the relevant server – it should produce something of the form `<#1234567890>`, which you can then use in the `channelMapping` config.
+
+### Webhooks
+Webhooks allow nickname and avatar override, so messages coming from IRC will appear almost as regular Discord messages.
+
+See [here (part 1 only)](https://support.discordapp.com/hc/en-us/articles/228383668-Intro-to-Webhooks) to create a webhook for a channel.
+
+Example result:
+
+![discord-webhook](http://i.imgur.com/lNeJIUI.jpg)
 
 ### Encodings
 
