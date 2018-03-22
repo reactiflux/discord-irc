@@ -107,16 +107,23 @@ The `ircOptions` object is passed directly to irc-upd ([available options](https
 To retrieve a discord channel ID, write `\#channel` on the relevant server – it should produce something of the form `<#1234567890>`, which you can then use in the `channelMapping` config.
 
 ### Webhooks
-Webhooks allow nickname and avatar override, so messages coming from IRC will appear almost as regular Discord messages.
-
-See [here (part 1 only)](https://support.discordapp.com/hc/en-us/articles/228383668-Intro-to-Webhooks) to create a webhook for a channel.
-
-Example result:
+Webhooks lets you override nicknames and avatars, so messages coming from IRC
+can appear as regular Discord messages:
 
 ![discord-webhook](http://i.imgur.com/lNeJIUI.jpg)
 
-### Encodings
+To enable webhooks, follow part 1 of [this
+guide](https://support.discordapp.com/hc/en-us/articles/228383668-Intro-to-Webhooks)
+to create and retrieve a webhook URL for a specific channel, then enable it in
+discord-irc's config as follows:
 
+```json
+  "webhooks": {
+    "#discord-channel": "https://discordapp.com/api/webhooks/id/token"
+  }
+```
+
+### Encodings
 If you encounter trouble with some characters being corrupted from some clients (particularly umlauted characters, such as `ä` or `ö`), try installing the optional dependencies `iconv` and `node-icu-charset-detector`.
 The bot will produce a warning when started if the IRC library is unable to convert between encodings.
 
