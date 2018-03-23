@@ -93,6 +93,10 @@ First you need to create a Discord bot user, which you can do by following the i
     "ignoreUsers": {
       "irc": ["irc_nick1", "irc_nick2"], // Ignore specified IRC nicks and do not send their messages to Discord.
       "discord": ["discord_nick1", "discord_nick2"] // Ignore specified Discord nicks and do not send their messages to IRC.
+    },
+    // List of webhooks per channel
+    "webhooks": {
+      "#discord": "https://discordapp.com/api/webhooks/id/token"
     }
   }
 ]
@@ -102,8 +106,24 @@ The `ircOptions` object is passed directly to irc-upd ([available options](https
 
 To retrieve a discord channel ID, write `\#channel` on the relevant server – it should produce something of the form `<#1234567890>`, which you can then use in the `channelMapping` config.
 
-### Encodings
+### Webhooks
+Webhooks lets you override nicknames and avatars, so messages coming from IRC
+can appear as regular Discord messages:
 
+![discord-webhook](http://i.imgur.com/lNeJIUI.jpg)
+
+To enable webhooks, follow part 1 of [this
+guide](https://support.discordapp.com/hc/en-us/articles/228383668-Intro-to-Webhooks)
+to create and retrieve a webhook URL for a specific channel, then enable it in
+discord-irc's config as follows:
+
+```json
+  "webhooks": {
+    "#discord-channel": "https://discordapp.com/api/webhooks/id/token"
+  }
+```
+
+### Encodings
 If you encounter trouble with some characters being corrupted from some clients (particularly umlauted characters, such as `ä` or `ö`), try installing the optional dependencies `iconv` and `node-icu-charset-detector`.
 The bot will produce a warning when started if the IRC library is unable to convert between encodings.
 

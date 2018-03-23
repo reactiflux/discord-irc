@@ -1,6 +1,27 @@
 # Changelog
 This project adheres to [Semantic Versioning](http://semver.org/).
 
+## [2.6.0] - 2018-03-22
+### Added
+* Support for posting messages to Discord using webhooks (thanks to
+  [Fiaxhs](https://github.com/reactiflux/discord-irc/pull/230)!).
+
+Webhooks lets you override nicknames and avatars, so messages coming from IRC
+can appear as regular Discord messages:
+
+![discord-webhook](http://i.imgur.com/lNeJIUI.jpg)
+
+To enable webhooks, follow part 1 of [this
+guide](https://support.discordapp.com/hc/en-us/articles/228383668-Intro-to-Webhooks)
+to create and retrieve a webhook URL for a specific channel, then enable it in
+discord-irc's config as follows:
+
+```json
+  "webhooks": {
+    "#discord-channel": "https://discordapp.com/api/webhooks/id/token"
+  }
+```
+
 ## [2.5.1] - 2018-01-18
 ### Fixed
 * Upgraded dependencies.

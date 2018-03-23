@@ -8,6 +8,7 @@ import discord from 'discord.js';
 import Bot from '../lib/bot';
 import createDiscordStub from './stubs/discord-stub';
 import ClientStub from './stubs/irc-client-stub';
+import createWebhookStub from './stubs/webhook-stub';
 import config from './fixtures/single-test-config.json';
 import configMsgFormatDefault from './fixtures/msg-formats-default.json';
 
@@ -40,6 +41,8 @@ describe('Bot', function () {
     ClientStub.prototype.say = sandbox.stub();
     ClientStub.prototype.send = sandbox.stub();
     ClientStub.prototype.join = sandbox.stub();
+    this.sendWebhookMessageStub = sandbox.stub();
+    discord.WebhookClient = createWebhookStub(this.sendWebhookMessageStub);
     this.bot = new Bot(config);
     this.bot.connect();
 
@@ -890,6 +893,82 @@ describe('Bot', function () {
     this.bot.sendToDiscord(username, '#irc', msg);
     this.sendStub.should.have.been.calledOnce;
     this.sendStub.getCall(0).args.should.deep.equal([msg]);
+  });
+
+  it('should create webhooks clients for each webhook url in the config', function () {
+    this.bot.webhooks.should.have.property('#withwebhook');
+  });
+
+  it('should extract id and token from webhook urls', function () {
+    this.bot.webhooks['#withwebhook'].id.should.equal('id');
+  });
+
+  it('should find the matching webhook when it exists', function () {
+    this.bot.findWebhook('#ircwebhook').should.not.equal(null);
+  });
+
+  it('should prefer webhooks to send a message when possible', function () {
+    const newConfig = { ...config, webhooks: { '#discord': 'https://discordapp.com/api/webhooks/id/token' } };
+    const bot = new Bot(newConfig);
+    bot.connect();
+    bot.sendToDiscord('nick', '#irc', 'text');
+    this.sendWebhookMessageStub.should.have.been.called;
+  });
+
+  it('should find a matching username, case sensitive, when looking for an avatar', function () {
+    const newConfig = { ...config, webhooks: { '#discord': 'https://discordapp.com/api/webhooks/id/token' } };
+    const bot = new Bot(newConfig);
+    bot.connect();
+    const userObj = { id: 123, username: 'Nick', avatar: 'avatarURL' };
+    const memberObj = { nickname: 'Different' };
+    this.addUser(userObj, memberObj);
+    this.bot.getDiscordAvatar('Nick', '#irc').should.equal('/avatars/123/avatarURL.png?size=2048');
+  });
+
+  it('should find a matching username, case insensitive, when looking for an avatar', function () {
+    const newConfig = { ...config, webhooks: { '#discord': 'https://discordapp.com/api/webhooks/id/token' } };
+    const bot = new Bot(newConfig);
+    bot.connect();
+    const userObj = { id: 124, username: 'nick', avatar: 'avatarURL' };
+    const memberObj = { nickname: 'Different' };
+    this.addUser(userObj, memberObj);
+    this.bot.getDiscordAvatar('Nick', '#irc').should.equal('/avatars/124/avatarURL.png?size=2048');
+  });
+
+  it('should find a matching nickname, case sensitive, when looking for an avatar', function () {
+    const newConfig = { ...config, webhooks: { '#discord': 'https://discordapp.com/api/webhooks/id/token' } };
+    const bot = new Bot(newConfig);
+    bot.connect();
+    const userObj = { id: 125, username: 'Nick', avatar: 'avatarURL' };
+    const memberObj = { nickname: 'Different' };
+    this.addUser(userObj, memberObj);
+    this.bot.getDiscordAvatar('Different', '#irc').should.equal('/avatars/125/avatarURL.png?size=2048');
+  });
+
+  it('should not return an avatar with two matching usernames when looking for an avatar', function () {
+    const newConfig = { ...config, webhooks: { '#discord': 'https://discordapp.com/api/webhooks/id/token' } };
+    const bot = new Bot(newConfig);
+    bot.connect();
+    const userObj1 = { id: 126, username: 'common', avatar: 'avatarURL' };
+    const userObj2 = { id: 127, username: 'Nick', avatar: 'avatarURL' };
+    const memberObj1 = { nickname: 'Different' };
+    const memberObj2 = { nickname: 'common' };
+    this.addUser(userObj1, memberObj1);
+    this.addUser(userObj2, memberObj2);
+    chai.should().equal(this.bot.getDiscordAvatar('common', '#irc'), null);
+  });
+
+  it('should not return an avatar when no users match and should handle lack of nickname, when looking for an avatar', function () {
+    const newConfig = { ...config, webhooks: { '#discord': 'https://discordapp.com/api/webhooks/id/token' } };
+    const bot = new Bot(newConfig);
+    bot.connect();
+    const userObj1 = { id: 128, username: 'common', avatar: 'avatarURL' };
+    const userObj2 = { id: 129, username: 'Nick', avatar: 'avatarURL' };
+    const memberObj1 = {};
+    const memberObj2 = { nickname: 'common' };
+    this.addUser(userObj1, memberObj1);
+    this.addUser(userObj2, memberObj2);
+    chai.should().equal(this.bot.getDiscordAvatar('nonexistent', '#irc'), null);
   });
 
   it(

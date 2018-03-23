@@ -13,7 +13,11 @@
   "channelMapping": {
     "#discord": "#irc channelKey",
     "#notinchannel": "#otherIRC",
-    "1234": "#channelforid"
+    "1234": "#channelforid",
+    "#withwebhook": "#ircwebhook"
+  },
+  "webhooks": {
+    "#withwebhook": "https://discordapp.com/api/webhooks/id/token"
   },
   "ignoreUsers": {
     "irc": ["irc_ignored_user"],
