@@ -423,6 +423,15 @@ describe('Bot', function () {
     this.bot.parseText(message).should.equal(':SCGWat:');
   });
 
+  it('should convert animated emoji from discord', function () {
+    const message = {
+      mentions: { users: [] },
+      content: '<a:in_love:432887860270465028>'
+    };
+
+    this.bot.parseText(message).should.equal(':in_love:');
+  });
+
   it('should convert user mentions from IRC', function () {
     const testUser = this.addUser({ username: 'testuser', id: '123' });
 
