@@ -1,6 +1,10 @@
 # Changelog
 This project adheres to [Semantic Versioning](http://semver.org/).
 
+## [2.6.1] - 2018-05-11
+### Changed
+* Upgraded dependencies.
+
 ## [2.6.0] - 2018-03-22
 ### Added
 * Support for posting messages to Discord using webhooks (thanks to
