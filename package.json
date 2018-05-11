@@ -41,7 +41,7 @@
     "discord.js": "11.3.2",
     "irc-colors": "1.4.2",
     "irc-formatting": "1.0.0-rc3",
-    "irc-upd": "0.8.1",
+    "irc-upd": "0.9.0",
     "lodash": "^4.17.4",
     "simple-markdown": "0.3.3",
     "strip-json-comments": "2.0.1",
