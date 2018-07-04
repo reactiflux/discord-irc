@@ -76,10 +76,11 @@ First you need to create a Discord bot user, which you can do by following the i
       "commandPrelude": "Command sent by {$nickname}", // Message sent before a command
       "ircText": "<{$displayUsername}> {$text}", // When sending a message to IRC
       "urlAttachment": "<{$displayUsername}> {$attachmentURL}", // When sending a Discord attachment to IRC
-      "discord": "**<{$author}>** {$withMentions}" // When sending a message to Discord
+      "discord": "**<{$author}>** {$withMentions}", // When sending a message to Discord
       // Other patterns that can be used:
       // {$discordChannel} (e.g. #general)
       // {$ircChannel} (e.g. #irc)
+      "webhookAvatarURL": "https://robohash.org/{$nickname}" // Default avatar to use for webhook messages
     },
     "ircNickColor": false, // Gives usernames a color in IRC for better readability (on by default)
     // Makes the bot hide the username prefix for messages that start
