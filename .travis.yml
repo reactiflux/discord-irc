@@ -1,6 +1,7 @@
 language: node_js
 after_success:
   - npm run report
+  - sh docker/build.sh
 node_js:
   - '6'
   - '8'
