@@ -90,6 +90,8 @@ First you need to create a Discord bot user, which you can do by following the i
       "irc": ["irc_nick1", "irc_nick2"], // Ignore specified IRC nicks and do not send their messages to Discord.
       "discord": ["discord_nick1", "discord_nick2"] // Ignore specified Discord nicks and do not send their messages to IRC.
     },
+    // Sets the discord activity status, can be set to one of "PLAYING, STREAMING, LISTENING or WATCHING"
+  	"discordStatus": ["PLAYING", "with you!"],
     // List of webhooks per channel
     "webhooks": {
       "#discord": "https://discordapp.com/api/webhooks/id/token"
