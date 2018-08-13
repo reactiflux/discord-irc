@@ -56,7 +56,7 @@
     "chai": "^4.0.2",
     "coveralls": "^3.0.0",
     "eslint": "^4.8.0",
-    "eslint-config-airbnb-base": "^13.0.0",
+    "eslint-config-airbnb-base": "^13.1.0",
     "eslint-plugin-import": "^2.7.0",
     "mocha": "^5.0.0",
     "nyc": "^11.0.3",
