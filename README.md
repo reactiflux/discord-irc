@@ -69,7 +69,12 @@ First you need to create a Discord bot user, which you can do by following the i
     },
     "ircOptions": { // Optional node-irc options
       "floodProtection": false, // On by default
-      "floodProtectionDelay": 1000 // 500 by default
+      "floodProtectionDelay": 1000, // 500 by default
+      "port": "6697", // 6697 by default
+      "secure": "true", // enable SSL, false by default
+      "sasl:" "true", // false by default
+      "username:" "test", // nodeirc by default
+      "password": "p455w0rd" // empty by default
     },
     "format": { // Optional custom formatting options
       // Patterns, represented by {$patternName}, are replaced when sending messages
