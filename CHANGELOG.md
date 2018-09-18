@@ -1,6 +1,10 @@
 # Changelog
 This project adheres to [Semantic Versioning](http://semver.org/).
 
+## [2.6.2] - 2018-09-19
+### Changed
+* Upgraded dependencies.
+
 ## [2.6.1] - 2018-05-11
 ### Changed
 * Upgraded dependencies.
