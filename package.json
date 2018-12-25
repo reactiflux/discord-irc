@@ -1,6 +1,6 @@
 {
   "name": "discord-irc",
-  "version": "2.6.1",
+  "version": "2.6.2",
   "description": "Connects IRC and Discord channels by sending messages back and forth.",
   "keywords": [
     "discord",
@@ -37,15 +37,15 @@
   "license": "MIT",
   "dependencies": {
     "check-env": "1.3.0",
-    "commander": "2.15.1",
-    "discord.js": "11.3.2",
-    "irc-colors": "1.4.2",
+    "commander": "2.18.0",
+    "discord.js": "11.4.2",
+    "irc-colors": "1.4.3",
     "irc-formatting": "1.0.0-rc3",
-    "irc-upd": "0.9.0",
+    "irc-upd": "0.10.0",
     "lodash": "^4.17.4",
-    "simple-markdown": "0.4.0",
+    "simple-markdown": "0.4.2",
     "strip-json-comments": "2.0.1",
-    "winston": "2.4.2"
+    "winston": "3.1.0"
   },
   "devDependencies": {
     "babel-cli": "^6.6.5",
@@ -59,7 +59,7 @@
     "eslint-config-airbnb-base": "^12.0.1",
     "eslint-plugin-import": "^2.7.0",
     "mocha": "^5.0.0",
-    "nyc": "^11.0.3",
+    "nyc": "^13.0.1",
     "sinon": "^4.0.1",
     "sinon-chai": "^2.8.0"
   }
