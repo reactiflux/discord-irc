@@ -432,7 +432,7 @@ describe('Bot', function () {
     this.bot.parseText(message).should.equal(':in_love:');
   });
 
-  it('should convert user mentions from IRC', function () {
+  it('should convert user at-mentions from IRC', function () {
     const testUser = this.addUser({ username: 'testuser', id: '123' });
 
     const username = 'ircuser';
@@ -443,10 +443,52 @@ describe('Bot', function () {
     this.sendStub.should.have.been.calledWith(expected);
   });
 
-  it('should not convert user mentions from IRC if such user does not exist', function () {
+  it('should convert user colon-initial mentions from IRC', function () {
+    const testUser = this.addUser({ username: 'testuser', id: '123' });
+
+    const username = 'ircuser';
+    const text = 'testuser: hello!';
+    const expected = `**<${username}>** <@${testUser.id}> hello!`;
+
+    this.bot.sendToDiscord(username, '#irc', text);
+    this.sendStub.should.have.been.calledWith(expected);
+  });
+
+  it('should convert user comma-initial mentions from IRC', function () {
+    const testUser = this.addUser({ username: 'testuser', id: '123' });
+
+    const username = 'ircuser';
+    const text = 'testuser, hello!';
+    const expected = `**<${username}>** <@${testUser.id}> hello!`;
+
+    this.bot.sendToDiscord(username, '#irc', text);
+    this.sendStub.should.have.been.calledWith(expected);
+  });
+
+  it('should not convert user initial mentions from IRC mid-message', function () {
+    this.addUser({ username: 'testuser', id: '123' });
+
+    const username = 'ircuser';
+    const text = 'Hi there testuser, how goes?';
+    const expected = `**<${username}>** Hi there testuser, how goes?`;
+
+    this.bot.sendToDiscord(username, '#irc', text);
+    this.sendStub.should.have.been.calledWith(expected);
+  });
+
+  it('should not convert user at-mentions from IRC if such user does not exist', function () {
     const username = 'ircuser';
     const text = 'See you there @5pm';
     const expected = `**<${username}>** See you there @5pm`;
+
+    this.bot.sendToDiscord(username, '#irc', text);
+    this.sendStub.should.have.been.calledWith(expected);
+  });
+
+  it('should not convert user initial mentions from IRC if such user does not exist', function () {
+    const username = 'ircuser';
+    const text = 'Agreed, see you then.';
+    const expected = `**<${username}>** Agreed, see you then.`;
 
     this.bot.sendToDiscord(username, '#irc', text);
     this.sendStub.should.have.been.calledWith(expected);
