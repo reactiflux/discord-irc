@@ -21,12 +21,6 @@ describe('Bot', function () {
     useFakeServer: false
   });
 
-  const createGuildStub = () => ({
-    roles: new discord.Collection(),
-    members: new discord.Collection(),
-    emojis: new discord.Collection()
-  });
-
   beforeEach(function () {
     this.infoSpy = sandbox.stub(logger, 'info');
     this.debugSpy = sandbox.stub(logger, 'debug');
@@ -35,8 +29,7 @@ describe('Bot', function () {
 
     this.discordUsers = new discord.Collection();
     irc.Client = ClientStub;
-    this.guild = createGuildStub();
-    discord.Client = createDiscordStub(this.sendStub, this.guild, this.discordUsers);
+    discord.Client = createDiscordStub(this.sendStub, this.discordUsers);
 
     ClientStub.prototype.say = sandbox.stub();
     ClientStub.prototype.send = sandbox.stub();
@@ -44,10 +37,14 @@ describe('Bot', function () {
     this.sendWebhookMessageStub = sandbox.stub();
     discord.WebhookClient = createWebhookStub(this.sendWebhookMessageStub);
     this.bot = new Bot(config);
+    this.guild = this.bot.discord.guild;
     this.bot.connect();
 
+    // modified variants of https://github.com/discordjs/discord.js/blob/stable/src/client/ClientDataManager.js
+    // (for easier stubbing)
     this.addUser = function (user, member = null) {
       const userObj = new discord.User(this.bot.discord, user);
+      // also set guild members
       const guildMember = Object.assign({}, member || user, { user: userObj });
       guildMember.nick = guildMember.nickname; // nick => nickname in Discord API
       const memberObj = new discord.GuildMember(this.guild, guildMember);
@@ -57,13 +54,13 @@ describe('Bot', function () {
     };
 
     this.addRole = function (role) {
-      const roleObj = new discord.Role(this.bot.discord, role);
+      const roleObj = new discord.Role(this.guild, role);
       this.guild.roles.set(roleObj.id, roleObj);
       return roleObj;
     };
 
     this.addEmoji = function (emoji) {
-      const emojiObj = new discord.Emoji(this.bot.discord, emoji);
+      const emojiObj = new discord.Emoji(this.guild, emoji);
       this.guild.emojis.set(emojiObj.id, emojiObj);
       return emojiObj;
     };
