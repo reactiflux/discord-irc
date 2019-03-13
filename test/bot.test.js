@@ -514,6 +514,19 @@ describe('Bot', function () {
     this.sendStub.should.have.been.calledWith(expected);
   });
 
+  it('should convert channel mentions from IRC', function () {
+    this.guild.addTextChannel({ id: '1235', name: 'testchannel' });
+    this.guild.addTextChannel({ id: '1236', name: 'channel-compliqué' });
+    const otherGuild = this.bot.discord.createGuildStub({ id: '2' });
+    otherGuild.addTextChannel({ id: '1237', name: 'foreignchannel' });
+
+    const username = 'ircuser';
+    const text = "Here is a broken #channelname, a working #testchannel, #channel-compliqué, an irregular case #TestChannel and another guild's #foreignchannel";
+    const expected = `**<${username}>** Here is a broken #channelname, a working <#1235>, <#1236>, an irregular case <#1235> and another guild's #foreignchannel`;
+    this.bot.sendToDiscord(username, '#irc', text);
+    this.sendStub.should.have.been.calledWith(expected);
+  });
+
   it('should convert newlines from discord', function () {
     const message = {
       mentions: { users: [] },
