@@ -976,6 +976,32 @@ describe('Bot', function () {
     this.sendWebhookMessageStub.should.have.been.called;
   });
 
+  it('pads too short usernames for webhooks', function () {
+    const newConfig = { ...config, webhooks: { '#discord': 'https://discordapp.com/api/webhooks/id/token' } };
+    const bot = new Bot(newConfig);
+    const text = 'message';
+    bot.connect();
+    bot.sendToDiscord('n', '#irc', text);
+    this.sendWebhookMessageStub.should.have.been.calledWith(text, {
+      username: 'n_',
+      text,
+      avatarURL: null,
+    });
+  });
+
+  it('slices too long usernames for webhooks', function () {
+    const newConfig = { ...config, webhooks: { '#discord': 'https://discordapp.com/api/webhooks/id/token' } };
+    const bot = new Bot(newConfig);
+    const text = 'message';
+    bot.connect();
+    bot.sendToDiscord('1234567890123456789012345678901234567890', '#irc', text);
+    this.sendWebhookMessageStub.should.have.been.calledWith(text, {
+      username: '12345678901234567890123456789012',
+      text,
+      avatarURL: null,
+    });
+  });
+
   it('should find a matching username, case sensitive, when looking for an avatar', function () {
     const newConfig = { ...config, webhooks: { '#discord': 'https://discordapp.com/api/webhooks/id/token' } };
     const bot = new Bot(newConfig);
