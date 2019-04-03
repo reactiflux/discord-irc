@@ -1,6 +1,12 @@
 # Changelog
 This project adheres to [Semantic Versioning](http://semver.org/).
 
+## [2.7.0] - 2019-04-02
+### Changed
+* Convert channel mentions to codified mentions (thanks to [Throne3d](https://github.com/reactiflux/discord-irc/pull/476)).
+* Match IRC style mentions at the beginning of message (thanks to [rdb](https://github.com/reactiflux/discord-irc/pull/470)).
+* Upgraded dependencies.
+
 ## [2.6.2] - 2018-09-19
 ### Changed
 * Upgraded dependencies.
