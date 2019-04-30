@@ -44,7 +44,7 @@
     "irc-upd": "0.10.0",
     "lodash": "^4.17.11",
     "simple-markdown": "0.4.2",
-    "strip-json-comments": "2.0.1",
+    "strip-json-comments": "3.0.0",
     "winston": "3.1.0"
   },
   "devDependencies": {
