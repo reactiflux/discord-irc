@@ -986,6 +986,7 @@ describe('Bot', function () {
       username: 'n_',
       text,
       avatarURL: null,
+      disableEveryone: true,
     });
   });
 
@@ -999,6 +1000,7 @@ describe('Bot', function () {
       username: '12345678901234567890123456789012',
       text,
       avatarURL: null,
+      disableEveryone: true,
     });
   });
 
