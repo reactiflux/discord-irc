@@ -21,12 +21,6 @@ describe('Bot', function () {
     useFakeServer: false
   });
 
-  const createGuildStub = () => ({
-    roles: new discord.Collection(),
-    members: new discord.Collection(),
-    emojis: new discord.Collection()
-  });
-
   beforeEach(function () {
     this.infoSpy = sandbox.stub(logger, 'info');
     this.debugSpy = sandbox.stub(logger, 'debug');
@@ -35,8 +29,7 @@ describe('Bot', function () {
 
     this.discordUsers = new discord.Collection();
     irc.Client = ClientStub;
-    this.guild = createGuildStub();
-    discord.Client = createDiscordStub(this.sendStub, this.guild, this.discordUsers);
+    discord.Client = createDiscordStub(this.sendStub, this.discordUsers);
 
     ClientStub.prototype.say = sandbox.stub();
     ClientStub.prototype.send = sandbox.stub();
@@ -44,10 +37,14 @@ describe('Bot', function () {
     this.sendWebhookMessageStub = sandbox.stub();
     discord.WebhookClient = createWebhookStub(this.sendWebhookMessageStub);
     this.bot = new Bot(config);
+    this.guild = this.bot.discord.guild;
     this.bot.connect();
 
+    // modified variants of https://github.com/discordjs/discord.js/blob/stable/src/client/ClientDataManager.js
+    // (for easier stubbing)
     this.addUser = function (user, member = null) {
       const userObj = new discord.User(this.bot.discord, user);
+      // also set guild members
       const guildMember = Object.assign({}, member || user, { user: userObj });
       guildMember.nick = guildMember.nickname; // nick => nickname in Discord API
       const memberObj = new discord.GuildMember(this.guild, guildMember);
@@ -57,13 +54,13 @@ describe('Bot', function () {
     };
 
     this.addRole = function (role) {
-      const roleObj = new discord.Role(this.bot.discord, role);
+      const roleObj = new discord.Role(this.guild, role);
       this.guild.roles.set(roleObj.id, roleObj);
       return roleObj;
     };
 
     this.addEmoji = function (emoji) {
-      const emojiObj = new discord.Emoji(this.bot.discord, emoji);
+      const emojiObj = new discord.Emoji(this.guild, emoji);
       this.guild.emojis.set(emojiObj.id, emojiObj);
       return emojiObj;
     };
@@ -432,7 +429,7 @@ describe('Bot', function () {
     this.bot.parseText(message).should.equal(':in_love:');
   });
 
-  it('should convert user mentions from IRC', function () {
+  it('should convert user at-mentions from IRC', function () {
     const testUser = this.addUser({ username: 'testuser', id: '123' });
 
     const username = 'ircuser';
@@ -443,10 +440,52 @@ describe('Bot', function () {
     this.sendStub.should.have.been.calledWith(expected);
   });
 
-  it('should not convert user mentions from IRC if such user does not exist', function () {
+  it('should convert user colon-initial mentions from IRC', function () {
+    const testUser = this.addUser({ username: 'testuser', id: '123' });
+
+    const username = 'ircuser';
+    const text = 'testuser: hello!';
+    const expected = `**<${username}>** <@${testUser.id}> hello!`;
+
+    this.bot.sendToDiscord(username, '#irc', text);
+    this.sendStub.should.have.been.calledWith(expected);
+  });
+
+  it('should convert user comma-initial mentions from IRC', function () {
+    const testUser = this.addUser({ username: 'testuser', id: '123' });
+
+    const username = 'ircuser';
+    const text = 'testuser, hello!';
+    const expected = `**<${username}>** <@${testUser.id}> hello!`;
+
+    this.bot.sendToDiscord(username, '#irc', text);
+    this.sendStub.should.have.been.calledWith(expected);
+  });
+
+  it('should not convert user initial mentions from IRC mid-message', function () {
+    this.addUser({ username: 'testuser', id: '123' });
+
+    const username = 'ircuser';
+    const text = 'Hi there testuser, how goes?';
+    const expected = `**<${username}>** Hi there testuser, how goes?`;
+
+    this.bot.sendToDiscord(username, '#irc', text);
+    this.sendStub.should.have.been.calledWith(expected);
+  });
+
+  it('should not convert user at-mentions from IRC if such user does not exist', function () {
     const username = 'ircuser';
     const text = 'See you there @5pm';
     const expected = `**<${username}>** See you there @5pm`;
+
+    this.bot.sendToDiscord(username, '#irc', text);
+    this.sendStub.should.have.been.calledWith(expected);
+  });
+
+  it('should not convert user initial mentions from IRC if such user does not exist', function () {
+    const username = 'ircuser';
+    const text = 'Agreed, see you then.';
+    const expected = `**<${username}>** Agreed, see you then.`;
 
     this.bot.sendToDiscord(username, '#irc', text);
     this.sendStub.should.have.been.calledWith(expected);
@@ -471,6 +510,19 @@ describe('Bot', function () {
     const username = 'ircuser';
     const text = 'Here is a broken :emojitest:, a working :testemoji: and another :emoji: that won\'t parse';
     const expected = `**<${username}>** Here is a broken :emojitest:, a working <:testemoji:987> and another :emoji: that won't parse`;
+    this.bot.sendToDiscord(username, '#irc', text);
+    this.sendStub.should.have.been.calledWith(expected);
+  });
+
+  it('should convert channel mentions from IRC', function () {
+    this.guild.addTextChannel({ id: '1235', name: 'testchannel' });
+    this.guild.addTextChannel({ id: '1236', name: 'channel-compliqué' });
+    const otherGuild = this.bot.discord.createGuildStub({ id: '2' });
+    otherGuild.addTextChannel({ id: '1237', name: 'foreignchannel' });
+
+    const username = 'ircuser';
+    const text = "Here is a broken #channelname, a working #testchannel, #channel-compliqué, an irregular case #TestChannel and another guild's #foreignchannel";
+    const expected = `**<${username}>** Here is a broken #channelname, a working <#1235>, <#1236>, an irregular case <#1235> and another guild's #foreignchannel`;
     this.bot.sendToDiscord(username, '#irc', text);
     this.sendStub.should.have.been.calledWith(expected);
   });
@@ -922,6 +974,32 @@ describe('Bot', function () {
     bot.connect();
     bot.sendToDiscord('nick', '#irc', 'text');
     this.sendWebhookMessageStub.should.have.been.called;
+  });
+
+  it('pads too short usernames for webhooks', function () {
+    const newConfig = { ...config, webhooks: { '#discord': 'https://discordapp.com/api/webhooks/id/token' } };
+    const bot = new Bot(newConfig);
+    const text = 'message';
+    bot.connect();
+    bot.sendToDiscord('n', '#irc', text);
+    this.sendWebhookMessageStub.should.have.been.calledWith(text, {
+      username: 'n_',
+      text,
+      avatarURL: null,
+    });
+  });
+
+  it('slices too long usernames for webhooks', function () {
+    const newConfig = { ...config, webhooks: { '#discord': 'https://discordapp.com/api/webhooks/id/token' } };
+    const bot = new Bot(newConfig);
+    const text = 'message';
+    bot.connect();
+    bot.sendToDiscord('1234567890123456789012345678901234567890', '#irc', text);
+    this.sendWebhookMessageStub.should.have.been.calledWith(text, {
+      username: '12345678901234567890123456789012',
+      text,
+      avatarURL: null,
+    });
   });
 
   it('should find a matching username, case sensitive, when looking for an avatar', function () {

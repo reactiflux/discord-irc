@@ -6,8 +6,8 @@ export default function createWebhookStub(sendWebhookMessage) {
       this.token = token;
     }
 
-    sendMessage() {
-      sendWebhookMessage();
+    sendMessage(...args) {
+      sendWebhookMessage(...args);
       return new Promise(() => {});
     }
   };
