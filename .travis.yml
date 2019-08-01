@@ -12,6 +12,6 @@ jobs:
         - docker
       deploy:
         provider: script
-        script: bash docker/deploy.sh
+        script: bash docker-deploy.sh
         on:
           branch: master
