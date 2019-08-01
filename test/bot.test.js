@@ -986,6 +986,7 @@ describe('Bot', function () {
       username: 'n_',
       text,
       avatarURL: null,
+      disableEveryone: true,
     });
   });
 
@@ -999,6 +1000,48 @@ describe('Bot', function () {
       username: '12345678901234567890123456789012',
       text,
       avatarURL: null,
+      disableEveryone: true,
+    });
+  });
+
+  it('does not ping everyone if user lacks permission', function () {
+    const newConfig = { ...config, webhooks: { '#discord': 'https://discordapp.com/api/webhooks/id/token' } };
+    const bot = new Bot(newConfig);
+    const text = 'message';
+    const permission = discord.Permissions.FLAGS.VIEW_CHANNEL
+      + discord.Permissions.FLAGS.SEND_MESSAGES;
+    bot.discord.channels.get('1234').setPermissionStub(
+      bot.discord.user,
+      new discord.Permissions(permission),
+    );
+    bot.connect();
+    bot.sendToDiscord('nick', '#irc', text);
+    this.sendWebhookMessageStub.should.have.been.calledWith(text, {
+      username: 'nick',
+      text,
+      avatarURL: null,
+      disableEveryone: true,
+    });
+  });
+
+  it('sends @everyone messages if the bot has permission to do so', function () {
+    const newConfig = { ...config, webhooks: { '#discord': 'https://discordapp.com/api/webhooks/id/token' } };
+    const bot = new Bot(newConfig);
+    const text = 'message';
+    const permission = discord.Permissions.FLAGS.VIEW_CHANNEL
+      + discord.Permissions.FLAGS.SEND_MESSAGES
+      + discord.Permissions.FLAGS.MENTION_EVERYONE;
+    bot.discord.channels.get('1234').setPermissionStub(
+      bot.discord.user,
+      new discord.Permissions(permission),
+    );
+    bot.connect();
+    bot.sendToDiscord('nick', '#irc', text);
+    this.sendWebhookMessageStub.should.have.been.calledWith(text, {
+      username: 'nick',
+      text,
+      avatarURL: null,
+      disableEveryone: false,
     });
   });
 
