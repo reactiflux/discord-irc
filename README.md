@@ -38,6 +38,24 @@ import config from './config.json';
 discordIRC(config);
 ```
 
+## Docker
+As an alternative to running discord-irc directly on your machine, we provide a [Docker container image](https://hub.docker.com/reactiflux/discord-irc).
+After creating a configuration file, you can fetch the image from Docker Hub and run it with the following command:
+
+```bash
+docker run -v /path/to/config:/config/config.json reactiflux/discord-irc
+```
+
+If you've checked out the repository already, you can build the Docker image locally and run that instead:
+
+```bash
+docker build -t discord-irc .
+docker run -v /path/to/config:/config/config.json discord-irc
+```
+
+Note that the path to the config file on the host (`/path/to/config`) _must_ be a valid absolute path to a config file.
+Otherwise, you may get the error "illegal operation on a directory".
+
 ## Configuration
 First you need to create a Discord bot user, which you can do by following the instructions [here](https://github.com/reactiflux/discord-irc/wiki/Creating-a-discord-bot-&-getting-a-token).
 
