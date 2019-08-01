@@ -11,6 +11,7 @@ jobs:
       services:
         - docker
       script: skip
+      after_success: echo Skipping coverage.
       deploy:
         provider: script
         script: bash docker-deploy.sh
