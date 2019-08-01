@@ -4,17 +4,3 @@ after_success:
 node_js:
   - '6'
   - '8'
-jobs:
-  include:
-    - stage: deploy
-      if: branch = master
-      node_js: '8'
-      services:
-        - docker
-      script: skip
-      after_success: echo Skipping coverage.
-      deploy:
-        provider: script
-        script: bash docker-deploy.sh
-        on:
-          branch: master
