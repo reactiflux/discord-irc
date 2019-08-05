@@ -1,4 +1,4 @@
-FROM node:8-alpine
+FROM node:12-alpine
 ENV LIBRARY_PATH=/lib:/usr/lib
 
 RUN mkdir /bot

@@ -10,7 +10,7 @@ jobs:
   include:
     - stage: deploy
       if: branch = master
-      node_js: '8'
+      node_js: '12'
       services:
         - docker
       script: skip
