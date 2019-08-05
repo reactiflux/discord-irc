@@ -9,7 +9,7 @@ node_js:
 jobs:
   include:
     - stage: deploy
-      if: branch = master
+      if: branch = master AND type = push
       node_js: '12'
       services:
         - docker
