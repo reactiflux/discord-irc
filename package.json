@@ -27,7 +27,7 @@
     "build": "babel lib --out-dir dist",
     "prepare": "npm run build",
     "lint": "eslint . --ignore-path .gitignore",
-    "coverage": "nyc --require babel-core/register _mocha -- test/*.test.js",
+    "coverage": "nyc --require babel-core/register _mocha -- 'test/*.test.js'",
     "report": "nyc report --reporter=text-lcov | coveralls",
     "test": "npm run lint && npm run coverage"
   },
