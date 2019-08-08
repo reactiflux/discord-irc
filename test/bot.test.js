@@ -336,6 +336,33 @@ describe('Bot', function () {
     }
   );
 
+  it('should break mentions when ircPreventMention is enabled', function () {
+    const newConfig = { ...config, ircPreventMention: true };
+    this.bot = new Bot(newConfig);
+    this.bot.connect();
+
+    const text = 'testmessage';
+    const username = 'otherauthor';
+    const brokenNickname = 'o\u200Btherauthor';
+    const message = {
+      content: text,
+      mentions: { users: [] },
+      channel: {
+        name: 'discord'
+      },
+      author: {
+        username,
+        id: 'not bot id'
+      },
+      guild: this.guild
+    };
+
+    this.bot.sendToIRC(message);
+    // Wrap in colors:
+    const expected = `<\u000304${brokenNickname}\u000f> ${text}`;
+    ClientStub.prototype.say.should.have.been.calledWith('#irc', expected);
+  });
+
   it('should parse text from discord when sending messages', function () {
     const text = '<#1234>';
     const message = {
