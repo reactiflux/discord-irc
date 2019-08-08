@@ -1088,12 +1088,27 @@ describe('Bot', function () {
     chai.should().equal(this.bot.getDiscordAvatar('common', '#irc'), null);
   });
 
+  it('should use the default avatar URL format if one is specified and there is no matching user', function () {
+    const newConfig = { ...config, webhooks: { '#discord': 'https://discordapp.com/api/webhooks/id/token' }, format: { webhookAvatarURL: 'avatarFrom/{$nickname}' } };
+    const bot = new Bot(newConfig);
+    this.bot = bot;
+    bot.connect();
+    const userObj1 = { id: 128, username: 'common', avatar: 'avatarURL' };
+    const userObj2 = { id: 129, username: 'Nick', avatar: 'avatarURL' };
+    const memberObj1 = { nickname: 'Different' };
+    const memberObj2 = { nickname: 'common' };
+    this.addUser(userObj1, memberObj1);
+    this.addUser(userObj2, memberObj2);
+    chai.should().equal(this.bot.getDiscordAvatar('common', '#irc'), 'avatarFrom/common');
+    chai.should().equal(this.bot.getDiscordAvatar('nonexistant', '#irc'), 'avatarFrom/nonexistant');
+  });
+
   it('should not return an avatar when no users match and should handle lack of nickname, when looking for an avatar', function () {
     const newConfig = { ...config, webhooks: { '#discord': 'https://discordapp.com/api/webhooks/id/token' } };
     const bot = new Bot(newConfig);
     bot.connect();
-    const userObj1 = { id: 128, username: 'common', avatar: 'avatarURL' };
-    const userObj2 = { id: 129, username: 'Nick', avatar: 'avatarURL' };
+    const userObj1 = { id: 130, username: 'common', avatar: 'avatarURL' };
+    const userObj2 = { id: 131, username: 'Nick', avatar: 'avatarURL' };
     const memberObj1 = {};
     const memberObj2 = { nickname: 'common' };
     this.addUser(userObj1, memberObj1);
