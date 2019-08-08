@@ -1,6 +1,14 @@
 # Changelog
 This project adheres to [Semantic Versioning](http://semver.org/).
 
+## [2.7.2] - 2019-08-08
+### Fixed
+* Defer to discord permissions for allowing `@everyone` and `@here` in webhook messages - [#497](https://github.com/reactiflux/discord-irc/pull/497)
+* Support Node 10 and 12 - [#499](https://github.com/reactiflux/discord-irc/pull/499)
+* Upgrade dependencies
+* Tests: Fix lint config deprecation - [#500](https://github.com/reactiflux/discord-irc/pull/500)
+* Tests: Ensure all tests are run in dev environment - [#501](https://github.com/reactiflux/discord-irc/pull/501)
+
 ## [2.7.1] - 2019-06-15
 ### Changed
 * Upgraded dependencies.
