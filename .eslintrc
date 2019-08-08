@@ -11,6 +11,8 @@
     "func-names": 0,
     "import/no-extraneous-dependencies": [2, { "devDependencies": true }],
     "import/prefer-default-export": 0,
-    "import/no-dynamic-require": 0
+    "import/no-dynamic-require": 0,
+    "operator-linebreak": 0,
+    "implicit-arrow-linebreak": 0
   }
 }
