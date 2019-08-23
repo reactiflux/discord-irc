@@ -1171,4 +1171,24 @@ describe('Bot', function () {
       ClientStub.prototype.say.should.not.have.been.called;
     }
   );
+  it(
+    'should not send messages to IRC if Discord user is ignored by id',
+    function () {
+      const message = {
+        content: 'text',
+        mentions: { users: [] },
+        channel: {
+          name: 'discord'
+        },
+        author: {
+          username: 'vasya_pupkin',
+          id: 4499
+        },
+        guild: this.guild
+      };
+
+      this.bot.sendToIRC(message);
+      ClientStub.prototype.say.should.not.have.been.called;
+    }
+  );
 });
