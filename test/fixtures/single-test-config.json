@@ -22,6 +22,6 @@
   "ignoreUsers": {
     "irc": ["irc_ignored_user"],
     "discord": ["discord_ignored_user"],
-    "discordIds": [4499]
+    "discordIds": ["4499"]
   }
 }

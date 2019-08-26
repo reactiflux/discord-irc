@@ -1182,7 +1182,7 @@ describe('Bot', function () {
         },
         author: {
           username: 'vasya_pupkin',
-          id: 4499
+          id: '4499'
         },
         guild: this.guild
       };
