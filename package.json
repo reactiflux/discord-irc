@@ -43,7 +43,7 @@
     "irc-formatting": "1.0.0-rc3",
     "irc-upd": "0.10.0",
     "lodash": "^4.17.15",
-    "simple-markdown": "0.4.4",
+    "simple-markdown": "0.6.0",
     "strip-json-comments": "3.0.1",
     "winston": "3.2.1"
   },
