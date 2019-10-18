@@ -14,7 +14,7 @@ chai.should();
 chai.use(sinonChai);
 
 describe('Create Bots', function () {
-  const sandbox = sinon.sandbox.create({
+  const sandbox = sinon.createSandbox({
     useFakeTimers: false,
     useFakeServer: false
   });

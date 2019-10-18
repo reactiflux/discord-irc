@@ -4,8 +4,8 @@ import sinonChai from 'sinon-chai';
 import sinon from 'sinon';
 import irc from 'irc-upd';
 import discord from 'discord.js';
-import logger from 'winston';
 import Bot from '../lib/bot';
+import logger from '../lib/logger';
 import createDiscordStub from './stubs/discord-stub';
 import ClientStub from './stubs/irc-client-stub';
 import config from './fixtures/single-test-config.json';
@@ -14,7 +14,7 @@ chai.should();
 chai.use(sinonChai);
 
 describe('Bot Events', function () {
-  const sandbox = sinon.sandbox.create({
+  const sandbox = sinon.createSandbox({
     useFakeTimers: false,
     useFakeServer: false
   });
