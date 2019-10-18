@@ -151,8 +151,10 @@ describe('Bot', function () {
   it(
     'should not send special messages to discord by Discord channel if it isn\'t in the channel',
     function () {
-      this.bot.sendExactToDiscordByIrcChannel('#notinchannel', 'message');
+      const channel = '#notinchannel';
+      this.bot.sendExactToDiscordByDiscordChannel(channel, 'message');
       this.sendStub.should.not.have.been.called;
+      this.infoSpy.should.have.been.calledWith('Tried to send a message to a Discord channel the bot isn\'t in: ', channel);
     }
   );
 
