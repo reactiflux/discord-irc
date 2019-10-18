@@ -126,7 +126,7 @@ describe('Bot', function () {
   it(
     'should not send special messages to discord if the channel isn\'t in the channel mapping',
     function () {
-      this.bot.sendExactToDiscord('#no-irc', 'message');
+      this.bot.sendExactToDiscordByIrcChannel('#no-irc', 'message');
       this.sendStub.should.not.have.been.called;
     }
   );
@@ -134,7 +134,7 @@ describe('Bot', function () {
   it(
     'should not send special messages to discord if it isn\'t in the channel',
     function () {
-      this.bot.sendExactToDiscord('#otherirc', 'message');
+      this.bot.sendExactToDiscordByIrcChannel('#otherirc', 'message');
       this.sendStub.should.not.have.been.called;
     }
   );
@@ -142,7 +142,7 @@ describe('Bot', function () {
   it(
     'should send special messages to discord',
     function () {
-      this.bot.sendExactToDiscord('#irc', 'message');
+      this.bot.sendExactToDiscordByIrcChannel('#irc', 'message');
       this.sendStub.should.have.been.calledWith('message');
       this.debugSpy.should.have.been.calledWith('Sending special message to Discord', 'message', '#irc', '->', '#discord');
     }
