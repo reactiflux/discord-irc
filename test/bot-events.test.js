@@ -231,6 +231,22 @@ describe('Bot Events', function () {
     bot.channelUsers.should.deep.equal({ '#channel': channelNicks });
   });
 
+  it('should send single join message to specified discord channel when config enabled and multiple channels are joined', function () {
+    const notifyChannel = '#joins-and-leaves';
+    const bot = createBot({ ...config, ircStatusNotices: notifyChannel });
+    bot.connect();
+    const channel1 = '#channel1';
+    const channel2 = '#channel2';
+    bot.ircClient.emit('names', channel1, { [bot.nickname]: '' });
+    bot.ircClient.emit('names', channel2, { [bot.nickname]: '' });
+    const nick = 'user';
+    const text = `*${nick}* has joined IRC`;
+    bot.ircClient.emit('join', channel1, nick);
+    bot.ircClient.emit('join', channel2, nick);
+    bot.sendExactToDiscordByDiscordChannel.should.have.been.calledOnce;
+    bot.sendExactToDiscordByDiscordChannel.should.have.been.calledWithExactly(notifyChannel, text);
+  });
+
   it('should not announce itself joining by default', function () {
     const bot = createBot({ ...config, ircStatusNotices: true });
     bot.connect();
