@@ -24,9 +24,10 @@ export default function createDiscordStub(sendStub, discordUsers) {
     }
 
     addTextChannel(guild, textChannel) {
-      const textChannelData = Object.assign({
-        type: 'text'
-      }, textChannel);
+      const textChannelData = {
+        type: 'text',
+        ...textChannel
+      };
       const textChannelObj = new discord.TextChannel(guild, textChannelData);
       textChannelObj.send = sendStub;
       const permissions = new discord.Collection();

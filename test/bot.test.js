@@ -45,7 +45,7 @@ describe('Bot', function () {
     this.addUser = function (user, member = null) {
       const userObj = new discord.User(this.bot.discord, user);
       // also set guild members
-      const guildMember = Object.assign({}, member || user, { user: userObj });
+      const guildMember = { ...(member || user), user: userObj };
       guildMember.nick = guildMember.nickname; // nick => nickname in Discord API
       const memberObj = new discord.GuildMember(this.guild, guildMember);
       this.guild.members.set(userObj.id, memberObj);
@@ -336,8 +336,8 @@ describe('Bot', function () {
     }
   );
 
-  it('should break mentions when ircPreventMention is enabled', function () {
-    const newConfig = { ...config, ircPreventMention: true };
+  it('should break mentions when parallelPingFix is enabled', function () {
+    const newConfig = { ...config, parallelPingFix: true };
     this.bot = new Bot(newConfig);
     this.bot.connect();
 
@@ -1163,6 +1163,26 @@ describe('Bot', function () {
         author: {
           username: 'discord_ignored_user',
           id: 'some id'
+        },
+        guild: this.guild
+      };
+
+      this.bot.sendToIRC(message);
+      ClientStub.prototype.say.should.not.have.been.called;
+    }
+  );
+  it(
+    'should not send messages to IRC if Discord user is ignored by id',
+    function () {
+      const message = {
+        content: 'text',
+        mentions: { users: [] },
+        channel: {
+          name: 'discord'
+        },
+        author: {
+          username: 'vasya_pupkin',
+          id: '4499'
         },
         guild: this.guild
       };
