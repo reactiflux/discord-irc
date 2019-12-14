@@ -1,6 +1,19 @@
 # Changelog
 This project adheres to [Semantic Versioning](http://semver.org/).
 
+## [2.8.0] - 2019-12-14
+### Added
+* `format.webhookAvatarURL`, to customize the unrecognized user webhook avatar (thanks to [Geo1088](https://github.com/reactiflux/discord-irc/pull/419))
+* `parallelPingFix`, disabled by default, to prevent users of both Discord and IRC getting pings whenever their messages are mirrored to IRC (thanks to [qaisjp](https://github.com/reactiflux/discord-irc/pull/243) originally, follow up in [#502](https://github.com/reactiflux/discord-irc/pull/502) and [#520](https://github.com/reactiflux/discord-irc/pull/520))
+* `ignoreUsers.discordIds`, to ignore specific Discord users through the bridge by ID instead of name (thanks to [nsavch](https://github.com/reactiflux/discord-irc/pull/508))
+* A basic Docker image, found at [discordirc/discord-irc](https://hub.docker.com/r/discordirc/discord-irc)! This may not be often updated with the release tags we publish on GitHub, but it should contain a `latest` tag in addition to whichever Git hash is available on master (thanks to [gdude2002](https://github.com/reactiflux/discord-irc/pull/421), follow up in [#498](https://github.com/reactiflux/discord-irc/pull/498))
+
+### Changed
+* Add support for Node 13, drop testing for Node 6 - [#521](https://github.com/reactiflux/discord-irc/pull/521)
+
+### Fixed
+* Upgrade various dependencies: babel, commander, coveralls, discord.js, eslint, mocha, simple-markdown, sinon, sinon-chai - [#488](https://github.com/reactiflux/discord-irc/pull/488), [#503](https://github.com/reactiflux/discord-irc/pull/503), [#522](https://github.com/reactiflux/discord-irc/pull/522), [#523](https://github.com/reactiflux/discord-irc/pull/523), [#524](https://github.com/reactiflux/discord-irc/pull/524/files), [#525](https://github.com/reactiflux/discord-irc/pull/525)
+
 ## [2.7.2] - 2019-08-08
 ### Fixed
 * Defer to discord permissions for allowing `@everyone` and `@here` in webhook messages - [#497](https://github.com/reactiflux/discord-irc/pull/497)
