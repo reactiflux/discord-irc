@@ -6,6 +6,7 @@
     "node": true
   },
   "rules": {
+    "arrow-parens": 0,
     "global-require": 0,
     "comma-dangle": 0,
     "func-names": 0,
