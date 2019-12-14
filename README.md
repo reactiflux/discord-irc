@@ -7,6 +7,7 @@
 
 ## Installation and usage
 **Note**: discord-irc requires Node.js version 6 or newer, as it depends on [discord.js](https://github.com/hydrabolt/discord.js).
+Future versions may require newer Node.js versions, though we should support active releases.
 
 Before you can run discord-irc you need to create a configuration file by
 following the instructions [here](https://github.com/reactiflux/discord-irc#configuration).

@@ -2,7 +2,7 @@ language: node_js
 after_success:
   - npm run report
 node_js:
-  - '6'
   - '8'
   - '10'
   - '12'
+  - '13'
