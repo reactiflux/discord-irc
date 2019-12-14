@@ -7,6 +7,7 @@
 
 ## Installation and usage
 **Note**: discord-irc requires Node.js version 6 or newer, as it depends on [discord.js](https://github.com/hydrabolt/discord.js).
+Future versions may require newer Node.js versions, though we should support active releases.
 
 Before you can run discord-irc you need to create a configuration file by
 following the instructions [here](https://github.com/reactiflux/discord-irc#configuration).
@@ -36,6 +37,24 @@ import discordIRC from 'discord-irc';
 import config from './config.json';
 discordIRC(config);
 ```
+
+## Docker
+As an alternative to running discord-irc directly on your machine, we provide a [Docker container image](https://hub.docker.com/r/discordirc/discord-irc).
+After creating a configuration file, you can fetch the image from Docker Hub and run it with the following command:
+
+```bash
+docker run -v /path/to/config:/config/config.json discordirc/discord-irc
+```
+
+If you've checked out the repository already, you can build the Docker image locally and run that instead:
+
+```bash
+docker build -t discord-irc .
+docker run -v /path/to/config:/config/config.json discord-irc
+```
+
+Note that the path to the config file on the host (`/path/to/config`) _must_ be a valid absolute path to a config file.
+Otherwise, you may get the error "illegal operation on a directory".
 
 ## Configuration
 First you need to create a Discord bot user, which you can do by following the instructions [here](https://github.com/reactiflux/discord-irc/wiki/Creating-a-discord-bot-&-getting-a-token).
@@ -88,7 +107,7 @@ First you need to create a Discord bot user, which you can do by following the i
       "webhookAvatarURL": "https://robohash.org/{$nickname}" // Default avatar to use for webhook messages
     },
     "ircNickColor": false, // Gives usernames a color in IRC for better readability (on by default)
-    "ircPreventMention": true, // Prevents users of both IRC and Discord from being mentioned in IRC when they speak in Discord (off by default)
+    "parallelPingFix": true, // Prevents users of both IRC and Discord from being mentioned in IRC when they speak in Discord (off by default)
     // Makes the bot hide the username prefix for messages that start
     // with one of these characters (commands):
     "commandCharacters": ["!", "."],

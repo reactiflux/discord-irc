@@ -336,8 +336,8 @@ describe('Bot', function () {
     }
   );
 
-  it('should break mentions when ircPreventMention is enabled', function () {
-    const newConfig = { ...config, ircPreventMention: true };
+  it('should break mentions when parallelPingFix is enabled', function () {
+    const newConfig = { ...config, parallelPingFix: true };
     this.bot = new Bot(newConfig);
     this.bot.connect();
 
