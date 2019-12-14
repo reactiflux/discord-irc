@@ -48,11 +48,10 @@
     "winston": "3.2.1"
   },
   "devDependencies": {
-    "babel-cli": "^6.6.5",
-    "babel-core": "^6.26.3",
+    "@babel/cli": "^7.0.0",
+    "@babel/core": "^7.0.0",
     "babel-eslint": "^10.0.1",
     "babel-preset-node6": "^11.0.0",
-    "babel-preset-stage-0": "^6.5.0",
     "chai": "^4.2.0",
     "coveralls": "^3.0.4",
     "eslint": "^5.16.0",
