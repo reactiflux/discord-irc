@@ -45,7 +45,7 @@ describe('Bot', function () {
     this.addUser = function (user, member = null) {
       const userObj = new discord.User(this.bot.discord, user);
       // also set guild members
-      const guildMember = Object.assign({}, member || user, { user: userObj });
+      const guildMember = { ...(member || user), user: userObj };
       guildMember.nick = guildMember.nickname; // nick => nickname in Discord API
       const memberObj = new discord.GuildMember(this.guild, guildMember);
       this.guild.members.set(userObj.id, memberObj);
