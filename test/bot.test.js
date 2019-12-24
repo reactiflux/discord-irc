@@ -1079,7 +1079,7 @@ describe('Bot', function () {
     const userObj = { id: 123, username: 'Nick', avatar: 'avatarURL' };
     const memberObj = { nickname: 'Different' };
     this.addUser(userObj, memberObj);
-    this.bot.getDiscordAvatar('Nick', '#irc').should.equal('/avatars/123/avatarURL.png?size=2048');
+    this.bot.getDiscordAvatar('Nick', '#irc').should.equal('/avatars/123/avatarURL.png?size=128');
   });
 
   it('should find a matching username, case insensitive, when looking for an avatar', function () {
@@ -1089,7 +1089,7 @@ describe('Bot', function () {
     const userObj = { id: 124, username: 'nick', avatar: 'avatarURL' };
     const memberObj = { nickname: 'Different' };
     this.addUser(userObj, memberObj);
-    this.bot.getDiscordAvatar('Nick', '#irc').should.equal('/avatars/124/avatarURL.png?size=2048');
+    this.bot.getDiscordAvatar('Nick', '#irc').should.equal('/avatars/124/avatarURL.png?size=128');
   });
 
   it('should find a matching nickname, case sensitive, when looking for an avatar', function () {
@@ -1099,7 +1099,7 @@ describe('Bot', function () {
     const userObj = { id: 125, username: 'Nick', avatar: 'avatarURL' };
     const memberObj = { nickname: 'Different' };
     this.addUser(userObj, memberObj);
-    this.bot.getDiscordAvatar('Different', '#irc').should.equal('/avatars/125/avatarURL.png?size=2048');
+    this.bot.getDiscordAvatar('Different', '#irc').should.equal('/avatars/125/avatarURL.png?size=128');
   });
 
   it('should not return an avatar with two matching usernames when looking for an avatar', function () {
