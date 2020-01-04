@@ -1107,6 +1107,13 @@ describe('Bot', function () {
         this.addUser(userObj, memberObj);
         this.bot.getDiscordAvatar('nickless', '#irc').should.equal('/avatars/124/nickless-avatar.png?size=128');
       });
+
+      it('should handle users without avatars', function () {
+        const userObj = { id: 124, username: 'avatarless' };
+        const memberObj = {};
+        this.addUser(userObj, memberObj);
+        expect(this.bot.getDiscordAvatar('avatarless', '#irc')).to.equal(null);
+      });
     });
 
     context('when matching avatars with fallback URL', function () {
@@ -1133,6 +1140,13 @@ describe('Bot', function () {
         this.bot.getDiscordAvatar('diffUser', '#irc').should.equal('/avatars/125/avatarURL.png?size=128');
         this.bot.getDiscordAvatar('diffNick', '#irc').should.equal('/avatars/124/avatarURL.png?size=128');
         this.bot.getDiscordAvatar('common', '#irc').should.equal('avatarFrom/common');
+      });
+
+      it('should use fallback for users without avatars', function () {
+        const userObj = { id: 124, username: 'avatarless' };
+        const memberObj = {};
+        this.addUser(userObj, memberObj);
+        this.bot.getDiscordAvatar('avatarless', '#irc').should.equal('avatarFrom/avatarless');
       });
     });
   });
