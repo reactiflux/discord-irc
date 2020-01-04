@@ -12,6 +12,7 @@ import createWebhookStub from './stubs/webhook-stub';
 import config from './fixtures/single-test-config.json';
 import configMsgFormatDefault from './fixtures/msg-formats-default.json';
 
+const { expect } = chai;
 chai.should();
 chai.use(sinonChai);
 
@@ -36,9 +37,14 @@ describe('Bot', function () {
     ClientStub.prototype.join = sandbox.stub();
     this.sendWebhookMessageStub = sandbox.stub();
     discord.WebhookClient = createWebhookStub(this.sendWebhookMessageStub);
-    this.bot = new Bot(config);
-    this.guild = this.bot.discord.guild;
-    this.bot.connect();
+
+    this.setCustomBot = conf => {
+      this.bot = new Bot(conf);
+      this.guild = this.bot.discord.guild;
+      this.bot.connect();
+    };
+
+    this.setCustomBot(config);
 
     // modified variants of https://github.com/discordjs/discord.js/blob/stable/src/client/ClientDataManager.js
     // (for easier stubbing)
@@ -148,8 +154,7 @@ describe('Bot', function () {
   it('should not color irc messages if the option is disabled', function () {
     const text = 'testmessage';
     const newConfig = { ...config, ircNickColor: false };
-    const bot = new Bot(newConfig);
-    bot.connect();
+    this.setCustomBot(newConfig);
     const message = {
       content: text,
       mentions: { users: [] },
@@ -163,7 +168,7 @@ describe('Bot', function () {
       guild: this.guild
     };
 
-    bot.sendToIRC(message);
+    this.bot.sendToIRC(message);
     const expected = `<${message.author.username}> ${text}`;
     ClientStub.prototype.say.should.have.been.calledWith('#irc', expected);
   });
@@ -338,8 +343,7 @@ describe('Bot', function () {
 
   it('should break mentions when parallelPingFix is enabled', function () {
     const newConfig = { ...config, parallelPingFix: true };
-    this.bot = new Bot(newConfig);
-    this.bot.connect();
+    this.setCustomBot(newConfig);
 
     const text = 'testmessage';
     const username = 'otherauthor';
@@ -586,7 +590,7 @@ describe('Bot', function () {
   });
 
   it('should support multi-character command prefixes', function () {
-    const bot = new Bot({ ...config, commandCharacters: ['@@'] });
+    this.setCustomBot({ ...config, commandCharacters: ['@@'] });
     const text = '@@test command';
     const message = {
       content: text,
@@ -600,9 +604,8 @@ describe('Bot', function () {
       },
       guild: this.guild
     };
-    bot.connect();
 
-    bot.sendToIRC(message);
+    this.bot.sendToIRC(message);
     ClientStub.prototype.say.getCall(0).args.should.deep.equal([
       '#irc', 'Command sent from Discord by test:'
     ]);
@@ -621,11 +624,10 @@ describe('Bot', function () {
   it('should use nickname instead of username when available', function () {
     const text = 'testmessage';
     const newConfig = { ...config, ircNickColor: false };
-    const bot = new Bot(newConfig);
+    this.setCustomBot(newConfig);
     const id = 'not bot id';
     const nickname = 'discord-nickname';
     this.guild.members.set(id, { nickname });
-    bot.connect();
     const message = {
       content: text,
       mentions: { users: [] },
@@ -639,7 +641,7 @@ describe('Bot', function () {
       guild: this.guild
     };
 
-    bot.sendToIRC(message);
+    this.bot.sendToIRC(message);
     const expected = `<${nickname}> ${text}`;
     ClientStub.prototype.say.should.have.been.calledWith('#irc', expected);
   });
@@ -775,55 +777,7 @@ describe('Bot', function () {
   });
 
   it('should successfully send messages with default config', function () {
-    const bot = new Bot(configMsgFormatDefault);
-    bot.connect();
-
-    bot.sendToDiscord('testuser', '#irc', 'test message');
-    this.sendStub.should.have.been.calledOnce;
-    const message = {
-      content: 'test message',
-      mentions: { users: [] },
-      channel: {
-        name: 'discord'
-      },
-      author: {
-        username: 'otherauthor',
-        id: 'not bot id'
-      },
-      guild: this.guild
-    };
-
-    bot.sendToIRC(message);
-    this.sendStub.should.have.been.calledOnce;
-  });
-
-  it('should not replace unmatched patterns', function () {
-    const format = { discord: '{$unmatchedPattern} stays intact: {$author} {$text}' };
-    const bot = new Bot({ ...configMsgFormatDefault, format });
-    bot.connect();
-
-    const username = 'testuser';
-    const msg = 'test message';
-    const expected = `{$unmatchedPattern} stays intact: ${username} ${msg}`;
-    bot.sendToDiscord(username, '#irc', msg);
-    this.sendStub.should.have.been.calledWith(expected);
-  });
-
-  it('should respect custom formatting for Discord', function () {
-    const format = { discord: '<{$author}> {$ircChannel} => {$discordChannel}: {$text}' };
-    const bot = new Bot({ ...configMsgFormatDefault, format });
-    bot.connect();
-
-    const username = 'test';
-    const msg = 'test @user <#1234>';
-    const expected = `<test> #irc => #discord: ${msg}`;
-    bot.sendToDiscord(username, '#irc', msg);
-    this.sendStub.should.have.been.calledWith(expected);
-  });
-
-  it('should successfully send messages with default config', function () {
-    this.bot = new Bot(configMsgFormatDefault);
-    this.bot.connect();
+    this.setCustomBot(configMsgFormatDefault);
 
     this.bot.sendToDiscord('testuser', '#irc', 'test message');
     this.sendStub.should.have.been.calledOnce;
@@ -846,8 +800,51 @@ describe('Bot', function () {
 
   it('should not replace unmatched patterns', function () {
     const format = { discord: '{$unmatchedPattern} stays intact: {$author} {$text}' };
-    this.bot = new Bot({ ...configMsgFormatDefault, format });
-    this.bot.connect();
+    this.setCustomBot({ ...configMsgFormatDefault, format });
+
+    const username = 'testuser';
+    const msg = 'test message';
+    const expected = `{$unmatchedPattern} stays intact: ${username} ${msg}`;
+    this.bot.sendToDiscord(username, '#irc', msg);
+    this.sendStub.should.have.been.calledWith(expected);
+  });
+
+  it('should respect custom formatting for Discord', function () {
+    const format = { discord: '<{$author}> {$ircChannel} => {$discordChannel}: {$text}' };
+    this.setCustomBot({ ...configMsgFormatDefault, format });
+
+    const username = 'test';
+    const msg = 'test @user <#1234>';
+    const expected = `<test> #irc => #discord: ${msg}`;
+    this.bot.sendToDiscord(username, '#irc', msg);
+    this.sendStub.should.have.been.calledWith(expected);
+  });
+
+  it('should successfully send messages with default config', function () {
+    this.setCustomBot(configMsgFormatDefault);
+
+    this.bot.sendToDiscord('testuser', '#irc', 'test message');
+    this.sendStub.should.have.been.calledOnce;
+    const message = {
+      content: 'test message',
+      mentions: { users: [] },
+      channel: {
+        name: 'discord'
+      },
+      author: {
+        username: 'otherauthor',
+        id: 'not bot id'
+      },
+      guild: this.guild
+    };
+
+    this.bot.sendToIRC(message);
+    this.sendStub.should.have.been.calledOnce;
+  });
+
+  it('should not replace unmatched patterns', function () {
+    const format = { discord: '{$unmatchedPattern} stays intact: {$author} {$text}' };
+    this.setCustomBot({ ...configMsgFormatDefault, format });
 
     const username = 'testuser';
     const msg = 'test message';
@@ -858,8 +855,7 @@ describe('Bot', function () {
 
   it('should respect custom formatting for regular Discord output', function () {
     const format = { discord: '<{$author}> {$ircChannel} => {$discordChannel}: {$text}' };
-    this.bot = new Bot({ ...configMsgFormatDefault, format });
-    this.bot.connect();
+    this.setCustomBot({ ...configMsgFormatDefault, format });
 
     const username = 'test';
     const msg = 'test @user <#1234>';
@@ -870,8 +866,7 @@ describe('Bot', function () {
 
   it('should respect custom formatting for commands in Discord output', function () {
     const format = { commandPrelude: '{$nickname} from {$ircChannel} sent command to {$discordChannel}:' };
-    this.bot = new Bot({ ...configMsgFormatDefault, format });
-    this.bot.connect();
+    this.setCustomBot({ ...configMsgFormatDefault, format });
 
     const username = 'test';
     const msg = '!testcmd';
@@ -883,8 +878,7 @@ describe('Bot', function () {
 
   it('should respect custom formatting for regular IRC output', function () {
     const format = { ircText: '<{$nickname}> {$discordChannel} => {$ircChannel}: {$text}' };
-    this.bot = new Bot({ ...configMsgFormatDefault, format });
-    this.bot.connect();
+    this.setCustomBot({ ...configMsgFormatDefault, format });
     const message = {
       content: 'test message',
       mentions: { users: [] },
@@ -905,8 +899,7 @@ describe('Bot', function () {
 
   it('should respect custom formatting for commands in IRC output', function () {
     const format = { commandPrelude: '{$nickname} from {$discordChannel} sent command to {$ircChannel}:' };
-    this.bot = new Bot({ ...configMsgFormatDefault, format });
-    this.bot.connect();
+    this.setCustomBot({ ...configMsgFormatDefault, format });
 
     const text = '!testcmd';
     const message = {
@@ -930,8 +923,7 @@ describe('Bot', function () {
 
   it('should respect custom formatting for attachment URLs in IRC output', function () {
     const format = { urlAttachment: '<{$nickname}> {$discordChannel} => {$ircChannel}, attachment: {$attachmentURL}' };
-    this.bot = new Bot({ ...configMsgFormatDefault, format });
-    this.bot.connect();
+    this.setCustomBot({ ...configMsgFormatDefault, format });
 
     const attachmentUrl = 'https://image/url.jpg';
     const message = {
@@ -955,8 +947,7 @@ describe('Bot', function () {
 
   it('should not bother with command prelude if falsy', function () {
     const format = { commandPrelude: null };
-    this.bot = new Bot({ ...configMsgFormatDefault, format });
-    this.bot.connect();
+    this.setCustomBot({ ...configMsgFormatDefault, format });
 
     const text = '!testcmd';
     const message = {
@@ -995,152 +986,169 @@ describe('Bot', function () {
     this.bot.findWebhook('#ircwebhook').should.not.equal(null);
   });
 
-  it('should prefer webhooks to send a message when possible', function () {
-    const newConfig = { ...config, webhooks: { '#discord': 'https://discordapp.com/api/webhooks/id/token' } };
-    const bot = new Bot(newConfig);
-    bot.connect();
-    bot.sendToDiscord('nick', '#irc', 'text');
-    this.sendWebhookMessageStub.should.have.been.called;
-  });
-
-  it('pads too short usernames for webhooks', function () {
-    const newConfig = { ...config, webhooks: { '#discord': 'https://discordapp.com/api/webhooks/id/token' } };
-    const bot = new Bot(newConfig);
-    const text = 'message';
-    bot.connect();
-    bot.sendToDiscord('n', '#irc', text);
-    this.sendWebhookMessageStub.should.have.been.calledWith(text, {
-      username: 'n_',
-      text,
-      avatarURL: null,
-      disableEveryone: true,
+  context('with enabled Discord webhook', function () {
+    this.beforeEach(function () {
+      const newConfig = { ...config, webhooks: { '#discord': 'https://discordapp.com/api/webhooks/id/token' } };
+      this.setCustomBot(newConfig);
     });
-  });
 
-  it('slices too long usernames for webhooks', function () {
-    const newConfig = { ...config, webhooks: { '#discord': 'https://discordapp.com/api/webhooks/id/token' } };
-    const bot = new Bot(newConfig);
-    const text = 'message';
-    bot.connect();
-    bot.sendToDiscord('1234567890123456789012345678901234567890', '#irc', text);
-    this.sendWebhookMessageStub.should.have.been.calledWith(text, {
-      username: '12345678901234567890123456789012',
-      text,
-      avatarURL: null,
-      disableEveryone: true,
+    it('should prefer webhooks to send a message', function () {
+      this.bot.sendToDiscord('nick', '#irc', 'text');
+      this.sendWebhookMessageStub.should.have.been.called;
     });
-  });
 
-  it('does not ping everyone if user lacks permission', function () {
-    const newConfig = { ...config, webhooks: { '#discord': 'https://discordapp.com/api/webhooks/id/token' } };
-    const bot = new Bot(newConfig);
-    const text = 'message';
-    const permission = discord.Permissions.FLAGS.VIEW_CHANNEL
-      + discord.Permissions.FLAGS.SEND_MESSAGES;
-    bot.discord.channels.get('1234').setPermissionStub(
-      bot.discord.user,
-      new discord.Permissions(permission),
-    );
-    bot.connect();
-    bot.sendToDiscord('nick', '#irc', text);
-    this.sendWebhookMessageStub.should.have.been.calledWith(text, {
-      username: 'nick',
-      text,
-      avatarURL: null,
-      disableEveryone: true,
+    it('pads too short usernames', function () {
+      const text = 'message';
+      this.bot.sendToDiscord('n', '#irc', text);
+      this.sendWebhookMessageStub.should.have.been.calledWith(text, {
+        username: 'n_',
+        text,
+        avatarURL: null,
+        disableEveryone: true,
+      });
     });
-  });
 
-  it('sends @everyone messages if the bot has permission to do so', function () {
-    const newConfig = { ...config, webhooks: { '#discord': 'https://discordapp.com/api/webhooks/id/token' } };
-    const bot = new Bot(newConfig);
-    const text = 'message';
-    const permission = discord.Permissions.FLAGS.VIEW_CHANNEL
-      + discord.Permissions.FLAGS.SEND_MESSAGES
-      + discord.Permissions.FLAGS.MENTION_EVERYONE;
-    bot.discord.channels.get('1234').setPermissionStub(
-      bot.discord.user,
-      new discord.Permissions(permission),
-    );
-    bot.connect();
-    bot.sendToDiscord('nick', '#irc', text);
-    this.sendWebhookMessageStub.should.have.been.calledWith(text, {
-      username: 'nick',
-      text,
-      avatarURL: null,
-      disableEveryone: false,
+    it('slices too long usernames', function () {
+      const text = 'message';
+      this.bot.sendToDiscord('1234567890123456789012345678901234567890', '#irc', text);
+      this.sendWebhookMessageStub.should.have.been.calledWith(text, {
+        username: '12345678901234567890123456789012',
+        text,
+        avatarURL: null,
+        disableEveryone: true,
+      });
     });
-  });
 
-  it('should find a matching username, case sensitive, when looking for an avatar', function () {
-    const newConfig = { ...config, webhooks: { '#discord': 'https://discordapp.com/api/webhooks/id/token' } };
-    const bot = new Bot(newConfig);
-    bot.connect();
-    const userObj = { id: 123, username: 'Nick', avatar: 'avatarURL' };
-    const memberObj = { nickname: 'Different' };
-    this.addUser(userObj, memberObj);
-    this.bot.getDiscordAvatar('Nick', '#irc').should.equal('/avatars/123/avatarURL.png?size=128');
-  });
+    it('does not ping everyone if user lacks permission', function () {
+      const text = 'message';
+      const permission = discord.Permissions.FLAGS.VIEW_CHANNEL
+        + discord.Permissions.FLAGS.SEND_MESSAGES;
+      this.bot.discord.channels.get('1234').setPermissionStub(
+        this.bot.discord.user,
+        new discord.Permissions(permission),
+      );
+      this.bot.sendToDiscord('nick', '#irc', text);
+      this.sendWebhookMessageStub.should.have.been.calledWith(text, {
+        username: 'nick',
+        text,
+        avatarURL: null,
+        disableEveryone: true,
+      });
+    });
 
-  it('should find a matching username, case insensitive, when looking for an avatar', function () {
-    const newConfig = { ...config, webhooks: { '#discord': 'https://discordapp.com/api/webhooks/id/token' } };
-    const bot = new Bot(newConfig);
-    bot.connect();
-    const userObj = { id: 124, username: 'nick', avatar: 'avatarURL' };
-    const memberObj = { nickname: 'Different' };
-    this.addUser(userObj, memberObj);
-    this.bot.getDiscordAvatar('Nick', '#irc').should.equal('/avatars/124/avatarURL.png?size=128');
-  });
+    it('sends @everyone messages if the bot has permission to do so', function () {
+      const text = 'message';
+      const permission = discord.Permissions.FLAGS.VIEW_CHANNEL
+        + discord.Permissions.FLAGS.SEND_MESSAGES
+        + discord.Permissions.FLAGS.MENTION_EVERYONE;
+      this.bot.discord.channels.get('1234').setPermissionStub(
+        this.bot.discord.user,
+        new discord.Permissions(permission),
+      );
+      this.bot.sendToDiscord('nick', '#irc', text);
+      this.sendWebhookMessageStub.should.have.been.calledWith(text, {
+        username: 'nick',
+        text,
+        avatarURL: null,
+        disableEveryone: false,
+      });
+    });
 
-  it('should find a matching nickname, case sensitive, when looking for an avatar', function () {
-    const newConfig = { ...config, webhooks: { '#discord': 'https://discordapp.com/api/webhooks/id/token' } };
-    const bot = new Bot(newConfig);
-    bot.connect();
-    const userObj = { id: 125, username: 'Nick', avatar: 'avatarURL' };
-    const memberObj = { nickname: 'Different' };
-    this.addUser(userObj, memberObj);
-    this.bot.getDiscordAvatar('Different', '#irc').should.equal('/avatars/125/avatarURL.png?size=128');
-  });
+    const setupUser = base => {
+      const userObj = { id: 123, username: 'Nick', avatar: 'avatarURL' };
+      const memberObj = { nickname: 'Different' };
+      base.addUser(userObj, memberObj);
+    };
 
-  it('should not return an avatar with two matching usernames when looking for an avatar', function () {
-    const newConfig = { ...config, webhooks: { '#discord': 'https://discordapp.com/api/webhooks/id/token' } };
-    const bot = new Bot(newConfig);
-    bot.connect();
-    const userObj1 = { id: 126, username: 'common', avatar: 'avatarURL' };
-    const userObj2 = { id: 127, username: 'Nick', avatar: 'avatarURL' };
-    const memberObj1 = { nickname: 'Different' };
-    const memberObj2 = { nickname: 'common' };
-    this.addUser(userObj1, memberObj1);
-    this.addUser(userObj2, memberObj2);
-    chai.should().equal(this.bot.getDiscordAvatar('common', '#irc'), null);
-  });
+    const setupCommonPair = base => {
+      const userObj1 = { id: 124, username: 'common', avatar: 'avatarURL' };
+      const userObj2 = { id: 125, username: 'diffUser', avatar: 'avatarURL' };
+      const memberObj1 = { nickname: 'diffNick' };
+      const memberObj2 = { nickname: 'common' };
+      base.addUser(userObj1, memberObj1);
+      base.addUser(userObj2, memberObj2);
+    };
 
-  it('should use the default avatar URL format if one is specified and there is no matching user', function () {
-    const newConfig = { ...config, webhooks: { '#discord': 'https://discordapp.com/api/webhooks/id/token' }, format: { webhookAvatarURL: 'avatarFrom/{$nickname}' } };
-    const bot = new Bot(newConfig);
-    this.bot = bot;
-    bot.connect();
-    const userObj1 = { id: 128, username: 'common', avatar: 'avatarURL' };
-    const userObj2 = { id: 129, username: 'Nick', avatar: 'avatarURL' };
-    const memberObj1 = { nickname: 'Different' };
-    const memberObj2 = { nickname: 'common' };
-    this.addUser(userObj1, memberObj1);
-    this.addUser(userObj2, memberObj2);
-    chai.should().equal(this.bot.getDiscordAvatar('common', '#irc'), 'avatarFrom/common');
-    chai.should().equal(this.bot.getDiscordAvatar('nonexistant', '#irc'), 'avatarFrom/nonexistant');
-  });
+    context('when matching avatars', function () {
+      this.beforeEach(function () {
+        setupUser(this);
+      });
 
-  it('should not return an avatar when no users match and should handle lack of nickname, when looking for an avatar', function () {
-    const newConfig = { ...config, webhooks: { '#discord': 'https://discordapp.com/api/webhooks/id/token' } };
-    const bot = new Bot(newConfig);
-    bot.connect();
-    const userObj1 = { id: 130, username: 'common', avatar: 'avatarURL' };
-    const userObj2 = { id: 131, username: 'Nick', avatar: 'avatarURL' };
-    const memberObj1 = {};
-    const memberObj2 = { nickname: 'common' };
-    this.addUser(userObj1, memberObj1);
-    this.addUser(userObj2, memberObj2);
-    chai.should().equal(this.bot.getDiscordAvatar('nonexistent', '#irc'), null);
+      it('should match a user\'s username', function () {
+        this.bot.getDiscordAvatar('Nick', '#irc').should.equal('/avatars/123/avatarURL.png?size=128');
+      });
+
+      it('should match a user\'s username case insensitively', function () {
+        this.bot.getDiscordAvatar('nick', '#irc').should.equal('/avatars/123/avatarURL.png?size=128');
+      });
+
+      it('should match a user\'s nickname', function () {
+        this.bot.getDiscordAvatar('Different', '#irc').should.equal('/avatars/123/avatarURL.png?size=128');
+      });
+
+      it('should match a user\'s nickname case insensitively', function () {
+        this.bot.getDiscordAvatar('different', '#irc').should.equal('/avatars/123/avatarURL.png?size=128');
+      });
+
+      it('should only return matching users\' avatars', function () {
+        expect(this.bot.getDiscordAvatar('other', '#irc')).to.equal(null);
+      });
+
+      it('should return no avatar when there are multiple matches', function () {
+        setupCommonPair(this);
+        this.bot.getDiscordAvatar('diffUser', '#irc').should.not.equal(null);
+        this.bot.getDiscordAvatar('diffNick', '#irc').should.not.equal(null);
+        expect(this.bot.getDiscordAvatar('common', '#irc')).to.equal(null);
+      });
+
+      it('should handle users without nicknames', function () {
+        const userObj = { id: 124, username: 'nickless', avatar: 'nickless-avatar' };
+        const memberObj = {};
+        this.addUser(userObj, memberObj);
+        this.bot.getDiscordAvatar('nickless', '#irc').should.equal('/avatars/124/nickless-avatar.png?size=128');
+      });
+
+      it('should handle users without avatars', function () {
+        const userObj = { id: 124, username: 'avatarless' };
+        const memberObj = {};
+        this.addUser(userObj, memberObj);
+        expect(this.bot.getDiscordAvatar('avatarless', '#irc')).to.equal(null);
+      });
+    });
+
+    context('when matching avatars with fallback URL', function () {
+      this.beforeEach(function () {
+        const newConfig = { ...config, webhooks: { '#discord': 'https://discordapp.com/api/webhooks/id/token' }, format: { webhookAvatarURL: 'avatarFrom/{$nickname}' } };
+        this.setCustomBot(newConfig);
+
+        setupUser(this);
+      });
+
+      it('should use a matching user\'s avatar', function () {
+        this.bot.getDiscordAvatar('Nick', '#irc').should.equal('/avatars/123/avatarURL.png?size=128');
+        this.bot.getDiscordAvatar('nick', '#irc').should.equal('/avatars/123/avatarURL.png?size=128');
+        this.bot.getDiscordAvatar('Different', '#irc').should.equal('/avatars/123/avatarURL.png?size=128');
+        this.bot.getDiscordAvatar('different', '#irc').should.equal('/avatars/123/avatarURL.png?size=128');
+      });
+
+      it('should use fallback without matching user', function () {
+        this.bot.getDiscordAvatar('other', '#irc').should.equal('avatarFrom/other');
+      });
+
+      it('should use fallback when there are multiple matches', function () {
+        setupCommonPair(this);
+        this.bot.getDiscordAvatar('diffUser', '#irc').should.equal('/avatars/125/avatarURL.png?size=128');
+        this.bot.getDiscordAvatar('diffNick', '#irc').should.equal('/avatars/124/avatarURL.png?size=128');
+        this.bot.getDiscordAvatar('common', '#irc').should.equal('avatarFrom/common');
+      });
+
+      it('should use fallback for users without avatars', function () {
+        const userObj = { id: 124, username: 'avatarless' };
+        const memberObj = {};
+        this.addUser(userObj, memberObj);
+        this.bot.getDiscordAvatar('avatarless', '#irc').should.equal('avatarFrom/avatarless');
+      });
+    });
   });
 
   it(
@@ -1171,6 +1179,7 @@ describe('Bot', function () {
       ClientStub.prototype.say.should.not.have.been.called;
     }
   );
+
   it(
     'should not send messages to IRC if Discord user is ignored by id',
     function () {
