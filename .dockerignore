@@ -1,0 +1,20 @@
+.git
+
+# Coverage directory used by tools like istanbul
+coverage
+.nyc_output
+
+# Compiled binary addons (http://nodejs.org/api/addons.html)
+build/Release
+
+# Dependency directory
+# https://www.npmjs.org/doc/misc/npm-faq.html#should-i-check-my-node_modules-folder-into-git-
+node_modules
+
+# Environment variables and configuration
+.env
+.environment
+config.json
+
+# Build
+dist/
