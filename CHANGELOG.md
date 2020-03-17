@@ -1,6 +1,12 @@
 # Changelog
 This project adheres to [Semantic Versioning](http://semver.org/).
 
+## [2.8.1] - 2020-03-16
+### Fixed
+* Large avatars failed to display when bridging through webhooks - (thanks to [Miosame](https://github.com/reactiflux/discord-irc/pull/511), follow up in [#530](https://github.com/reactiflux/discord-irc/pull/530))
+* Update acorn to 7.1.1 - [#534](https://github.com/reactiflux/discord-irc/pull/534)
+* Remove code coverage instrumentation from `dist/` files - [#536](https://github.com/reactiflux/discord-irc/pull/536)
+
 ## [2.8.0] - 2019-12-14
 ### Added
 * `format.webhookAvatarURL`, to customize the unrecognized user webhook avatar (thanks to [Geo1088](https://github.com/reactiflux/discord-irc/pull/419))
