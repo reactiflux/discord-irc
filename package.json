@@ -27,7 +27,7 @@
     "build": "babel lib --out-dir dist",
     "prepare": "npm run build",
     "lint": "eslint . --ignore-path .gitignore",
-    "coverage": "nyc --require @babel/register mocha -- 'test/*.test.js'",
+    "coverage": "cross-env NODE_ENV=test nyc --require @babel/register mocha -- 'test/*.test.js'",
     "report": "nyc report --reporter=text-lcov | coveralls",
     "test": "npm run lint && npm run coverage"
   },
@@ -57,6 +57,7 @@
     "babel-plugin-istanbul": "^5.2.0",
     "chai": "^4.2.0",
     "coveralls": "^3.0.9",
+    "cross-env": "^6.0.3",
     "eslint": "^6.7.2",
     "eslint-config-airbnb-base": "^14.0.0",
     "eslint-plugin-import": "^2.19.1",

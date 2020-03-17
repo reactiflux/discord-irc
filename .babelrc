@@ -9,7 +9,11 @@
       }
     ]
   ],
-  "plugins": [
-    "istanbul"
-  ]
+  "env": {
+    "test": {
+      "plugins": [
+        "istanbul"
+      ]
+    }
+  }
 }
