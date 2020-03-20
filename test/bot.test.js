@@ -558,6 +558,34 @@ describe('Bot', function () {
     this.sendStub.should.have.been.calledWith(expected);
   });
 
+  it('should not convert user at-mentions from IRC if setting is disabled', function () {
+    const newConfig = { ...config, allowDiscordStyleNotifyFromIRC: false };
+    this.setCustomBot(newConfig);
+
+    const testUser = this.addUser({ username: 'testuser', id: '123' });
+
+    const username = 'ircuser';
+    const text = `Not mentioning @${testUser.username}`;
+    const expected = `**<${username}>** Not mentioning @${testUser.username}`;
+
+    this.bot.sendToDiscord(username, '#irc', text);
+    this.sendStub.should.have.been.calledWith(expected);
+  });
+
+  it('should not convert user initial mentions from IRC if setting is disabled', function () {
+    const newConfig = { ...config, allowIRCStyleNotifyFromIRC: false };
+    this.setCustomBot(newConfig);
+
+    const testUser = this.addUser({ username: 'testuser', id: '123' });
+
+    const username = 'ircuser';
+    const text = `${testUser.username}: not mentioning you!`;
+    const expected = `**<${username}>** ${testUser.username}: not mentioning you!`;
+
+    this.bot.sendToDiscord(username, '#irc', text);
+    this.sendStub.should.have.been.calledWith(expected);
+  });
+
   it('should convert newlines from discord', function () {
     const message = {
       mentions: { users: [] },
