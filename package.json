@@ -28,7 +28,7 @@
     "prepare": "npm run build",
     "lint": "eslint . --ignore-path .gitignore",
     "coverage": "cross-env NODE_ENV=test nyc --require @babel/register mocha -- 'test/*.test.js'",
-    "report": "nyc report --reporter=text-lcov | coveralls",
+    "save-coverage": "nyc report --reporter=lcov",
     "test": "npm run lint && npm run coverage"
   },
   "author": {
