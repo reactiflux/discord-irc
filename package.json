@@ -52,9 +52,9 @@
     "@babel/core": "^7.11.1",
     "@babel/preset-env": "^7.11.0",
     "@babel/register": "^7.10.5",
-    "@istanbuljs/nyc-config-babel": "^2.1.1",
+    "@istanbuljs/nyc-config-babel": "^3.0.0",
     "babel-eslint": "^10.1.0",
-    "babel-plugin-istanbul": "^5.2.0",
+    "babel-plugin-istanbul": "^6.0.0",
     "chai": "^4.2.0",
     "coveralls": "^3.0.9",
     "cross-env": "^6.0.3",
@@ -62,7 +62,7 @@
     "eslint-config-airbnb-base": "^14.2.0",
     "eslint-plugin-import": "^2.22.0",
     "mocha": "^6.2.2",
-    "nyc": "^14.1.1",
+    "nyc": "^15.1.0",
     "sinon": "^7.5.0",
     "sinon-chai": "^3.3.0"
   }
