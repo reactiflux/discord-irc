@@ -10,5 +10,7 @@ export default function createWebhookStub(sendWebhookMessage) {
       sendWebhookMessage(...args);
       return new Promise(() => {});
     }
+
+    destroy() {}
   };
 }

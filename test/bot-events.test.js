@@ -7,6 +7,7 @@ import discord from 'discord.js';
 import Bot from '../lib/bot';
 import logger from '../lib/logger';
 import createDiscordStub from './stubs/discord-stub';
+import createWebhookStub from './stubs/webhook-stub';
 import ClientStub from './stubs/irc-client-stub';
 import config from './fixtures/single-test-config.json';
 
@@ -36,6 +37,7 @@ describe('Bot Events', function () {
     this.sendStub = sandbox.stub();
     irc.Client = ClientStub;
     discord.Client = createDiscordStub(this.sendStub);
+    discord.WebhookClient = createWebhookStub(this.sendStub);
     ClientStub.prototype.send = sandbox.stub();
     ClientStub.prototype.join = sandbox.stub();
     this.bot = createBot();
@@ -43,6 +45,7 @@ describe('Bot Events', function () {
   });
 
   afterEach(function () {
+    this.bot.disconnect();
     sandbox.restore();
   });
 

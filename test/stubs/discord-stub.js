@@ -25,6 +25,8 @@ export default function createDiscordStub(sendStub) {
       this.rest = this.createRestStub();
     }
 
+    destroy() {}
+
     addTextChannel(guild, textChannel) {
       const textChannelData = {
         type: discord.Constants.ChannelTypes.TEXT,
