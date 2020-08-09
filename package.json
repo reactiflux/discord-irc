@@ -40,7 +40,7 @@
     "discord.js": "11.5.1",
     "irc-colors": "1.5.0",
     "irc-formatting": "1.0.0-rc3",
-    "irc-upd": "0.10.0",
+    "irc-upd": "0.11.0",
     "lodash": "^4.17.15",
     "simple-markdown": "^0.7.1",
     "strip-json-comments": "3.0.1",
