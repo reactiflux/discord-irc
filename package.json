@@ -48,10 +48,10 @@
     "winston": "3.2.1"
   },
   "devDependencies": {
-    "@babel/cli": "^7.0.0",
-    "@babel/core": "^7.0.0",
-    "@babel/preset-env": "^7.7.6",
-    "@babel/register": "^7.7.4",
+    "@babel/cli": "^7.10.5",
+    "@babel/core": "^7.11.1",
+    "@babel/preset-env": "^7.11.0",
+    "@babel/register": "^7.10.5",
     "@istanbuljs/nyc-config-babel": "^2.1.1",
     "babel-eslint": "^10.0.3",
     "babel-plugin-istanbul": "^5.2.0",
