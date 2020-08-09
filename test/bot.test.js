@@ -1001,9 +1001,8 @@ describe('Bot', function () {
       this.bot.sendToDiscord('n', '#irc', text);
       this.sendWebhookMessageStub.should.have.been.calledWith(text, {
         username: 'n_',
-        text,
         avatarURL: null,
-        disableEveryone: true,
+        disableMentions: 'everyone',
       });
     });
 
@@ -1012,9 +1011,8 @@ describe('Bot', function () {
       this.bot.sendToDiscord('1234567890123456789012345678901234567890', '#irc', text);
       this.sendWebhookMessageStub.should.have.been.calledWith(text, {
         username: '12345678901234567890123456789012',
-        text,
         avatarURL: null,
-        disableEveryone: true,
+        disableMentions: 'everyone',
       });
     });
 
@@ -1029,9 +1027,8 @@ describe('Bot', function () {
       this.bot.sendToDiscord('nick', '#irc', text);
       this.sendWebhookMessageStub.should.have.been.calledWith(text, {
         username: 'nick',
-        text,
         avatarURL: null,
-        disableEveryone: true,
+        disableMentions: 'everyone',
       });
     });
 
@@ -1047,9 +1044,8 @@ describe('Bot', function () {
       this.bot.sendToDiscord('nick', '#irc', text);
       this.sendWebhookMessageStub.should.have.been.calledWith(text, {
         username: 'nick',
-        text,
         avatarURL: null,
-        disableEveryone: false,
+        disableMentions: 'none',
       });
     });
 
