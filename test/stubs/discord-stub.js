@@ -3,29 +3,33 @@ import events from 'events';
 import sinon from 'sinon';
 import discord from 'discord.js';
 
-export default function createDiscordStub(sendStub, discordUsers) {
+export default function createDiscordStub(sendStub) {
   return class DiscordStub extends events.EventEmitter {
     constructor() {
       super();
       this.user = {
         id: 'testid'
       };
-      this.channels = new discord.Collection();
+      this.channels = new discord.ChannelManager(this, []);
       this.options = {
         http: {
           cdn: ''
         }
       };
 
-      this.users = discordUsers;
-      this.guilds = new discord.Collection();
-      this.guild = this.createGuildStub();
-      this.guilds.set(this.guild.id, this.guild);
+      this.users = new discord.UserManager(this, []);
+      this.guilds = new discord.GuildManager(this, []);
+      const guild = this.createGuildStub();
+      this.guilds.cache.set(guild.id, guild);
+
+      this.rest = this.createRestStub();
     }
+
+    destroy() {}
 
     addTextChannel(guild, textChannel) {
       const textChannelData = {
-        type: 'text',
+        type: discord.Constants.ChannelTypes.TEXT,
         ...textChannel
       };
       const textChannelObj = new discord.TextChannel(guild, textChannelData);
@@ -33,7 +37,7 @@ export default function createDiscordStub(sendStub, discordUsers) {
       const permissions = new discord.Collection();
       textChannelObj.setPermissionStub = (user, perms) => permissions.set(user, perms);
       textChannelObj.permissionsFor = user => permissions.get(user);
-      this.channels.set(textChannelObj.id, textChannelObj);
+      this.channels.cache.set(textChannelObj.id, textChannelObj);
       return textChannelObj;
     }
 
@@ -41,18 +45,18 @@ export default function createDiscordStub(sendStub, discordUsers) {
       const guild = {
         id: '1',
         client: this,
-        roles: new discord.Collection(),
-        members: new discord.Collection(),
-        emojis: new discord.Collection(),
-        channels: new discord.Collection(),
         addTextChannel: (textChannel) => {
           const textChannelObj = this.addTextChannel(guild, textChannel);
-          textChannelObj.guild.channels.set(textChannelObj.id, textChannelObj);
+          textChannelObj.guild.channels.cache.set(textChannelObj.id, textChannelObj);
           return textChannelObj;
         }
       };
+      guild.roles = new discord.RoleManager(guild, []);
+      guild.members = new discord.GuildMemberManager(guild, []);
+      guild.emojis = new discord.GuildEmojiManager(guild, []);
+      guild.channels = new discord.GuildChannelManager(guild, []);
       Object.assign(guild, guildData);
-      this.guilds.set(guild.id, guild);
+      this.guilds.cache.set(guild.id, guild);
 
       if (guild.id === '1') {
         guild.addTextChannel({
@@ -62,6 +66,12 @@ export default function createDiscordStub(sendStub, discordUsers) {
       }
 
       return guild;
+    }
+
+    createRestStub() {
+      return {
+        cdn: discord.Constants.Endpoints.CDN(''),
+      };
     }
 
     login() {
