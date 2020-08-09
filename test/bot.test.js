@@ -28,9 +28,8 @@ describe('Bot', function () {
     this.errorSpy = sandbox.stub(logger, 'error');
     this.sendStub = sandbox.stub();
 
-    this.discordUsers = new discord.Collection();
     irc.Client = ClientStub;
-    discord.Client = createDiscordStub(this.sendStub, this.discordUsers);
+    discord.Client = createDiscordStub(this.sendStub);
 
     ClientStub.prototype.say = sandbox.stub();
     ClientStub.prototype.send = sandbox.stub();
@@ -40,7 +39,7 @@ describe('Bot', function () {
 
     this.setCustomBot = conf => {
       this.bot = new Bot(conf);
-      this.guild = this.bot.discord.guild;
+      this.guild = this.bot.discord.guilds.cache.first();
       this.bot.connect();
     };
 
@@ -53,21 +52,21 @@ describe('Bot', function () {
       // also set guild members
       const guildMember = { ...(member || user), user: userObj };
       guildMember.nick = guildMember.nickname; // nick => nickname in Discord API
-      const memberObj = new discord.GuildMember(this.guild, guildMember);
-      this.guild.members.set(userObj.id, memberObj);
-      this.discordUsers.set(userObj.id, userObj);
+      const memberObj = new discord.GuildMember(this.bot.discord, guildMember, this.guild);
+      this.guild.members.cache.set(userObj.id, memberObj);
+      this.bot.discord.users.cache.set(userObj.id, userObj);
       return memberObj;
     };
 
     this.addRole = function (role) {
-      const roleObj = new discord.Role(this.guild, role);
-      this.guild.roles.set(roleObj.id, roleObj);
+      const roleObj = new discord.Role(this.bot.discord, role, this.guild);
+      this.guild.roles.cache.set(roleObj.id, roleObj);
       return roleObj;
     };
 
     this.addEmoji = function (emoji) {
-      const emojiObj = new discord.Emoji(this.guild, emoji);
-      this.guild.emojis.set(emojiObj.id, emojiObj);
+      const emojiObj = new discord.GuildEmoji(this.bot.discord, emoji, this.guild);
+      this.guild.emojis.cache.set(emojiObj.id, emojiObj);
       return emojiObj;
     };
   });
@@ -627,7 +626,7 @@ describe('Bot', function () {
     this.setCustomBot(newConfig);
     const id = 'not bot id';
     const nickname = 'discord-nickname';
-    this.guild.members.set(id, { nickname });
+    this.guild.members.cache.set(id, { nickname });
     const message = {
       content: text,
       mentions: { users: [] },
@@ -1023,7 +1022,7 @@ describe('Bot', function () {
       const text = 'message';
       const permission = discord.Permissions.FLAGS.VIEW_CHANNEL
         + discord.Permissions.FLAGS.SEND_MESSAGES;
-      this.bot.discord.channels.get('1234').setPermissionStub(
+      this.bot.discord.channels.cache.get('1234').setPermissionStub(
         this.bot.discord.user,
         new discord.Permissions(permission),
       );
@@ -1041,7 +1040,7 @@ describe('Bot', function () {
       const permission = discord.Permissions.FLAGS.VIEW_CHANNEL
         + discord.Permissions.FLAGS.SEND_MESSAGES
         + discord.Permissions.FLAGS.MENTION_EVERYONE;
-      this.bot.discord.channels.get('1234').setPermissionStub(
+      this.bot.discord.channels.cache.get('1234').setPermissionStub(
         this.bot.discord.user,
         new discord.Permissions(permission),
       );
