@@ -57,7 +57,7 @@
     "babel-plugin-istanbul": "^6.0.0",
     "chai": "^4.2.0",
     "coveralls": "^3.0.9",
-    "cross-env": "^6.0.3",
+    "cross-env": "^7.0.2",
     "eslint": "^7.6.0",
     "eslint-config-airbnb-base": "^14.2.0",
     "eslint-plugin-import": "^2.22.0",
