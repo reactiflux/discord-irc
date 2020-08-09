@@ -1,6 +1,19 @@
 # Changelog
 This project adheres to [Semantic Versioning](http://semver.org/).
 
+## [2.9.0-alpha] - 2020-08-08
+Pre-release of a (relatively large) upcoming change to use discord.js v12! There were a lot of breaking changes in the upstream library, including removal of support for Node <12, which is what prompts me to make this into a pre-release rather than storming ahead to release it directly. If nobody reports bugs on this soon, and I don't spot any, I'll promote this into a full release!
+
+**Please do test this out, if you're happy to risk breakages and report these bugs to me!**
+
+### Changed
+* Upgrade discord.js to 12.2.0, which changes a lot of how the bot works behind the scenes, and starts preparing us for upcoming Discord API changes - [#555](https://github.com/reactiflux/discord-irc/pull/555)
+* Add support for Node 14 ([#549](https://github.com/reactiflux/discord-irc/pull/549)); drop support for Node 6, 8 and 10 ([#550](https://github.com/reactiflux/discord-irc/pull/550)).
+
+### Fixed
+* A bunch of vulnerabilities listed in `npm audit` are now gone - [#544](https://github.com/reactiflux/discord-irc/pull/544), [#548](https://github.com/reactiflux/discord-irc/pull/548), [#551](https://github.com/reactiflux/discord-irc/pull/551), [#552](https://github.com/reactiflux/discord-irc/pull/552), [#553](https://github.com/reactiflux/discord-irc/pull/553)
+* Log messages now typically take up one line again (fixing a relatively long-standing bug, at this point – oops!) - [#554](https://github.com/reactiflux/discord-irc/pull/554)
+
 ## [2.8.1] - 2020-03-16
 ### Fixed
 * Large avatars failed to display when bridging through webhooks - (thanks to [Miosame](https://github.com/reactiflux/discord-irc/pull/511), follow up in [#530](https://github.com/reactiflux/discord-irc/pull/530))
