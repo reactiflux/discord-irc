@@ -37,7 +37,7 @@
   "license": "MIT",
   "dependencies": {
     "commander": "^6.0.0",
-    "discord.js": "11.5.1",
+    "discord.js": "12.2.0",
     "irc-colors": "1.5.0",
     "irc-formatting": "1.0.0-rc3",
     "irc-upd": "0.11.0",
