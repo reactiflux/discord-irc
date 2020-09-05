@@ -172,6 +172,28 @@ describe('Bot', function () {
     ClientStub.prototype.say.should.have.been.calledWith('#irc', expected);
   });
 
+  it('should only use message color defined in config', function () {
+    const text = 'testmessage';
+    const newConfig = { ...config, ircNickColors: ['orange'] };
+    this.setCustomBot(newConfig);
+    const message = {
+      content: text,
+      mentions: { users: [] },
+      channel: {
+        name: 'discord'
+      },
+      author: {
+        username: 'otherauthor',
+        id: 'not bot id'
+      },
+      guild: this.guild
+    };
+
+    this.bot.sendToIRC(message);
+    const expected = `<\u000307${message.author.username}\u000f> ${text}`;
+    ClientStub.prototype.say.should.have.been.calledWith('#irc', expected);
+  });
+
   it('should send correct messages to irc', function () {
     const text = 'testmessage';
     const message = {
