@@ -1009,7 +1009,7 @@ describe('Bot', function () {
 
   context('with enabled Discord webhook', function () {
     this.beforeEach(function () {
-      const newConfig = { ...config, webhooks: { '#discord': 'https://discordapp.com/api/webhooks/id/token' } };
+      const newConfig = { ...config, webhooks: { '#discord': 'https://discord.com/api/webhooks/id/token' } };
       this.setCustomBot(newConfig);
     });
 
@@ -1135,7 +1135,7 @@ describe('Bot', function () {
 
     context('when matching avatars with fallback URL', function () {
       this.beforeEach(function () {
-        const newConfig = { ...config, webhooks: { '#discord': 'https://discordapp.com/api/webhooks/id/token' }, format: { webhookAvatarURL: 'avatarFrom/{$nickname}' } };
+        const newConfig = { ...config, webhooks: { '#discord': 'https://discord.com/api/webhooks/id/token' }, format: { webhookAvatarURL: 'avatarFrom/{$nickname}' } };
         this.setCustomBot(newConfig);
 
         setupUser(this);

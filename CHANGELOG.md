@@ -75,13 +75,13 @@ can appear as regular Discord messages:
 ![discord-webhook](http://i.imgur.com/lNeJIUI.jpg)
 
 To enable webhooks, follow part 1 of [this
-guide](https://support.discordapp.com/hc/en-us/articles/228383668-Intro-to-Webhooks)
+guide](https://support.discord.com/hc/en-us/articles/228383668-Intro-to-Webhooks)
 to create and retrieve a webhook URL for a specific channel, then enable it in
 discord-irc's config as follows:
 
 ```json
   "webhooks": {
-    "#discord-channel": "https://discordapp.com/api/webhooks/id/token"
+    "#discord-channel": "https://discord.com/api/webhooks/id/token"
   }
 ```
 
