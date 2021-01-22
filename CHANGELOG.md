@@ -30,7 +30,7 @@ Everything seemed to go fine, which is why you're now receiving this latest upda
 * `format.webhookAvatarURL`, to customize the unrecognized user webhook avatar (thanks to [Geo1088](https://github.com/reactiflux/discord-irc/pull/419))
 * `parallelPingFix`, disabled by default, to prevent users of both Discord and IRC getting pings whenever their messages are mirrored to IRC (thanks to [qaisjp](https://github.com/reactiflux/discord-irc/pull/243) originally, follow up in [#502](https://github.com/reactiflux/discord-irc/pull/502) and [#520](https://github.com/reactiflux/discord-irc/pull/520))
 * `ignoreUsers.discordIds`, to ignore specific Discord users through the bridge by ID instead of name (thanks to [nsavch](https://github.com/reactiflux/discord-irc/pull/508))
-* A basic Docker image, found at [discordirc/discord-irc](https://hub.docker.com/r/discordirc/discord-irc)! This may not be often updated with the release tags we publish on GitHub, but it should contain a `latest` tag in addition to whichever Git hash is available on master (thanks to [gdude2002](https://github.com/reactiflux/discord-irc/pull/421), follow up in [#498](https://github.com/reactiflux/discord-irc/pull/498))
+* A basic Docker image, found at [discordirc/discord-irc](https://hub.docker.com/r/discordirc/discord-irc)! This may not be often updated with the release tags we publish on GitHub, but it should contain a `latest` tag in addition to whichever Git hash is available on main (thanks to [gdude2002](https://github.com/reactiflux/discord-irc/pull/421), follow up in [#498](https://github.com/reactiflux/discord-irc/pull/498))
 
 ### Changed
 * Add support for Node 13, drop testing for Node 6 - [#521](https://github.com/reactiflux/discord-irc/pull/521)
