@@ -172,6 +172,29 @@ describe('Bot', function () {
     ClientStub.prototype.say.should.have.been.calledWith('#irc', expected);
   });
 
+  it('should show <deleted> for delete messages', function () {
+    const text = 'testmessage';
+    const newConfig = { ...config, ircNickColor: false };
+    this.setCustomBot(newConfig);
+    const message = {
+      deleted: true,
+      content: text,
+      mentions: { users: [] },
+      channel: {
+        name: 'discord'
+      },
+      author: {
+        username: 'otherauthor',
+        id: 'not bot id'
+      },
+      guild: this.guild
+    };
+
+    this.bot.sendToIRC(message);
+    const expected = `<${message.author.username}> <deleted> ${text}`;
+    ClientStub.prototype.say.should.have.been.calledWith('#irc', expected);
+  });
+
   it('should only use message color defined in config', function () {
     const text = 'testmessage';
     const newConfig = { ...config, ircNickColors: ['orange'] };
