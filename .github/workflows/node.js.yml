@@ -30,10 +30,9 @@ jobs:
     - run: npm run save-coverage
     - name: Report to Coveralls (parallel)
       uses: coverallsapp/github-action@master
-      env:
-        COVERALLS_FLAG_NAME: run-${{ matrix.test_number }}
       with:
         github-token: ${{ secrets.GITHUB_TOKEN }}
+        flag-name: run-${{ matrix.node-version }}
         parallel: true
 
   finish:
