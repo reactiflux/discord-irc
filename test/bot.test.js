@@ -126,9 +126,9 @@ describe('Bot', function () {
   });
 
   it(
-    'should not send special messages to discord if the channel isn\'t in the channel mapping',
+    'should not send special messages to discord if the channel isn\'t in the IRC channel mapping',
     function () {
-      this.bot.sendExactToDiscord('#no-irc', 'message');
+      this.bot.sendExactToDiscordByIrcChannel('#no-irc', 'message');
       this.sendStub.should.not.have.been.called;
     }
   );
@@ -136,7 +136,7 @@ describe('Bot', function () {
   it(
     'should not send special messages to discord if it isn\'t in the channel',
     function () {
-      this.bot.sendExactToDiscord('#otherirc', 'message');
+      this.bot.sendExactToDiscordByIrcChannel('#otherirc', 'message');
       this.sendStub.should.not.have.been.called;
     }
   );
@@ -144,9 +144,28 @@ describe('Bot', function () {
   it(
     'should send special messages to discord',
     function () {
-      this.bot.sendExactToDiscord('#irc', 'message');
+      this.bot.sendExactToDiscordByIrcChannel('#irc', 'message');
       this.sendStub.should.have.been.calledWith('message');
       this.debugSpy.should.have.been.calledWith('Sending special message to Discord', 'message', '#irc', '->', '#discord');
+    }
+  );
+
+  it(
+    'should not send special messages to discord by Discord channel if it isn\'t in the channel',
+    function () {
+      const channel = '#notinchannel';
+      this.bot.sendExactToDiscordByDiscordChannel(channel, 'message');
+      this.sendStub.should.not.have.been.called;
+      this.infoSpy.should.have.been.calledWith('Tried to send a message to a Discord channel the bot isn\'t in: ', channel);
+    }
+  );
+
+  it(
+    'should send special messages to discord by Discord channel',
+    function () {
+      this.bot.sendExactToDiscordByDiscordChannel('#discord', 'message');
+      this.sendStub.should.have.been.calledWith('message');
+      this.debugSpy.should.have.been.calledWith('Sending special message to Discord', 'message', '#discord');
     }
   );
 

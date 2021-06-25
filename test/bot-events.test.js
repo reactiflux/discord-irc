@@ -25,7 +25,8 @@ describe('Bot Events', function () {
     const bot = new Bot(useConfig);
     bot.sendToIRC = sandbox.stub();
     bot.sendToDiscord = sandbox.stub();
-    bot.sendExactToDiscord = sandbox.stub();
+    bot.sendExactToDiscordByIrcChannel = sandbox.stub();
+    bot.sendExactToDiscordByDiscordChannel = sandbox.stub();
     return bot;
   };
 
@@ -120,7 +121,7 @@ describe('Bot Events', function () {
     const oldnick = 'user1';
     const newnick = 'user2';
     this.bot.ircClient.emit('nick', oldnick, newnick, [channel]);
-    this.bot.sendExactToDiscord.should.not.have.been.called;
+    this.bot.sendExactToDiscordByIrcChannel.should.not.have.been.called;
   });
 
   it('should send name change event to discord', function () {
@@ -140,7 +141,33 @@ describe('Bot Events', function () {
     const formattedText = `*${oldNick}* is now known as ${newNick}`;
     const channelNicksAfter = new Set([bot.nickname, newNick]);
     bot.ircClient.emit('nick', oldNick, newNick, [channel1, channel2, channel3]);
-    bot.sendExactToDiscord.should.have.been.calledWithExactly(channel1, formattedText);
+    bot.sendExactToDiscordByIrcChannel.should.have.been.calledWithExactly(channel1, formattedText);
+    bot.channelUsers.should.deep.equal({ '#channel1': channelNicksAfter, '#channel2': staticChannel });
+  });
+
+  it('should send name change event to specified discord channel', function () {
+    const channel1 = '#channel1';
+    const channel2 = '#channel2';
+    const channel3 = '#channel3';
+    const oldNick = 'user1';
+    const newNick = 'user2';
+    const user3 = 'user3';
+    const notifyChannel = '#joins-and-leaves';
+    const bot = createBot({ ...config, ircStatusNotices: notifyChannel });
+    const staticChannel = new Set([bot.nickname, user3]);
+    bot.connect();
+    bot.ircClient.emit('names', channel1, { [bot.nickname]: '', [oldNick]: '' });
+    bot.ircClient.emit('names', channel2, { [bot.nickname]: '', [user3]: '' });
+    const channelNicksPre = new Set([bot.nickname, oldNick]);
+    bot.channelUsers.should.deep.equal({ '#channel1': channelNicksPre, '#channel2': staticChannel });
+    const formattedText = `*${oldNick}* is now known as ${newNick}`;
+    const channelNicksAfter = new Set([bot.nickname, newNick]);
+    bot.ircClient.emit('nick', oldNick, newNick, [channel1, channel2, channel3]);
+    bot.sendExactToDiscordByDiscordChannel.should.have.been.calledOnce;
+    bot.sendExactToDiscordByDiscordChannel.should.have.been.calledWithExactly(
+      notifyChannel,
+      formattedText
+    );
     bot.channelUsers.should.deep.equal({ '#channel1': channelNicksAfter, '#channel2': staticChannel });
   });
 
@@ -186,9 +213,40 @@ describe('Bot Events', function () {
     const nick = 'user';
     const text = `*${nick}* has joined the channel`;
     bot.ircClient.emit('join', channel, nick);
-    bot.sendExactToDiscord.should.have.been.calledWithExactly(channel, text);
+    bot.sendExactToDiscordByIrcChannel.should.have.been.calledWithExactly(channel, text);
     const channelNicks = new Set([bot.nickname, nick]);
     bot.channelUsers.should.deep.equal({ '#channel': channelNicks });
+  });
+
+  it('should send join messages to specified discord channel when config enabled', function () {
+    const notifyChannel = '#joins-and-leaves';
+    const bot = createBot({ ...config, ircStatusNotices: notifyChannel });
+    bot.connect();
+    const channel = '#channel';
+    bot.ircClient.emit('names', channel, { [bot.nickname]: '' });
+    const nick = 'user';
+    const text = `*${nick}* has joined IRC`;
+    bot.ircClient.emit('join', channel, nick);
+    bot.sendExactToDiscordByDiscordChannel.should.have.been.calledOnce;
+    bot.sendExactToDiscordByDiscordChannel.should.have.been.calledWithExactly(notifyChannel, text);
+    const channelNicks = new Set([bot.nickname, nick]);
+    bot.channelUsers.should.deep.equal({ '#channel': channelNicks });
+  });
+
+  it('should send single join message to specified discord channel when config enabled and multiple channels are joined', function () {
+    const notifyChannel = '#joins-and-leaves';
+    const bot = createBot({ ...config, ircStatusNotices: notifyChannel });
+    bot.connect();
+    const channel1 = '#channel1';
+    const channel2 = '#channel2';
+    bot.ircClient.emit('names', channel1, { [bot.nickname]: '' });
+    bot.ircClient.emit('names', channel2, { [bot.nickname]: '' });
+    const nick = 'user';
+    const text = `*${nick}* has joined IRC`;
+    bot.ircClient.emit('join', channel1, nick);
+    bot.ircClient.emit('join', channel2, nick);
+    bot.sendExactToDiscordByDiscordChannel.should.have.been.calledOnce;
+    bot.sendExactToDiscordByDiscordChannel.should.have.been.calledWithExactly(notifyChannel, text);
   });
 
   it('should not announce itself joining by default', function () {
@@ -198,7 +256,7 @@ describe('Bot Events', function () {
     bot.ircClient.emit('names', channel, { [bot.nickname]: '' });
     const nick = bot.nickname;
     bot.ircClient.emit('join', channel, nick);
-    bot.sendExactToDiscord.should.not.have.been.called;
+    bot.sendExactToDiscordByIrcChannel.should.not.have.been.called;
     const channelNicks = new Set([bot.nickname]);
     bot.channelUsers.should.deep.equal({ '#channel': channelNicks });
   });
@@ -212,7 +270,7 @@ describe('Bot Events', function () {
     const nick = this.bot.nickname;
     const text = `*${nick}* has joined the channel`;
     bot.ircClient.emit('join', channel, nick);
-    bot.sendExactToDiscord.should.have.been.calledWithExactly(channel, text);
+    bot.sendExactToDiscordByIrcChannel.should.have.been.calledWithExactly(channel, text);
   });
 
   it('should send part messages to discord when config enabled', function () {
@@ -226,7 +284,26 @@ describe('Bot Events', function () {
     const reason = 'Leaving';
     const text = `*${nick}* has left the channel (${reason})`;
     bot.ircClient.emit('part', channel, nick, reason);
-    bot.sendExactToDiscord.should.have.been.calledWithExactly(channel, text);
+    bot.sendExactToDiscordByIrcChannel.should.have.been.calledWithExactly(channel, text);
+    // it should remove the nickname from the channelUsers list
+    const channelNicks = new Set([bot.nickname]);
+    bot.channelUsers.should.deep.equal({ '#channel': channelNicks });
+  });
+
+  it('should send part messages to specified discord channel when config enabled', function () {
+    const notifyChannel = '#joins-and-leaves';
+    const bot = createBot({ ...config, ircStatusNotices: notifyChannel });
+    bot.connect();
+    const channel = '#channel';
+    const nick = 'user';
+    bot.ircClient.emit('names', channel, { [bot.nickname]: '', [nick]: '' });
+    const originalNicks = new Set([bot.nickname, nick]);
+    bot.channelUsers.should.deep.equal({ '#channel': originalNicks });
+    const reason = 'Leaving';
+    const text = `*${nick}* has left ${channel} (${reason})`;
+    bot.ircClient.emit('part', channel, nick, reason);
+    bot.sendExactToDiscordByDiscordChannel.should.have.been.calledOnce;
+    bot.sendExactToDiscordByDiscordChannel.should.have.been.calledWithExactly(notifyChannel, text);
     // it should remove the nickname from the channelUsers list
     const channelNicks = new Set([bot.nickname]);
     bot.channelUsers.should.deep.equal({ '#channel': channelNicks });
@@ -241,7 +318,7 @@ describe('Bot Events', function () {
     bot.channelUsers.should.deep.equal({ '#channel': originalNicks });
     const reason = 'Leaving';
     bot.ircClient.emit('part', channel, bot.nickname, reason);
-    bot.sendExactToDiscord.should.not.have.been.called;
+    bot.sendExactToDiscordByIrcChannel.should.not.have.been.called;
     // it should remove the nickname from the channelUsers list
     bot.channelUsers.should.deep.equal({});
   });
@@ -260,9 +337,28 @@ describe('Bot Events', function () {
     const text = `*${nick}* has quit (${reason})`;
     // send quit message for all channels on server, as the node-irc library does
     bot.ircClient.emit('quit', nick, reason, [channel1, channel2, channel3]);
-    bot.sendExactToDiscord.should.have.been.calledTwice;
-    bot.sendExactToDiscord.getCall(0).args.should.deep.equal([channel1, text]);
-    bot.sendExactToDiscord.getCall(1).args.should.deep.equal([channel3, text]);
+    bot.sendExactToDiscordByIrcChannel.should.have.been.calledTwice;
+    bot.sendExactToDiscordByIrcChannel.getCall(0).args.should.deep.equal([channel1, text]);
+    bot.sendExactToDiscordByIrcChannel.getCall(1).args.should.deep.equal([channel3, text]);
+  });
+
+  it('should send quit messages to a specified discord channel when config enabled', function () {
+    const notifyChannel = '#joins-and-leaves';
+    const bot = createBot({ ...config, ircStatusNotices: notifyChannel });
+    bot.connect();
+    const channel1 = '#channel1';
+    const channel2 = '#channel2';
+    const channel3 = '#channel3';
+    const nick = 'user';
+    bot.ircClient.emit('names', channel1, { [bot.nickname]: '', [nick]: '' });
+    bot.ircClient.emit('names', channel2, { [bot.nickname]: '' });
+    bot.ircClient.emit('names', channel3, { [bot.nickname]: '', [nick]: '' });
+    const reason = 'Quit: Leaving';
+    const text = `*${nick}* has quit (${reason})`;
+    // send quit message for all channels on server, as the node-irc library does
+    bot.ircClient.emit('quit', nick, reason, [channel1, channel2, channel3]);
+    bot.sendExactToDiscordByDiscordChannel.should.have.been.calledOnce;
+    bot.sendExactToDiscordByDiscordChannel.should.have.been.calledWithExactly(notifyChannel, text);
   });
 
   it('should not crash with join/part/quit messages and weird channel casing', function () {
@@ -293,7 +389,7 @@ describe('Bot Events', function () {
     bot.ircClient.emit('part', channel, nick, reason);
     bot.ircClient.emit('join', channel, nick);
     bot.ircClient.emit('quit', nick, reason, [channel]);
-    bot.sendExactToDiscord.should.not.have.been.called;
+    bot.sendExactToDiscordByIrcChannel.should.not.have.been.called;
   });
 
   it('should warn if it receives a part/quit before a names event', function () {
