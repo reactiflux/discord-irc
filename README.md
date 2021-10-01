@@ -94,6 +94,7 @@ First you need to create a Discord bot user, which you can do by following the i
       "sasl": true, // false by default
       "username": "test", // nodeirc by default
       "password": "p455w0rd" // empty by default
+      "unemojify": true // Textify emojis from messages send to Discord, false by default
     },
     "format": { // Optional custom formatting options
       // Patterns, represented by {$patternName}, are replaced when sending messages
