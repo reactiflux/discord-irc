@@ -1,12 +1,12 @@
-# discord-irc [![Build Status](https://travis-ci.org/reactiflux/discord-irc.svg?branch=master)](https://travis-ci.org/reactiflux/discord-irc) [![Coverage Status](https://coveralls.io/repos/github/reactiflux/discord-irc/badge.svg?branch=master)](https://coveralls.io/github/reactiflux/discord-irc?branch=master)
+[![Coverage Status](https://coveralls.io/repos/github/reactiflux/discord-irc/badge.svg?branch=main)](https://coveralls.io/github/reactiflux/discord-irc?branch=main)
 
-> Connects [Discord](https://discordapp.com/) and [IRC](https://www.ietf.org/rfc/rfc1459.txt) channels by sending messages back and forth.
+> Connects [Discord](https://discord.com/) and [IRC](https://www.ietf.org/rfc/rfc1459.txt) channels by sending messages back and forth.
 
 ## Example
 ![discord-irc](http://i.imgur.com/oI6iCrf.gif)
 
 ## Installation and usage
-**Note**: discord-irc requires Node.js version 6 or newer, as it depends on [discord.js](https://github.com/hydrabolt/discord.js).
+**Note**: discord-irc requires Node.js version 12 or newer, as it depends on [discord.js](https://github.com/hydrabolt/discord.js).
 Future versions may require newer Node.js versions, though we should support active releases.
 
 Before you can run discord-irc you need to create a configuration file by
@@ -107,6 +107,7 @@ First you need to create a Discord bot user, which you can do by following the i
       "webhookAvatarURL": "https://robohash.org/{$nickname}" // Default avatar to use for webhook messages
     },
     "ircNickColor": false, // Gives usernames a color in IRC for better readability (on by default)
+    "ircNickColors": ['light_blue', 'dark_blue', 'light_red', 'dark_red', 'light_green', 'dark_green', 'magenta', 'light_magenta', 'orange', 'yellow', 'cyan', 'light_cyan'], // Which irc-upd colors to use
     "parallelPingFix": true, // Prevents users of both IRC and Discord from being mentioned in IRC when they speak in Discord (off by default)
     // Makes the bot hide the username prefix for messages that start
     // with one of these characters (commands):
@@ -119,7 +120,7 @@ First you need to create a Discord bot user, which you can do by following the i
     },
     // List of webhooks per channel
     "webhooks": {
-      "#discord": "https://discordapp.com/api/webhooks/id/token"
+      "#discord": "https://discord.com/api/webhooks/id/token"
     }
   }
 ]
@@ -136,13 +137,13 @@ can appear as regular Discord messages:
 ![discord-webhook](http://i.imgur.com/lNeJIUI.jpg)
 
 To enable webhooks, follow part 1 of [this
-guide](https://support.discordapp.com/hc/en-us/articles/228383668-Intro-to-Webhooks)
+guide](https://support.discord.com/hc/en-us/articles/228383668-Intro-to-Webhooks)
 to create and retrieve a webhook URL for a specific channel, then enable it in
 discord-irc's config as follows:
 
 ```json
   "webhooks": {
-    "#discord-channel": "https://discordapp.com/api/webhooks/id/token"
+    "#discord-channel": "https://discord.com/api/webhooks/id/token"
   }
 ```
 

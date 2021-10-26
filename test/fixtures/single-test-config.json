@@ -17,7 +17,7 @@
     "#withwebhook": "#ircwebhook"
   },
   "webhooks": {
-    "#withwebhook": "https://discordapp.com/api/webhooks/id/token"
+    "#withwebhook": "https://discord.com/api/webhooks/id/token"
   },
   "ignoreUsers": {
     "irc": ["irc_ignored_user"],

@@ -1,6 +1,24 @@
 # Changelog
 This project adheres to [Semantic Versioning](http://semver.org/).
 
+## [2.9.0] - 2020-10-03
+This release comes with a (relatively large) change to use discord.js v12!
+There were a lot of breaking changes in the upstream library, including removal of support for Node <12, which prompted a 2.9.0-alpha release before this main version.
+Everything seemed to go fine, which is why you're now receiving this latest update!
+
+### Added
+* IRC nick colors are now customizable in the config (thanks to [KWeaver87](https://github.com/reactiflux/discord-irc/pull/561))
+
+### Changed
+* Upgrade discord.js to 12.3.1 (the pre-release came with 12.2.0) - this changes a lot of how the bot works behind the scenes, and prepares us for upcoming Discord API changes - [#555](https://github.com/reactiflux/discord-irc/pull/555), [#564](https://github.com/reactiflux/discord-irc/pull/564)
+* Add support for Node 14 ([#549](https://github.com/reactiflux/discord-irc/pull/549)); drop support for Node 6, 8 and 10 ([#550](https://github.com/reactiflux/discord-irc/pull/550))
+
+### Fixed
+* A bunch of vulnerabilities listed in `npm audit` are now gone - [#544](https://github.com/reactiflux/discord-irc/pull/544), [#548](https://github.com/reactiflux/discord-irc/pull/548), [#551](https://github.com/reactiflux/discord-irc/pull/551), [#552](https://github.com/reactiflux/discord-irc/pull/552), [#553](https://github.com/reactiflux/discord-irc/pull/553), [#562](https://github.com/reactiflux/discord-irc/pull/562)
+* Log messages now typically take up one line again (fixing a relatively long-standing bug, at this point – oops!) - [#554](https://github.com/reactiflux/discord-irc/pull/554)
+* Mentioning the same user more than once in a single message is now fixed (thanks to [Qyriad](https://github.com/reactiflux/discord-irc/pull/541))
+* Our Discord client now uses a retry limit of 3 (rather than 1) on internal server errors (hopefully fixing [#461](https://github.com/reactiflux/discord-irc/issues/461)) - [#565](https://github.com/reactiflux/discord-irc/pull/565)
+
 ## [2.8.1] - 2020-03-16
 ### Fixed
 * Large avatars failed to display when bridging through webhooks - (thanks to [Miosame](https://github.com/reactiflux/discord-irc/pull/511), follow up in [#530](https://github.com/reactiflux/discord-irc/pull/530))
@@ -12,7 +30,7 @@ This project adheres to [Semantic Versioning](http://semver.org/).
 * `format.webhookAvatarURL`, to customize the unrecognized user webhook avatar (thanks to [Geo1088](https://github.com/reactiflux/discord-irc/pull/419))
 * `parallelPingFix`, disabled by default, to prevent users of both Discord and IRC getting pings whenever their messages are mirrored to IRC (thanks to [qaisjp](https://github.com/reactiflux/discord-irc/pull/243) originally, follow up in [#502](https://github.com/reactiflux/discord-irc/pull/502) and [#520](https://github.com/reactiflux/discord-irc/pull/520))
 * `ignoreUsers.discordIds`, to ignore specific Discord users through the bridge by ID instead of name (thanks to [nsavch](https://github.com/reactiflux/discord-irc/pull/508))
-* A basic Docker image, found at [discordirc/discord-irc](https://hub.docker.com/r/discordirc/discord-irc)! This may not be often updated with the release tags we publish on GitHub, but it should contain a `latest` tag in addition to whichever Git hash is available on master (thanks to [gdude2002](https://github.com/reactiflux/discord-irc/pull/421), follow up in [#498](https://github.com/reactiflux/discord-irc/pull/498))
+* A basic Docker image, found at [discordirc/discord-irc](https://hub.docker.com/r/discordirc/discord-irc)! This may not be often updated with the release tags we publish on GitHub, but it should contain a `latest` tag in addition to whichever Git hash is available on main (thanks to [gdude2002](https://github.com/reactiflux/discord-irc/pull/421), follow up in [#498](https://github.com/reactiflux/discord-irc/pull/498))
 
 ### Changed
 * Add support for Node 13, drop testing for Node 6 - [#521](https://github.com/reactiflux/discord-irc/pull/521)
@@ -57,13 +75,13 @@ can appear as regular Discord messages:
 ![discord-webhook](http://i.imgur.com/lNeJIUI.jpg)
 
 To enable webhooks, follow part 1 of [this
-guide](https://support.discordapp.com/hc/en-us/articles/228383668-Intro-to-Webhooks)
+guide](https://support.discord.com/hc/en-us/articles/228383668-Intro-to-Webhooks)
 to create and retrieve a webhook URL for a specific channel, then enable it in
 discord-irc's config as follows:
 
 ```json
   "webhooks": {
-    "#discord-channel": "https://discordapp.com/api/webhooks/id/token"
+    "#discord-channel": "https://discord.com/api/webhooks/id/token"
   }
 ```
 
