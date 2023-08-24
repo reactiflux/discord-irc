@@ -6,7 +6,7 @@ import { ConfigurationError } from './errors';
  * Reads from the provided config file and returns an array of bots
  * @return {object[]}
  */
-export function createBots(configFile) {
+export function createBots(configFile: any[]): object[] {
   const bots = [];
 
   // The config file can be both an array and an object
@@ -21,7 +21,7 @@ export function createBots(configFile) {
     bot.connect();
     bots.push(bot);
   } else {
-    throw new ConfigurationError();
+    throw new ConfigurationError("");
   }
 
   return bots;

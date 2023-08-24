@@ -1,68 +1,74 @@
 {
-  "name": "discord-irc",
-  "version": "2.9.0",
-  "description": "Connects IRC and Discord channels by sending messages back and forth.",
-  "keywords": [
-    "discord",
-    "irc",
-    "gateway",
-    "bot",
-    "discord-irc",
-    "reactiflux"
+  "version": "0.1.0",
+  "license": "MIT",
+  "main": "dist/index.js",
+  "typings": "dist/index.d.ts",
+  "files": [
+    "dist",
+    "src"
   ],
   "engines": {
-    "node": ">=16.6.0"
-  },
-  "main": "dist/index.js",
-  "bin": "dist/index.js",
-  "repository": {
-    "type": "git",
-    "url": "git@github.com:reactiflux/discord-irc.git"
-  },
-  "bugs": {
-    "url": "https://github.com/reactiflux/discord-irc/issues"
+    "node": ">=10"
   },
   "scripts": {
-    "start": "node dist/index.js",
-    "build": "babel lib --out-dir dist",
-    "prepare": "npm run build",
-    "lint": "eslint . --ignore-path .gitignore",
-    "coverage": "cross-env NODE_ENV=test nyc --require @babel/register mocha -- 'test/*.test.js'",
-    "save-coverage": "nyc report --reporter=lcov",
-    "test": "npm run lint && npm run coverage"
+    "start": "npx tsx src",
+    "build": "tsdx build",
+    "test": "tsdx test",
+    "lint": "tsdx lint",
+    "prepare": "tsdx build",
+    "size": "size-limit",
+    "analyze": "size-limit --why"
   },
-  "author": {
-    "name": "Reactiflux"
+  "husky": {
+    "hooks": {
+      "pre-commit": "tsdx lint"
+    }
   },
-  "license": "MIT",
-  "dependencies": {
-    "commander": "^7.2.0",
-    "discord.js": "^14.13.0",
-    "irc-colors": "1.5.0",
-    "irc-formatting": "1.0.0-rc3",
-    "irc-upd": "0.11.0",
-    "lodash": "^4.17.21",
-    "simple-markdown": "^0.7.3",
-    "strip-json-comments": "^3.1.1",
-    "winston": "^3.10.0"
+  "prettier": {
+    "printWidth": 80,
+    "semi": true,
+    "singleQuote": true,
+    "trailingComma": "es5"
   },
+  "name": "discord-irc",
+  "author": "Isaac Aronson",
+  "module": "dist/discord-irc.esm.js",
+  "size-limit": [
+    {
+      "path": "dist/discord-irc.cjs.production.min.js",
+      "limit": "10 KB"
+    },
+    {
+      "path": "dist/discord-irc.esm.js",
+      "limit": "10 KB"
+    }
+  ],
   "devDependencies": {
-    "@babel/cli": "^7.13.16",
-    "@babel/core": "^7.13.16",
-    "@babel/eslint-parser": "^7.13.14",
-    "@babel/preset-env": "^7.13.15",
-    "@babel/register": "^7.13.16",
-    "@istanbuljs/nyc-config-babel": "^3.0.0",
-    "babel-plugin-istanbul": "^6.0.0",
-    "chai": "^4.3.4",
-    "coveralls": "^3.1.0",
-    "cross-env": "^7.0.3",
+    "@size-limit/preset-small-lib": "^8.2.6",
+    "@types/lodash-es": "^4.17.8",
+    "@types/node": "^20.5.6",
     "eslint": "^7.25.0",
     "eslint-config-airbnb-base": "^14.2.1",
     "eslint-plugin-import": "^2.22.1",
-    "mocha": "^8.3.2",
-    "nyc": "^15.1.0",
-    "sinon": "^10.0.0",
-    "sinon-chai": "^3.6.0"
+    "husky": "^8.0.3",
+    "size-limit": "^8.2.6",
+    "ts-node": "^10.9.1",
+    "tsdx": "^0.14.1",
+    "tslib": "^2.6.2",
+    "typescript": "^5.2.2"
+  },
+  "dependencies": {
+    "@types/underscore": "^1.11.7",
+    "commander": "^7.2.0",
+    "discord.js": "14.13.0",
+    "irc-colors": "1.5.0",
+    "irc-formatting": "1.0.0-rc3",
+    "irc-upd": "^0.11.0",
+    "lodash-es": "^4.17.21",
+    "simple-markdown": "^0.7.3",
+    "source-map-loader": "^4.0.1",
+    "strip-json-comments": "^3.1.1",
+    "underscore": "^1.13.6",
+    "winston": "^3.10.0"
   }
 }

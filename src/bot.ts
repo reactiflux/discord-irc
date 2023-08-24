@@ -1,6 +1,7 @@
-import _ from 'lodash';
-import irc from 'irc-upd';
-import discord, { GatewayIntentBits, Partials } from 'discord.js';
+import _ from 'underscore';
+import lodash from 'lodash';
+const irc = require('irc-upd');
+import discord, { GatewayIntentBits, GuildMember, Partials, GuildChannel, TextChannel } from 'discord.js';
 import logger from './logger';
 import { ConfigurationError } from './errors';
 import { validateChannelMapping } from './validators';
@@ -15,12 +16,45 @@ const DEFAULT_NICK_COLORS = ['light_blue', 'dark_blue', 'light_red', 'dark_red',
   'dark_green', 'magenta', 'light_magenta', 'orange', 'yellow', 'cyan', 'light_cyan'];
 const patternMatch = /{\$(.+?)}/g;
 
+function escapeMarkdown(text:string) {
+  const unescaped = text.replace(/\\(\*|_|`|~|\\)/g, '$1'); // unescape any "backslashed" character
+  const escaped = unescaped.replace(/(\*|_|`|~|\\)/g, '\\$1'); // escape *, _, `, ~, \
+  return escaped;
+}
+
 /**
  * An IRC bot, works as a middleman for all communication
  * @param {object} options - server, nickname, channelMapping, outgoingToken, incomingURL, partialMatch
  */
-class Bot {
-  constructor(options) {
+export default class Bot {
+  discord: discord.Client<boolean>;
+  server: string;
+  nickname: string;
+  ircOptions: any;
+  discordToken: string;
+  commandCharacters: string[];
+  ircNickColor: boolean;
+  ircNickColors: any;
+  parallelPingFix: boolean;
+  channels: any[];
+  ircStatusNotices: boolean;
+  announceSelfJoin: boolean;
+  webhookOptions: any;
+  partialMatch: boolean;
+  ignoreUsers: any;
+  format: any;
+  formatIRCText: any;
+  formatURLAttachment: any;
+  formatCommandPrelude: any;
+  formatDiscord: any;
+  formatWebhookAvatarURL: any;
+  channelUsers: _.Dictionary<any>;
+  channelMapping: _.Dictionary<string>;
+  webhooks: _.Dictionary<any>;
+  invertedMapping: _.Dictionary<any>;
+  autoSendCommands: any;
+  ircClient: any;
+  constructor(options:any) {
     REQUIRED_FIELDS.forEach((field) => {
       if (!options[field]) {
         throw new ConfigurationError(`Missing configuration field ${field}`);
@@ -29,8 +63,6 @@ class Bot {
     validateChannelMapping(options.channelMapping);
 
     this.discord = new discord.Client({
-      autoReconnect: true,
-      retryLimit: 3,
       partials: [Partials.Channel],
       intents: [
         GatewayIntentBits.Guilds,
@@ -97,7 +129,7 @@ class Bot {
     this.webhooks = {};
 
     // Remove channel passwords from the mapping and lowercase IRC channel names
-    _.forOwn(options.channelMapping, (ircChan, discordChan) => {
+    _.forEach(options.channelMapping, (ircChan, discordChan) => {
       this.channelMapping[discordChan] = ircChan.split(' ')[0].toLowerCase();
     });
 
@@ -110,7 +142,7 @@ class Bot {
     this.discord.login(this.discordToken);
 
     // Extract id and token from Webhook urls and connect.
-    _.forOwn(this.webhookOptions, (url, channel) => {
+    _.forEach(this.webhookOptions, (url, channel) => {
       const [id, token] = url.split('/').slice(-2);
       const client = new discord.WebhookClient({ id, token });
       this.webhooks[channel] = {
@@ -133,12 +165,12 @@ class Bot {
 
     // default encoding to UTF-8 so messages to Discord aren't corrupted
     if (!Object.prototype.hasOwnProperty.call(ircOptions, 'encoding')) {
-      if (irc.canConvertEncoding()) {
+      /* if (irc.canConvertEncoding()) {
         ircOptions.encoding = 'utf-8';
-      } else {
+      } else { */
         logger.warn('Cannot convert message encoding; you may encounter corrupted characters with non-English text.\n' +
           'For information on how to fix this, please see: https://github.com/Throne3d/node-irc#character-set-detection');
-      }
+      // }
     }
 
     this.ircClient = new irc.Client(this.server, this.nickname, ircOptions);
@@ -156,19 +188,19 @@ class Bot {
       logger.info('Connected to Discord');
     });
 
-    this.ircClient.on('registered', (message) => {
+    this.ircClient.on('registered', (message:any) => {
       logger.info('Connected to IRC');
       logger.debug('Registered event: ', message);
-      this.autoSendCommands.forEach((element) => {
+      this.autoSendCommands.forEach((element:any) => {
         this.ircClient.send(...element);
       });
     });
 
-    this.ircClient.on('error', (error) => {
+    this.ircClient.on('error', (error:any) => {
       logger.error('Received error event from IRC', error);
     });
 
-    this.discord.on('error', (error) => {
+    this.discord.on('error', (error:any) => {
       logger.error('Received error event from Discord', error);
     });
 
@@ -179,13 +211,13 @@ class Bot {
     this.discord.on('messageCreate', (message) => {
       // Show the IRC channel's /names list when asked for in Discord
       if (message.content.toLowerCase() === '/names') {
-        const channelName = `#${message.channel.name}`;
+        const channelName = `#${(message.channel as GuildChannel)?.name}`;
         const ircChannel = this.channelMapping[message.channel.id] ||
           this.channelMapping[channelName];
         if (this.channelUsers[ircChannel]) {
           const ircNames = this.channelUsers[ircChannel].values();
           const ircNamesArr = new Array(...ircNames);
-          this.sendExactToDiscord(ircChannel, `Users in ${ircChannel}\n> ${ircNamesArr.join(', ')}`);
+          this.sendExactToDiscord(ircChannel, `Users in ${ircChannel}\n> ${ircNamesArr.map(escapeMarkdown).join(', ')}`);
         } else {
           logger.warn(`No channelUsers found for ${ircChannel} when /names requested`);
           // Pass the command through if channelUsers is empty
@@ -200,18 +232,18 @@ class Bot {
     this.ircClient.on('message',
       this.sendToDiscord.bind(this));
 
-    this.ircClient.on('notice', (author, to, text) => {
+    this.ircClient.on('notice', (author:any, to:any, text:any) => {
       this.sendToDiscord(author, to, `*${text}*`);
     });
 
-    this.ircClient.on('nick', (oldNick, newNick, channels) => {
-      if (!this.ircStatusNotices) return;
+    this.ircClient.on('nick', (oldNick:string, newNick:string, channels:any[]) => {
       channels.forEach((channelName) => {
         const channel = channelName.toLowerCase();
         if (this.channelUsers[channel]) {
           if (this.channelUsers[channel].has(oldNick)) {
             this.channelUsers[channel].delete(oldNick);
             this.channelUsers[channel].add(newNick);
+            if (!this.ircStatusNotices) return;
             this.sendExactToDiscord(channel, `*${oldNick}* is now known as ${newNick}`);
           }
         } else {
@@ -220,7 +252,7 @@ class Bot {
       });
     });
 
-    this.ircClient.on('join', (channelName, nick) => {
+    this.ircClient.on('join', (channelName:string, nick:string) => {
       logger.debug('Received join:', channelName, nick);
       if (nick === this.ircClient.nick && !this.announceSelfJoin) return;
       const channel = channelName.toLowerCase();
@@ -231,7 +263,7 @@ class Bot {
       this.sendExactToDiscord(channel, `*${nick}* has joined the channel`);
     });
 
-    this.ircClient.on('part', (channelName, nick, reason) => {
+    this.ircClient.on('part', (channelName:string, nick:string, reason:string) => {
       logger.debug('Received part:', channelName, nick, reason);
       const channel = channelName.toLowerCase();
       // remove list of users when no longer in channel (as it will become out of date)
@@ -249,7 +281,7 @@ class Bot {
       this.sendExactToDiscord(channel, `*${nick}* has left the channel (${reason})`);
     });
 
-    this.ircClient.on('quit', (nick, reason, channels) => {
+    this.ircClient.on('quit', (nick:string, reason:string, channels:string[]) => {
       logger.debug('Received quit:', nick, channels);
       channels.forEach((channelName) => {
         const channel = channelName.toLowerCase();
@@ -263,17 +295,17 @@ class Bot {
       });
     });
 
-    this.ircClient.on('names', (channelName, nicks) => {
+    this.ircClient.on('names', (channelName:string, nicks:string[]) => {
       logger.debug('Received names:', channelName, nicks);
       const channel = channelName.toLowerCase();
       this.channelUsers[channel] = new Set(Object.keys(nicks));
     });
 
-    this.ircClient.on('action', (author, to, text) => {
+    this.ircClient.on('action', (author:any, to:any, text:any) => {
       this.sendToDiscord(author, to, `_${text}_`);
     });
 
-    this.ircClient.on('invite', (channel, from) => {
+    this.ircClient.on('invite', (channel:string, from:any) => {
       logger.debug('Received invite:', channel, from);
       if (!this.invertedMapping[channel]) {
         logger.debug('Channel not found in config, not joining:', channel);
@@ -290,18 +322,22 @@ class Bot {
     }
   }
 
-  static getDiscordNicknameOnServer(user, guild) {
+  static getDiscordNicknameOnServer(user:any, guild:any) {
     if (guild) {
       const userDetails = guild.members.cache.get(user.id);
       if (userDetails) {
-        return userDetails.nickname || user.displayName;
+        const value = userDetails.nickname || user.displayName;
+        logger.debug(`Got username value: ${value}`)
+        return value
       }
     }
+    const value = user.username;
+    logger.debug(`Got username value: ${value}`)
     return user.username;
   }
 
-  parseText(message) {
-    const text = message.mentions.users.reduce((content, mention) => {
+  parseText(message:any) {
+    const text = message.mentions.users.reduce((content: string, mention: { id: any; }) => {
       const displayName = Bot.getDiscordNicknameOnServer(mention, message.guild);
       const userMentionRegex = RegExp(`<@(&|!)?${mention.id}>`, 'g');
       return content.replace(userMentionRegex, `@${displayName}`);
@@ -309,43 +345,43 @@ class Bot {
 
     return text
       .replace(/\n|\r\n|\r/g, ' ')
-      .replace(/<#(\d+)>/g, (match, channelId) => {
+      .replace(/<#(\d+)>/g, (_: any, channelId: string) => {
         const channel = this.discord.channels.cache.get(channelId);
-        if (channel) return `#${channel.name}`;
+        if (channel) return `#${(channel as GuildChannel)?.name}`;
         return '#deleted-channel';
       })
-      .replace(/<@&(\d+)>/g, (match, roleId) => {
+      .replace(/<@&(\d+)>/g, (_: any, roleId: any) => {
         const role = message.guild.roles.cache.get(roleId);
         if (role) return `@${role.name}`;
         return '@deleted-role';
       })
-      .replace(/<a?(:\w+:)\d+>/g, (match, emoteName) => emoteName);
+      .replace(/<a?(:\w+:)\d+>/g, (_: any, emoteName: any) => emoteName);
   }
 
-  isCommandMessage(message) {
-    return this.commandCharacters.some(prefix => message.startsWith(prefix));
+  isCommandMessage(message: string) {
+    return this.commandCharacters.some((prefix: any) => message.startsWith(prefix));
   }
 
-  ignoredIrcUser(user) {
-    return this.ignoreUsers.irc.some(i => i.toLowerCase() === user.toLowerCase());
+  ignoredIrcUser(user: string) {
+    return this.ignoreUsers.irc.some((i: string) => i.toLowerCase() === user.toLowerCase());
   }
 
-  ignoredDiscordUser(discordUser) {
+  ignoredDiscordUser(discordUser: { username: string; id: any; }) {
     const ignoredName = this.ignoreUsers.discord.some(
-      i => i.toLowerCase() === discordUser.username.toLowerCase()
+      (      i: string) => i.toLowerCase() === discordUser.username.toLowerCase()
     );
-    const ignoredId = this.ignoreUsers.discordIds.some(i => i === discordUser.id);
+    const ignoredId = this.ignoreUsers.discordIds.some((i: any) => i === discordUser.id);
     return ignoredName || ignoredId;
   }
 
-  static substitutePattern(message, patternMapping) {
-    return message.replace(patternMatch, (match, varName) => patternMapping[varName] || match);
+  static substitutePattern(message: string, patternMapping: { [x: string]: any; author?: any; nickname?: any; displayUsername?: any; text?: any; discordChannel?: string; ircChannel?: any; }) {
+    return message.replace(patternMatch, (match: any, varName: string | number) => patternMapping[varName] || match);
   }
 
-  sendToIRC(message) {
+  sendToIRC(message: discord.Message<boolean>) {
     const { author } = message;
     // Ignore messages sent by the bot itself:
-    if (author.id === this.discord.user.id ||
+    if (author.id === this.discord.user?.id ||
       Object.keys(this.webhooks).some(channel => this.webhooks[channel].id === author.id)
     ) return;
 
@@ -354,8 +390,9 @@ class Bot {
       return;
     }
 
-    const channelName = `#${message.channel.name}`;
-    const ircChannel = this.channelMapping[message.channel.id] ||
+    const channel = message.channel as unknown as discord.GuildChannel;
+    const channelName = `#${channel.name}`;
+    const ircChannel = this.channelMapping[channel.id] ||
       this.channelMapping[channelName];
 
     logger.debug('Channel Mapping', channelName, this.channelMapping[channelName]);
@@ -382,11 +419,12 @@ class Bot {
         displayUsername,
         text,
         discordChannel: channelName,
-        ircChannel
+        ircChannel,
+        attachmentURL: ""
       };
 
       if (this.isCommandMessage(text)) {
-        patternMap.side = 'Discord';
+        //patternMap.side = 'Discord';
         logger.debug('Sending command message to IRC', ircChannel, text);
         // if (prelude) this.ircClient.say(ircChannel, prelude);
         if (this.formatCommandPrelude) {
@@ -406,7 +444,7 @@ class Bot {
         }
 
         if (message.attachments && message.attachments.size) {
-          message.attachments.forEach((a) => {
+          message.attachments.forEach((a: { url: any; }) => {
             patternMap.attachmentURL = a.url;
             const urlMessage = Bot.substitutePattern(this.formatURLAttachment, patternMap);
 
@@ -418,18 +456,19 @@ class Bot {
     }
   }
 
-  findDiscordChannel(ircChannel) {
+  findDiscordChannel(ircChannel: string) {
     const discordChannelName = this.invertedMapping[ircChannel.toLowerCase()];
     if (discordChannelName) {
       // #channel -> channel before retrieving and select only text channels:
-      let discordChannel = null;
+      let discordChannel:discord.Channel|undefined = undefined;
 
       if (this.discord.channels.cache.has(discordChannelName)) {
         discordChannel = this.discord.channels.cache.get(discordChannelName);
       } else if (discordChannelName.startsWith('#')) {
         discordChannel = this.discord.channels.cache
+          .map(c => c as TextChannel)
           // .filter(c => c.type === 'GUILD_TEXT')
-          .find(c => c.name === discordChannelName.slice(1));
+          .find(c => (c as unknown as discord.GuildChannel).name === discordChannelName.slice(1));
       }
 
       if (!discordChannel) {
@@ -444,25 +483,31 @@ class Bot {
     return null;
   }
 
-  findWebhook(ircChannel) {
+  findWebhook(ircChannel: string) {
     const discordChannelName = this.invertedMapping[ircChannel.toLowerCase()];
     return discordChannelName && this.webhooks[discordChannelName];
   }
 
-  getDiscordAvatar(nick, channel) {
-    const guildMembers = this.findDiscordChannel(channel).guild.members.cache;
-    const findByNicknameOrUsername = caseSensitive =>
-      (member) => {
+  getDiscordAvatar(nick: string, channel: any) {
+    const channelRef = this.findDiscordChannel(channel);
+    if (channelRef === null) return null;
+    const guildMembers = (channelRef as unknown as GuildChannel).guild.members.cache;
+    const findByNicknameOrUsername = (caseSensitive: boolean) =>
+      (member: GuildMember) => {
         if (caseSensitive) {
-          return member.user.username === nick || member.nickname === nick;
+          return member.user.username === nick ||
+            member.nickname === nick || member.displayName === nick;
         }
         const nickLowerCase = nick.toLowerCase();
         return member.user.username.toLowerCase() === nickLowerCase
-          || (member.nickname && member.nickname.toLowerCase() === nickLowerCase);
+          || (member.nickname && member.nickname.toLowerCase() === nickLowerCase)
+          || (member.displayName.toLowerCase() === nickLowerCase);
       };
 
     // Try to find exact matching case
     let users = guildMembers.filter(findByNicknameOrUsername(true));
+
+    logger.info(`Matched ${users.size} users in avatar lookup`);
 
     // Now let's search case insensitive.
     if (users.size === 0) {
@@ -471,7 +516,7 @@ class Bot {
 
     // No matching user or more than one => default avatar
     if (users && users.size === 1) {
-      const url = users.first().user.avatarURL({ size: 128, format: 'png' });
+      const url = users.first()?.user.avatarURL({ size: 128 });
       if (url) return url;
     }
 
@@ -484,19 +529,20 @@ class Bot {
 
   // compare two strings case-insensitively
   // for discord mention matching
-  static caseComp(str1, str2) {
+  static caseComp(str1: string, str2: string) {
     return str1.toUpperCase() === str2.toUpperCase();
   }
 
   // check if the first string starts with the second case-insensitively
   // for discord mention matching
-  static caseStartsWith(str1, str2) {
+  static caseStartsWith(str1: string, str2: string) {
     return str1.toUpperCase().startsWith(str2.toUpperCase());
   }
 
-  sendToDiscord(author, channel, text) {
+  sendToDiscord(author: string, channel: any, text: string) {
     const discordChannel = this.findDiscordChannel(channel);
     if (!discordChannel) return;
+    const channelName = (discordChannel as unknown as GuildChannel).name;
 
     // Do not send to Discord if this user is on the ignore list.
     if (this.ignoredIrcUser(author)) {
@@ -511,30 +557,36 @@ class Bot {
       nickname: author,
       displayUsername: author,
       text: withFormat,
-      discordChannel: `#${discordChannel.name}`,
-      ircChannel: channel
+      discordChannel: `#${channelName}`,
+      ircChannel: channel,
+      withMentions: "",
+      side: ""
     };
 
     if (this.isCommandMessage(text)) {
       patternMap.side = 'IRC';
-      logger.debug('Sending command message to Discord', `#${discordChannel.name}`, text);
+      logger.debug('Sending command message to Discord', `#${channelName}`, text);
       if (this.formatCommandPrelude) {
         const prelude = Bot.substitutePattern(this.formatCommandPrelude, patternMap);
-        discordChannel.send(prelude);
-      }
-      discordChannel.send(text);
+        if(discordChannel.type === discord.ChannelType.GuildText)
+          discordChannel.send(prelude);
+       }
+      if(discordChannel.type === discord.ChannelType.GuildText)
+        discordChannel.send(text);
       return;
     }
 
-    const { guild } = discordChannel;
+    let guild:discord.Guild|undefined = undefined;
+    if (discordChannel.type === discord.ChannelType.GuildText)
+      guild = discordChannel.guild;
     const withMentions = withFormat.replace(/@([^\s#]+)#(\d+)/g, (match, username, discriminator) => {
       // @username#1234 => mention
       // skips usernames including spaces for ease (they cannot include hashes)
       // checks case insensitively as Discord does
-      const user = guild.members.cache.find(x =>
+      const user = guild?.members.cache.find((x: { user: { username: any; discriminator: any; }; }) =>
         Bot.caseComp(x.user.username, username)
         && x.user.discriminator === discriminator);
-      if (user) return user;
+      if (user) return user.nickname || user.displayName;
 
       return match;
     }).replace(/^([^@\s:,]+)[:,]|@([^\s]+)/g, (match, startRef, atRef) => {
@@ -543,34 +595,34 @@ class Bot {
       // this preliminary stuff is ultimately unnecessary
       // but might save time over later more complicated calculations
       // @nickname => mention, case insensitively
-      const nickUser = guild.members.cache.find(x =>
+      const nickUser = guild?.members.cache.find((x: { nickname: any; }) =>
         x.nickname && Bot.caseComp(x.nickname, reference));
       if (nickUser) return nickUser;
 
       // @username => mention, case insensitively
-      const user = guild.members.cache.find(x => Bot.caseComp(x.user.username, reference));
+      const user = guild?.members.cache.find((x: { user: { username: any; }; }) => Bot.caseComp(x.user.username, reference));
       if (user) return user;
 
       // Disable broken partial mentions
       if (!this.partialMatch) return match;
 
       // @role => mention, case insensitively
-      const role = guild.roles.cache.find(x => x.mentionable && Bot.caseComp(x.name, reference));
+      const role = guild?.roles.cache.find((x: { mentionable: any; name: any; }) => x.mentionable && Bot.caseComp(x.name, reference));
       if (role) return role;
 
       // No match found checking the whole word. Check for partial matches now instead.
       // @nameextra => [mention]extra, case insensitively, as Discord does
       // uses the longest match, and if there are two, whichever is a match by case
       let matchLength = 0;
-      let bestMatch = null;
+      let bestMatch:any = null;
       let caseMatched = false;
 
       // check if a partial match is found in reference and if so update the match values
-      const checkMatch = function (matchString, matchValue) {
+      const checkMatch = function (matchString: string | any[], matchValue: any) {
         // if the matchString is longer than the current best and is a match
         // or if it's the same length but it matches by case unlike the current match
         // set the best match to this matchString and matchValue
-        if ((matchString.length > matchLength && Bot.caseStartsWith(reference, matchString))
+        if ((matchString.length > matchLength && Bot.caseStartsWith(reference, (matchString as string)))
           || (matchString.length === matchLength && !caseMatched
             && reference.startsWith(matchString))) {
           matchLength = matchString.length;
@@ -580,13 +632,13 @@ class Bot {
       };
 
       // check users by username and nickname
-      guild.members.cache.forEach((member) => {
+      guild?.members.cache.forEach((member: { user: { username: any; }; nickname: any; }) => {
         checkMatch(member.user.username, member);
         if (bestMatch === member || !member.nickname) return;
         checkMatch(member.nickname, member);
       });
       // check mentionable roles by visible name
-      guild.roles.cache.forEach((member) => {
+      guild?.roles.cache.forEach((member: { mentionable: any; name: any; }) => {
         if (!member.mentionable) return;
         checkMatch(member.name, member);
       });
@@ -597,8 +649,8 @@ class Bot {
       return match;
     }).replace(/:(\w+):/g, (match, ident) => {
       // :emoji: => mention, case sensitively
-      const emoji = guild.emojis.cache.find(x => x.name === ident && x.requiresColons);
-      if (emoji) return emoji;
+      const emoji = guild?.emojis.cache.find((x: { name: any; requiresColons: any; }) => x.name === ident && x.requiresColons);
+      if (emoji) return emoji.toString();
 
       return match;
     }).replace(/#([^\s#@'!?,.]+)/g, (match, channelName) => {
@@ -607,15 +659,17 @@ class Bot {
       // but these seem likely to be common around channel references)
 
       // discord matches channel names case insensitively
-      const chan = guild.channels.cache.find(x => Bot.caseComp(x.name, channelName));
-      return chan || match;
+      const chan = guild?.channels.cache.find((x: { name: any; }) => Bot.caseComp(x.name, channelName));
+      return (chan || match).toString();
     });
 
     // Webhooks first
     const webhook = this.findWebhook(channel);
     if (webhook) {
-      logger.debug('Sending message to Discord via webhook', withMentions, channel, '->', `#${discordChannel.name}`);
-      const permissions = discordChannel.permissionsFor(this.discord.user);
+      if (discordChannel.type === discord.ChannelType.GuildText)
+        logger.debug('Sending message to Discord via webhook', withMentions, channel, '->', `#${discordChannel.name}`);
+      if (this.discord.user === null) return;
+      // const permissions = discordChannel.permissionsFor(this.discord.user);
       const canPingEveryone = false;
       /*
       if (permissions) {
@@ -623,7 +677,7 @@ class Bot {
       }
       */
       const avatarURL = this.getDiscordAvatar(author, channel);
-      const username = _.padEnd(author.substring(0, USERNAME_MAX_LENGTH), USERNAME_MIN_LENGTH, '_');
+      const username = lodash.padEnd(author.substring(0, USERNAME_MAX_LENGTH), USERNAME_MIN_LENGTH, '_');
       webhook.client.send({
         username,
         content: withMentions,
@@ -642,18 +696,21 @@ class Bot {
     // Add bold formatting:
     // Use custom formatting from config / default formatting with bold author
     const withAuthor = Bot.substitutePattern(this.formatDiscord, patternMap);
-    logger.debug('Sending message to Discord', withAuthor, channel, '->', `#${discordChannel.name}`);
-    discordChannel.send(withAuthor);
+    if (discordChannel.type === discord.ChannelType.GuildText) {
+      logger.debug('Sending message to Discord', withAuthor, channel, '->', `#${discordChannel.name}`);
+      discordChannel.send(withAuthor);
+    }
   }
 
   /* Sends a message to Discord exactly as it appears */
-  sendExactToDiscord(channel, text) {
+  sendExactToDiscord(channel: string, text: string) {
     const discordChannel = this.findDiscordChannel(channel);
     if (!discordChannel) return;
 
-    logger.debug('Sending special message to Discord', text, channel, '->', `#${discordChannel.name}`);
-    discordChannel.send(text);
+
+    if (discordChannel.type === discord.ChannelType.GuildText) {
+      logger.debug('Sending special message to Discord', text, channel, '->', `#${discordChannel.name}`);
+      discordChannel.send(text);
+    }
   }
 }
-
-export default Bot;
