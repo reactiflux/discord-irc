@@ -236,7 +236,7 @@ export default class Bot {
       logger.warn('Received warn event from Discord', warning);
     });
 
-    this.discord.on('messageCreate', (message) => {
+    this.discord.on('messageCreate', async (message) => {
       // Show the IRC channel's /names list when asked for in Discord
       if (message.content.toLowerCase() === '/names') {
         const channelName = `#${(message.channel as GuildChannel)?.name}`;
@@ -245,7 +245,7 @@ export default class Bot {
         if (this.channelUsers[ircChannel]) {
           const ircNames = this.channelUsers[ircChannel].values();
           const ircNamesArr = new Array(...ircNames);
-          this.sendExactToDiscord(ircChannel, `Users in ${ircChannel}\n> ${ircNamesArr.map(escapeMarkdown).join(', ')}`);
+          await this.sendExactToDiscord(ircChannel, `Users in ${ircChannel}\n> ${ircNamesArr.map(escapeMarkdown).join(', ')}`);
         } else {
           logger.warn(`No channelUsers found for ${ircChannel} when /names requested`);
           // Pass the command through if channelUsers is empty
@@ -281,7 +281,7 @@ export default class Bot {
       });
     });
 
-    this.ircClient.on('join', (channelName:string, nick:string) => {
+    this.ircClient.on('join', async (channelName:string, nick:string) => {
       logger.debug('Received join:', channelName, nick);
       if (nick === this.ircClient.nick && !this.announceSelfJoin) return;
       const channel = channelName.toLowerCase();
@@ -289,10 +289,10 @@ export default class Bot {
       // so don't add nick to channelUsers
       if (nick !== this.ircClient.nick) this.channelUsers[channel].add(nick);
       if (!this.ircStatusNotices) return;
-      this.sendExactToDiscord(channel, `*${nick}* has joined the channel`);
+      await this.sendExactToDiscord(channel, `*${nick}* has joined the channel`);
     });
 
-    this.ircClient.on('part', (channelName:string, nick:string, reason:string) => {
+    this.ircClient.on('part', async (channelName:string, nick:string, reason:string) => {
       logger.debug('Received part:', channelName, nick, reason);
       const channel = channelName.toLowerCase();
       // remove list of users when no longer in channel (as it will become out of date)
@@ -307,7 +307,7 @@ export default class Bot {
         logger.warn(`No channelUsers found for ${channel} when ${nick} parted.`);
       }
       if (!this.ircStatusNotices) return;
-      this.sendExactToDiscord(channel, `*${nick}* has left the channel (${reason})`);
+      await this.sendExactToDiscord(channel, `*${nick}* has left the channel (${reason})`);
     });
 
     this.ircClient.on('quit', (nick:string, reason:string, channels:string[]) => {
@@ -747,14 +747,14 @@ export default class Bot {
   }
 
   /* Sends a message to Discord exactly as it appears */
-  sendExactToDiscord(channel: string, text: string) {
+  async sendExactToDiscord(channel: string, text: string) {
     const discordChannel = this.findDiscordChannel(channel);
     if (!discordChannel) return;
 
 
     if (discordChannel.type === discord.ChannelType.GuildText) {
       logger.debug('Sending special message to Discord', text, channel, '->', `#${discordChannel.name}`);
-      discordChannel.send(text);
+      await discordChannel.send(text);
     }
   }
 }
