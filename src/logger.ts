@@ -1,12 +1,12 @@
 import winston, { format } from 'winston';
 import { inspect } from 'util';
 
-function simpleInspect(value) {
+function simpleInspect(value: any) {
   if (typeof value === 'string') return value;
   return inspect(value, { depth: null });
 }
 
-function formatter(info) {
+function formatter(info: winston.Logform.TransformableInfo) {
   const splat = info[Symbol.for('splat')] || [];
   const stringifiedRest =
     splat.length > 0 ? ` ${splat.map(simpleInspect).join(' ')}` : '';
