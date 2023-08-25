@@ -24,7 +24,10 @@
     "**/*": "prettier --write --ignore-unknown"
   },
   "name": "discord-irc",
-  "author": "Reactiflux, Isaac Aronson",
+  "author": "Reactiflux",
+  "contributors": [
+    "Isaac Aronson"
+  ],
   "devDependencies": {
     "@types/node": "^20.5.6",
     "@typescript-eslint/eslint-plugin": "^6.4.1",
