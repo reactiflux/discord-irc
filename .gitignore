@@ -31,3 +31,6 @@ config.json
 
 # Build
 dist/
+
+# Husky
+.husky

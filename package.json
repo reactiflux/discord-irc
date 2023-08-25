@@ -10,13 +10,18 @@
   },
   "scripts": {
     "start": "tsx src",
-    "lint": "eslint src"
+    "lint": "eslint src",
+    "prepare": "husky install"
   },
   "prettier": {
     "printWidth": 80,
     "semi": true,
     "singleQuote": true,
     "trailingComma": "es5"
+  },
+  "lint-staged": {
+    "src/**/*.{js,jsx,ts,tsx}": "eslint --cache --fix",
+    "**/*": "prettier --write --ignore-unknown"
   },
   "name": "discord-irc",
   "author": "Isaac Aronson",
@@ -26,7 +31,9 @@
     "@typescript-eslint/eslint-plugin": "^6.4.1",
     "@typescript-eslint/parser": "^6.4.1",
     "eslint": "^8.47.0",
+    "eslint-config-prettier": "^9.0.0",
     "husky": "^8.0.3",
+    "lint-staged": "^14.0.1",
     "prettier": "3.0.2",
     "ts-node": "^10.9.1",
     "tslib": "^2.6.2",
