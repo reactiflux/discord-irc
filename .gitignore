@@ -37,3 +37,6 @@ dist/
 
 # Eslint
 .eslintcache
+
+# VSCode
+.vscode/
