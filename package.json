@@ -3,20 +3,14 @@
   "license": "MIT",
   "main": "src/index.ts",
   "files": [
-    "dist",
     "src"
   ],
   "engines": {
     "node": ">=16.6.0"
   },
   "scripts": {
-    "start": "npx tsx src",
-    "lint": "tsdx lint"
-  },
-  "husky": {
-    "hooks": {
-      "pre-commit": "tsdx lint"
-    }
+    "start": "tsx src",
+    "lint": "eslint src"
   },
   "prettier": {
     "printWidth": 80,
@@ -27,15 +21,13 @@
   "name": "discord-irc",
   "author": "Isaac Aronson",
   "devDependencies": {
-    "@size-limit/preset-small-lib": "^8.2.6",
     "@types/lodash-es": "^4.17.8",
     "@types/node": "^20.5.6",
-    "eslint": "^7.25.0",
-    "eslint-config-airbnb-base": "^14.2.1",
-    "eslint-plugin-import": "^2.22.1",
+    "@typescript-eslint/eslint-plugin": "^6.4.1",
+    "@typescript-eslint/parser": "^6.4.1",
+    "eslint": "^8.47.0",
     "husky": "^8.0.3",
     "ts-node": "^10.9.1",
-    "tsdx": "^0.14.1",
     "tslib": "^2.6.2",
     "typescript": "^5.2.2"
   },
@@ -50,6 +42,7 @@
     "simple-markdown": "^0.7.3",
     "source-map-loader": "^4.0.1",
     "strip-json-comments": "^3.1.1",
+    "tsx": "^3.12.7",
     "winston": "^3.10.0"
   }
 }

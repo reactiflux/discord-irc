@@ -366,28 +366,52 @@ export default class Bot {
     return user.username;
   }
 
-  parseText(message:discord.Message<boolean>) {
-    const text = message.mentions.users.reduce((content: string, mention) => {
-      if (!message.guild) return "";
-      const displayName = Bot.getDiscordNicknameOnServer(mention, message.guild);
-      const userMentionRegex = RegExp(`<@(&|!)?${mention.id}>`, 'g');
-      return content.replace(userMentionRegex, `@${displayName}`);
-    }, message.content);
-
-    return text
-      .replace(/\n|\r\n|\r/g, ' ')
-      .replace(/<#(\d+)>/g, (_: any, channelId: string) => {
-        const channel = this.discord.channels.cache.get(channelId);
-        if (channel) return `#${(channel as GuildChannel)?.name}`;
-        return '#deleted-channel';
-      })
-      .replace(/<@&(\d+)>/g, (_: any, roleId: any) => {
-        const role = message.guild?.roles.cache.get(roleId);
-        if (role) return `@${role.name}`;
-        return '@deleted-role';
-      })
-      .replace(/<a?(:\w+:)\d+>/g, (_: any, emoteName: any) => emoteName);
+  async replaceUserMentions(content: string, mention: discord.User, message: discord.Message<boolean>): Promise<string> {
+    if (!message.guild) return "";
+    const displayName = await Bot.getDiscordNicknameOnServer(mention, message.guild);
+    const userMentionRegex = RegExp(`<@(&|!)?${mention.id}>`, 'g');
+    return content.replace(userMentionRegex, `@${displayName}`);
   }
+
+  replaceNewlines(text: string): string {
+    return text.replace(/\n|\r\n|\r/g, ' ');
+  }
+
+  replaceChannelMentions(text: string): string {
+    return text.replace(/<#(\d+)>/g, (_, channelId: string) => {
+      const channel = this.discord.channels.cache.get(channelId);
+      if (channel) return `#${(channel as GuildChannel)?.name}`;
+      return '#deleted-channel';
+    });
+  }
+
+  replaceRoleMentions(text: string, message: discord.Message<boolean>): string {
+    return text.replace(/<@&(\d+)>/g, (_, roleId) => {
+      const role = message.guild?.roles.cache.get(roleId);
+      if (role) return `@${role.name}`;
+      return '@deleted-role';
+    });
+  }
+
+  replaceEmotes(text: string): string {
+    return text.replace(/<a?(:\w+:)\d+>/g, (_, emoteName) => emoteName);
+  }
+
+  async parseText(message: discord.Message<boolean>) {
+    let text = message.content;
+    for (const mention of message.mentions.users.values()) {
+      text = await this.replaceUserMentions(text, mention, message);
+    }
+
+    return this.replaceEmotes(
+      this.replaceRoleMentions(
+        this.replaceChannelMentions(
+          this.replaceNewlines(text)
+        ), message
+      )
+    );
+  }
+
 
   isCommandMessage(message: string) {
     return this.commandCharacters.some((prefix: any) => message.startsWith(prefix));
@@ -413,7 +437,7 @@ export default class Bot {
     const { author } = message;
     // Ignore messages sent by the bot itself:
     if (author.id === this.discord.user?.id ||
-        _.keys(this.webhooks).some((channel, _, __) => this.webhooks[channel].id === author.id)
+        _.keys(this.webhooks).some((channel) => this.webhooks[channel].id === author.id)
     ) return;
 
     // Do not send to IRC if this user is on the ignore list.
@@ -431,7 +455,7 @@ export default class Bot {
       const fromGuild = message.guild;
       if (!fromGuild) return;
       const nickname = await Bot.getDiscordNicknameOnServer(author, fromGuild);
-      let text = this.parseText(message);
+      let text = await this.parseText(message);
       let displayUsername = nickname;
 
       if (this.parallelPingFix) {
