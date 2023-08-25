@@ -24,7 +24,7 @@
     "**/*": "prettier --write --ignore-unknown"
   },
   "name": "discord-irc",
-  "author": "Isaac Aronson",
+  "author": "Reactiflux, Isaac Aronson",
   "devDependencies": {
     "@types/lodash-es": "^4.17.8",
     "@types/node": "^20.5.6",
