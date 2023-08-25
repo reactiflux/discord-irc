@@ -19,6 +19,9 @@ import { wrap } from './colors.ts';
 const USERNAME_MIN_LENGTH = 2;
 const USERNAME_MAX_LENGTH = 32;
 
+// Configure debug logging with environment
+const debug = (Deno.env.get("DEBUG") ?? "false").toLowerCase() === 'true';
+
 // const REQUIRED_FIELDS = ['server', 'nickname', 'channelMapping', 'discordToken'];
 const DEFAULT_NICK_COLORS = [
   'light_blue',
@@ -66,7 +69,6 @@ type Config = {
   format?: any;
   autoSendCommands?: string[];
   allowRolePings?: boolean;
-  logLevel?: string;
 };
 
 type Hook = {
@@ -96,7 +98,6 @@ export default class Bot {
   partialMatch: boolean;
   ignoreUsers: any;
   allowRolePings: boolean;
-  logLevel = 'info';
   format: any;
   formatIRCText: string;
   formatURLAttachment: string;
@@ -145,7 +146,6 @@ export default class Bot {
     if (options.allowRolePings !== undefined) {
       this.allowRolePings = options.allowRolePings;
     }
-    if (options.logLevel) this.logLevel = options.logLevel;
 
     // Nicks to ignore
     this.ignoreUsers = options.ignoreUsers || {};
@@ -192,31 +192,31 @@ export default class Bot {
     this.webhooks = {};
 
     // Remove channel passwords from the mapping and lowercase IRC channel names
-    forOwn(options.channelMapping, (ircChan: string, discordChan: string) => {
+    forOwn(options.channelMapping, (ircChan:string, discordChan:string) => {
       this.channelMapping[discordChan] = ircChan.split(' ')[0]
         .toLowerCase();
     });
 
     this.invertedMapping = invert(this.channelMapping);
     this.autoSendCommands = options.autoSendCommands || [];
-    const ircOptions: ClientOptions = {
+    const ircOptions:ClientOptions = {
       nick: this.nickname,
       username: this.nickname,
       realname: this.nickname,
       password: this.ircOptions.password,
       reconnect: true,
-      ...this.ircOptions,
-    };
+      ...this.ircOptions
+    }
 
     this.ircClient = new Client(ircOptions);
   }
 
   async connect() {
-    this.logger.debug('Connecting to IRC and Discord');
+    debug && this.logger.debug('Connecting to IRC and Discord');
     await this.discord.login(this.discordToken);
 
     // Extract id and token from Webhook urls and connect.
-    forOwn(this.webhookOptions, (url: string, channel: string) => {
+    forOwn(this.webhookOptions, (url:string, channel:string) => {
       const [id, token] = url.split('/').slice(-2);
       const client = new discord.WebhookClient({ id, token });
       this.webhooks[channel] = {
@@ -228,9 +228,10 @@ export default class Bot {
     this.attachListeners();
     await this.ircClient.connect(this.server);
     forOwn(Object.keys(this.invertedMapping), (ircChannel: string) => {
-      this.logger.info(`Joining channel ${ircChannel}`);
-      this.ircClient.join(ircChannel);
-    });
+        this.logger.info(`Joining channel ${ircChannel}`);
+        this.ircClient.join(ircChannel);
+      }
+    );
   }
 
   disconnect() {
@@ -246,7 +247,7 @@ export default class Bot {
 
     this.ircClient.on('register', (message) => {
       this.logger.info('Connected to IRC');
-      this.logger.debug(
+      debug && this.logger.debug(
         `Registered event:\n${JSON.stringify(message, null, 2)}`,
       );
       this.autoSendCommands.forEach((element) => {
@@ -306,20 +307,14 @@ export default class Bot {
     this.ircClient.on(
       'privmsg:channel',
       async (event) => {
-        await this.sendToDiscord(
-          event.source?.name ?? '',
-          event.params.target,
-          event.params.text,
-        );
+        await this.sendToDiscord(event.source?.name ?? "", event.params.target, event.params.text);
       },
     );
 
     this.ircClient.on(
       'notice',
       (event) => {
-        this.logger.debug(
-          `Received notice:\n${JSON.stringify(event.params.text)}`,
-        );
+        debug && this.logger.debug(`Received notice:\n${JSON.stringify(event.params.text)}`);
       },
     );
 
@@ -329,11 +324,11 @@ export default class Bot {
         Object.values(this.channelMapping).forEach((channelName) => {
           const channel = channelName.toLowerCase();
           const newNick = event.params.nick;
-          const oldNick = event.source?.name ?? '';
+          const oldNick = event.source?.name ?? "";
           this.logger.error(JSON.stringify(this.channelUsers));
           if (this.channelUsers[channelName]) {
             let users = this.channelUsers[channel];
-            const index = users.indexOf(oldNick);
+            const index = users.indexOf(oldNick)
             if (index !== -1) {
               users = users.splice(index, 1);
               users.push(newNick);
@@ -354,8 +349,8 @@ export default class Bot {
 
     this.ircClient.on('join', async (event) => {
       const channelName = event.params.channel;
-      const nick = event.source?.name ?? '';
-      this.logger.debug(`Received join: ${channelName} -- ${nick}`);
+      const nick = event.source?.name ?? "";
+      debug && this.logger.debug(`Received join: ${channelName} -- ${nick}`);
       if (nick === this.nickname && !this.announceSelfJoin) return;
       const channel = channelName.toLowerCase();
       // self-join is announced before names (which includes own nick)
@@ -374,15 +369,15 @@ export default class Bot {
       'part',
       async (event) => {
         const channelName = event.params.channel;
-        const nick = event.source?.name ?? '';
+        const nick = event.source?.name ?? "";
         const reason = event.params.comment;
-        this.logger.debug(
+        debug && this.logger.debug(
           `Received part: ${channelName} -- ${nick} -- ${reason}`,
         );
         const channel = channelName.toLowerCase();
         // remove list of users when no longer in channel (as it will become out of date)
         if (nick === this.nickname) {
-          this.logger.debug(
+          debug && this.logger.debug(
             `Deleting channelUsers as bot parted: ${channel}`,
           );
           delete this.channelUsers[channel];
@@ -408,9 +403,9 @@ export default class Bot {
     this.ircClient.on(
       'quit',
       (event) => {
-        const nick = event.source?.name ?? '';
-        const reason = event.params.comment ?? '';
-        this.logger.debug(
+        const nick = event.source?.name ?? "";
+        const reason = event.params.comment ?? "";
+        debug && this.logger.debug(
           `Received quit: ${nick}`,
         );
         Object.values(this.channelMapping).forEach((channelName) => {
@@ -433,7 +428,7 @@ export default class Bot {
             `*${nick}* has quit (${reason})`,
           );
         });
-        console.log('quit');
+        console.log("quit");
         console.log(event);
       },
     );
@@ -441,38 +436,34 @@ export default class Bot {
     this.ircClient.on('nicklist', (event) => {
       const channelName = event.params.channel;
       const nicks = event.params.nicklist;
-      this.logger.debug(
+      debug && this.logger.debug(
         `Received names: ${channelName}\n${JSON.stringify(nicks, null, 2)}`,
       );
       const channel = channelName.toLowerCase();
-      this.channelUsers[channel] = nicks.map((n) => n.nick);
+      this.channelUsers[channel] = nicks.map(n => n.nick);
     });
 
     this.ircClient.on('ctcp_action', async (event) => {
-      await this.sendToDiscord(
-        event.source?.name ?? '',
-        event.params.target,
-        `_${event.params.text}_`,
-      );
+      await this.sendToDiscord(event.source?.name ?? "", event.params.target, `_${event.params.text}_`);
     });
 
     this.ircClient.on('invite', (event) => {
       const channel = event.params.channel;
       const from = event.params.nick;
-      this.logger.debug(`Received invite: ${channel} -- ${from}`);
+      debug && this.logger.debug(`Received invite: ${channel} -- ${from}`);
       if (!this.invertedMapping[channel]) {
-        this.logger.debug(
+        debug && this.logger.debug(
           `Channel not found in config, not joining: ${channel}`,
         );
       } else {
         this.ircClient.join(channel);
-        this.logger.debug(`Joining channel: ${channel}`);
+        debug && this.logger.debug(`Joining channel: ${channel}`);
       }
     });
 
-    if (this.logLevel === 'debug') {
+    if (debug) {
       this.discord.on('debug', (message) => {
-        this.logger.debug(
+        debug && this.logger.debug(
           `Received debug event from Discord: ${
             JSON.stringify(
               message,
@@ -491,12 +482,12 @@ export default class Bot {
       const userDetails = members.get(user.id);
       if (userDetails) {
         const value = userDetails.nickname || user.displayName;
-        this.logger.debug(`Got username value: ${value}`);
+        debug && this.logger.debug(`Got username value: ${value}`);
         return value;
       }
     }
     const value = user.username;
-    this.logger.debug(`Got username value: ${value}`);
+    debug && this.logger.debug(`Got username value: ${value}`);
     return user.username;
   }
 
@@ -660,7 +651,7 @@ export default class Bot {
 
       if (this.isCommandMessage(text)) {
         //patternMap.side = 'Discord';
-        this.logger.debug(
+        debug && this.logger.debug(
           `Sending command message to IRC ${ircChannel} -- ${text}`,
         );
         // if (prelude) this.ircClient.say(ircChannel, prelude);
@@ -679,7 +670,7 @@ export default class Bot {
           patternMap.text = text;
 
           text = Bot.substitutePattern(this.formatIRCText, patternMap);
-          this.logger.debug(
+          debug && this.logger.debug(
             `Sending message to IRC ${ircChannel} -- ${text}`,
           );
           this.ircClient.privmsg(ircChannel, text);
@@ -693,7 +684,7 @@ export default class Bot {
               patternMap,
             );
 
-            this.logger.debug(
+            debug && this.logger.debug(
               `Sending attachment URL to IRC ${ircChannel} ${urlMessage}`,
             );
             this.ircClient.privmsg(ircChannel, urlMessage);
@@ -822,7 +813,7 @@ export default class Bot {
 
     if (this.isCommandMessage(text)) {
       patternMap.side = 'IRC';
-      this.logger.debug(
+      debug && this.logger.debug(
         `Sending command message to Discord #${channelName} -- ${text}`,
       );
       if (this.formatCommandPrelude) {
@@ -984,7 +975,7 @@ export default class Bot {
     const webhook = this.findWebhook(channel);
     if (webhook) {
       if (discordChannel.type === discord.ChannelType.GuildText) {
-        this.logger.debug(
+        debug && this.logger.debug(
           `Sending message to Discord via webhook ${withMentions} ${channel} -> #${discordChannel.name}`,
         );
       }
@@ -1025,7 +1016,7 @@ export default class Bot {
     // Use custom formatting from config / default formatting with bold author
     const withAuthor = Bot.substitutePattern(this.formatDiscord, patternMap);
     if (discordChannel.type === discord.ChannelType.GuildText) {
-      this.logger.debug(
+      debug && this.logger.debug(
         `Sending message to Discord ${withAuthor} ${channel} -> #${discordChannel.name}`,
       );
       discordChannel.send(withAuthor);
@@ -1038,7 +1029,7 @@ export default class Bot {
     if (!discordChannel) return;
 
     if (discordChannel.type === discord.ChannelType.GuildText) {
-      this.logger.debug(
+      debug && this.logger.debug(
         `Sending special message to Discord ${text} ${channel} -> #${discordChannel.name}`,
       );
       await discordChannel.send(text);
