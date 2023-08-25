@@ -39,7 +39,8 @@ type Config = {
   partialMatch?: boolean,
   ignoreUsers?: any,
   format?: any,
-  autoSendCommands?: string[]
+  autoSendCommands?: string[],
+  allowRolePings?: boolean
 }
 
 type Hook = {
@@ -67,6 +68,7 @@ export default class Bot {
   webhookOptions: _.Dictionary<string>;
   partialMatch: boolean;
   ignoreUsers: any;
+  allowRolePings: boolean;
   format: any;
   formatIRCText: string;
   formatURLAttachment: string;
@@ -110,6 +112,8 @@ export default class Bot {
     this.webhookOptions = options.webhooks ?? {};
     this.partialMatch = false;
     if (options.partialMatch) this.partialMatch = true;
+    this.allowRolePings = true;
+    if (options.allowRolePings !== undefined) this.allowRolePings = options.allowRolePings;
 
     // Nicks to ignore
     this.ignoreUsers = options.ignoreUsers || {};
@@ -604,89 +608,103 @@ export default class Bot {
       guild = discordChannel.guild;
     const members = await guild?.members.fetch();
     if (!members) return;
-    const withMentions = withFormat.replace(/@([^\s#]+)/g, (match, username) => {
-      // @username#1234 => mention
-      // skips usernames including spaces for ease (they cannot include hashes)
-      // checks case insensitively as Discord does
-      const user = members?.find((x) =>
-        Bot.caseComp(x.user.username, username) ||
-        Bot.caseComp(x.user.displayName, username));
-      if (user)
-        return user.toString();
+    const roles = await guild?.roles.fetch();
+    if (!roles) return;
 
-      return match;
-    }).replace(/^([^@\s:,]+)[:,]|@([^\s]+)/g, (match, startRef, atRef) => {
-      const reference = startRef || atRef;
+    const processQuickUsernames = (input: string) => {
+      return input.replace(/@([^\s#]+)/g, (match, username) => {
+          // @username#1234 => mention
+          // skips usernames including spaces for ease (they cannot include hashes)
+          // checks case insensitively as Discord does
+          const user = members?.find((x) =>
+            Bot.caseComp(x.user.username, username) ||
+            Bot.caseComp(x.user.displayName, username));
+          if (user)
+            return user.toString();
+    
+          return match;
+      })
+    }
 
-      // this preliminary stuff is ultimately unnecessary
-      // but might save time over later more complicated calculations
-      // @nickname => mention, case insensitively
-      const nickUser = members.find((x) => x.nickname && Bot.caseComp(x.nickname, reference));
-      if (nickUser) return nickUser;
+    const processMentionables = (input: string) => {
+      return input.replace(/^([^@\s:,]+)[:,]|@([^\s]+)/g, (match, startRef, atRef) => {
+        const reference = startRef || atRef;
+  
+        // @username => mention, case insensitively
+        const user = members.find((x) => Bot.caseComp(x.user.username, reference) || Bot.caseComp(x.user.displayName, reference));
+        if (user) return user;
+  
+        if (!this.allowRolePings) return;
+        // @role => mention, case insensitively
+        const role = roles.find((x) => x.mentionable && Bot.caseComp(x.name, reference));
+        if (role) return role;
+  
+        // Disable broken partial mentions
+        if (!this.partialMatch) return match;
+  
+        // No match found checking the whole word. Check for partial matches now instead.
+        // @nameextra => [mention]extra, case insensitively, as Discord does
+        // uses the longest match, and if there are two, whichever is a match by case
+        let matchLength = 0;
+        let bestMatch:any = null;
+        let caseMatched = false;
+  
+        // check if a partial match is found in reference and if so update the match values
+        const checkMatch = function (matchString: string | string[], matchValue: any) {
+          // if the matchString is longer than the current best and is a match
+          // or if it's the same length but it matches by case unlike the current match
+          // set the best match to this matchString and matchValue
+          if ((matchString.length > matchLength && Bot.caseStartsWith(reference, (matchString as string)))
+            || (matchString.length === matchLength && !caseMatched
+              && reference.startsWith(matchString))) {
+            matchLength = matchString.length;
+            bestMatch = matchValue;
+            caseMatched = reference.startsWith(matchString);
+          }
+        };
+  
+        // check users by username and nickname
+        members.forEach((member: { user: { username: any; }; nickname: any; }) => {
+          checkMatch(member.user.username, member);
+          if (bestMatch === member || !member.nickname) return;
+          checkMatch(member.nickname, member);
+        });
+        // check mentionable roles by visible name
+        roles.forEach((member: { mentionable: any; name: any; }) => {
+          if (!member.mentionable) return;
+          checkMatch(member.name, member);
+        });
+  
+        // if a partial match was found, return the match and the unmatched trailing characters
+        if (bestMatch) return bestMatch.toString() + reference.substring(matchLength);
+  
+        return match;
+      })
+    }
 
-      // @username => mention, case insensitively
-      const user = members.find((x) => Bot.caseComp(x.user.username, reference) || Bot.caseComp(x.user.displayName, reference));
-      if (user) return user;
+    const processEmoji = (input: string) => {
+      return input.replace(/:(\w+):/g, (match, ident) => {
+        // :emoji: => mention, case sensitively
+        const emoji = guild?.emojis.cache.find((x: { name: any; requiresColons: any; }) => x.name === ident && x.requiresColons);
+        if (emoji) return emoji.toString();
+  
+        return match;
+      })
+    }
 
-      // Disable broken partial mentions
-      if (!this.partialMatch) return match;
+    const processChannels = (input: string) => {
+      return input.replace(/#([^\s#@'!?,.]+)/g, (match, channelName) => {
+        // channel names can't contain spaces, #, @, ', !, ?, , or .
+        // (based on brief testing. they also can't contain some other symbols,
+        // but these seem likely to be common around channel references)
+  
+        // discord matches channel names case insensitively
+        const chan = guild?.channels.cache.find((x: { name: any; }) => Bot.caseComp(x.name, channelName));
+        return (chan || match).toString();
+      })
+    }
 
-      // @role => mention, case insensitively
-      const role = guild?.roles.cache.find((x: { mentionable: any; name: any; }) => x.mentionable && Bot.caseComp(x.name, reference));
-      if (role) return role;
-
-      // No match found checking the whole word. Check for partial matches now instead.
-      // @nameextra => [mention]extra, case insensitively, as Discord does
-      // uses the longest match, and if there are two, whichever is a match by case
-      let matchLength = 0;
-      let bestMatch:any = null;
-      let caseMatched = false;
-
-      // check if a partial match is found in reference and if so update the match values
-      const checkMatch = function (matchString: string | string[], matchValue: any) {
-        // if the matchString is longer than the current best and is a match
-        // or if it's the same length but it matches by case unlike the current match
-        // set the best match to this matchString and matchValue
-        if ((matchString.length > matchLength && Bot.caseStartsWith(reference, (matchString as string)))
-          || (matchString.length === matchLength && !caseMatched
-            && reference.startsWith(matchString))) {
-          matchLength = matchString.length;
-          bestMatch = matchValue;
-          caseMatched = reference.startsWith(matchString);
-        }
-      };
-
-      // check users by username and nickname
-      members.forEach((member: { user: { username: any; }; nickname: any; }) => {
-        checkMatch(member.user.username, member);
-        if (bestMatch === member || !member.nickname) return;
-        checkMatch(member.nickname, member);
-      });
-      // check mentionable roles by visible name
-      guild?.roles.cache.forEach((member: { mentionable: any; name: any; }) => {
-        if (!member.mentionable) return;
-        checkMatch(member.name, member);
-      });
-
-      // if a partial match was found, return the match and the unmatched trailing characters
-      if (bestMatch) return bestMatch.toString() + reference.substring(matchLength);
-
-      return match;
-    }).replace(/:(\w+):/g, (match, ident) => {
-      // :emoji: => mention, case sensitively
-      const emoji = guild?.emojis.cache.find((x: { name: any; requiresColons: any; }) => x.name === ident && x.requiresColons);
-      if (emoji) return emoji.toString();
-
-      return match;
-    }).replace(/#([^\s#@'!?,.]+)/g, (match, channelName) => {
-      // channel names can't contain spaces, #, @, ', !, ?, , or .
-      // (based on brief testing. they also can't contain some other symbols,
-      // but these seem likely to be common around channel references)
-
-      // discord matches channel names case insensitively
-      const chan = guild?.channels.cache.find((x: { name: any; }) => Bot.caseComp(x.name, channelName));
-      return (chan || match).toString();
-    });
+    const withMentions = processChannels(processEmoji(processMentionables(processQuickUsernames(withFormat))));
 
     // Webhooks first
     const webhook = this.findWebhook(channel);
