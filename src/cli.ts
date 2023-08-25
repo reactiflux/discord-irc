@@ -42,7 +42,7 @@ function run() {
 
   const completePath = path.resolve(process.cwd(), process.env.CONFIG_FILE);
   const config = endsWith(process.env.CONFIG_FILE, '.js')
-    ? require(completePath)
+    ? import(completePath)
     : readJSONConfig(completePath);
   helpers.createBots(config);
 }
