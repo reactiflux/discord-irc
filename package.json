@@ -26,7 +26,8 @@
   },
   "author": "Reactiflux",
   "contributors": [
-    "Isaac Aronson i@pingas.org https://github.com/aronson"
+    "Isaac Aronson i@pingas.org https://github.com/aronson",
+    "Kage kage@kage.wtf https://github.com/Kage"
   ],
   "devDependencies": {
     "@types/lodash": "^4.14.197",
