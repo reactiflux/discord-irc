@@ -249,11 +249,11 @@ export default class Bot {
         } else {
           logger.warn(`No channelUsers found for ${ircChannel} when /names requested`);
           // Pass the command through if channelUsers is empty
-          this.sendToIRC(message);
+          await this.sendToIRC(message);
         }
       } else {
         // Ignore bot messages and people leaving/joining
-        this.sendToIRC(message);
+        await this.sendToIRC(message);
       }
     });
 
