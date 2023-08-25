@@ -214,12 +214,12 @@ export default class Bot {
     if (!Object.prototype.hasOwnProperty.call(ircOptions, 'encoding')) {
       /* if (irc.canConvertEncoding()) {
         ircOptions.encoding = 'utf-8';
-      } else { */
+      } else { 
       logger.warn(
         'Cannot convert message encoding; you may encounter corrupted characters with non-English text.\n' +
           'For information on how to fix this, please see: https://github.com/Throne3d/node-irc#character-set-detection'
       );
-      // }
+      } */
     }
 
     this.ircClient = new irc.Client(this.server, this.nickname, ircOptions);
