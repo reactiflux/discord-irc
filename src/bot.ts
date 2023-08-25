@@ -257,11 +257,12 @@ export default class Bot {
       }
     });
 
-    this.ircClient.on('message',
-      this.sendToDiscord.bind(this));
+    this.ircClient.on('message', async (author: string, channel: string, text: string) => {
+      await this.sendToDiscord(author, channel, text)
+    })
 
-    this.ircClient.on('notice', (author:any, to:any, text:any) => {
-      this.sendToDiscord(author, to, `*${text}*`);
+    this.ircClient.on('notice', async (author:string, channel:string, text:string) => {
+      await this.sendToDiscord(author, channel, `*${text}*`);
     });
 
     this.ircClient.on('nick', (oldNick:string, newNick:string, channels:string[]) => {
@@ -329,8 +330,8 @@ export default class Bot {
       this.channelUsers[channel] = new Set(Object.keys(nicks));
     });
 
-    this.ircClient.on('action', (author:any, to:any, text:any) => {
-      this.sendToDiscord(author, to, `_${text}_`);
+    this.ircClient.on('action', async (author:any, to:any, text:any) => {
+      await this.sendToDiscord(author, to, `_${text}_`);
     });
 
     this.ircClient.on('invite', (channel:string, from:string) => {
