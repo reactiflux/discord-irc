@@ -256,7 +256,7 @@ export default class Bot {
     this.ircClient.on('registered', (message: any) => {
       this.logger.info('Connected to IRC');
       this.logger.debug(
-        `Registered event: ${JSON.stringify(message, null, 2)}`,
+        `Registered event:\n${JSON.stringify(message, null, 2)}`,
       );
       this.autoSendCommands.forEach((element: any) => {
         this.ircClient.send(...element);
@@ -265,19 +265,19 @@ export default class Bot {
 
     this.ircClient.on('error', (error: any) => {
       this.logger.error(
-        `Received error event from IRC ${JSON.stringify(error, null, 2)}`,
+        `Received error event from IRC\n${JSON.stringify(error, null, 2)}`,
       );
     });
 
     this.discord.on('error', (error: any) => {
       this.logger.error(
-        `Received error event from Discord ${JSON.stringify(error, null, 2)}`,
+        `Received error event from Discord\n${JSON.stringify(error, null, 2)}`,
       );
     });
 
     this.discord.on('warn', (warning) => {
       this.logger.warn(
-        `Received warn event from Discord ${JSON.stringify(warning, null, 2)}`,
+        `Received warn event from Discord\n${JSON.stringify(warning, null, 2)}`,
       );
     });
 
@@ -400,7 +400,7 @@ export default class Bot {
       'quit',
       (nick: string, reason: string, channels: string[]) => {
         this.logger.debug(
-          `Received quit: ${nick} ${JSON.stringify(channels, null, 2)}`,
+          `Received quit: ${nick}\n${JSON.stringify(channels, null, 2)}`,
         );
         channels.forEach((channelName) => {
           const channel = channelName.toLowerCase();
@@ -424,7 +424,7 @@ export default class Bot {
 
     this.ircClient.on('names', (channelName: string, nicks: string[]) => {
       this.logger.debug(
-        `Received names: ${channelName} ${JSON.stringify(nicks, null, 2)}`,
+        `Received names: ${channelName}\n${JSON.stringify(nicks, null, 2)}`,
       );
       const channel = channelName.toLowerCase();
       this.channelUsers[channel] = new Set(Object.keys(nicks));
