@@ -1,4 +1,4 @@
-import _ from 'lodash';
+import isObject from 'lodash/isObject';
 import { ConfigurationError } from './errors';
 
 /**
@@ -6,8 +6,8 @@ import { ConfigurationError } from './errors';
  * @param  {Object} mapping
  * @return {Object}
  */
-export function validateChannelMapping(mapping) {
-  if (!_.isObject(mapping)) {
+export function validateChannelMapping(mapping: any) {
+  if (!isObject(mapping)) {
     throw new ConfigurationError('Invalid channel mapping given');
   }
 

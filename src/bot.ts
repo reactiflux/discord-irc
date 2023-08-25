@@ -1,4 +1,8 @@
-import _ from 'lodash';
+import values from 'lodash/values';
+import forOwn from 'lodash/forOwn';
+import invert from 'lodash/invert';
+import keys from 'lodash/keys';
+import padEnd from 'lodash/padEnd';
 const irc = require('irc-upd');
 import discord, {
   GatewayIntentBits,
@@ -31,6 +35,10 @@ const DEFAULT_NICK_COLORS = [
 ];
 const patternMatch = /{\$(.+?)}/g;
 
+interface Dictionary<T> {
+  [index: string]: T;
+}
+
 function escapeMarkdown(text: string) {
   const unescaped = text.replace(/\\(\*|_|`|~|\\)/g, '$1'); // unescape any "backslashed" character
   const escaped = unescaped.replace(/(\*|_|`|~|\\)/g, '\\$1'); // escape *, _, `, ~, \
@@ -40,7 +48,7 @@ function escapeMarkdown(text: string) {
 type Config = {
   server: string;
   nickname: string;
-  channelMapping: _.Dictionary<string>;
+  channelMapping: Dictionary<string>;
   outgoingToken: string;
   incomingURL: string;
   ircOptions?: any;
@@ -51,7 +59,7 @@ type Config = {
   parallelPingFix?: boolean;
   ircStatusNotices?: boolean;
   announceSelfJoin?: boolean;
-  webhooks?: _.Dictionary<string>;
+  webhooks?: Dictionary<string>;
   partialMatch?: boolean;
   ignoreUsers?: any;
   format?: any;
@@ -81,7 +89,7 @@ export default class Bot {
   channels: string[];
   ircStatusNotices: boolean;
   announceSelfJoin: boolean;
-  webhookOptions: _.Dictionary<string>;
+  webhookOptions: Dictionary<string>;
   partialMatch: boolean;
   ignoreUsers: any;
   allowRolePings: boolean;
@@ -91,10 +99,10 @@ export default class Bot {
   formatCommandPrelude: string;
   formatDiscord: string;
   formatWebhookAvatarURL: string;
-  channelUsers: _.Dictionary<Set<string>>;
-  channelMapping: _.Dictionary<string>;
-  webhooks: _.Dictionary<Hook>;
-  invertedMapping: _.Dictionary<string>;
+  channelUsers: Dictionary<Set<string>>;
+  channelMapping: Dictionary<string>;
+  webhooks: Dictionary<Hook>;
+  invertedMapping: Dictionary<string>;
   autoSendCommands: string[];
   ircClient: any;
   constructor(options: Config) {
@@ -122,7 +130,7 @@ export default class Bot {
     this.ircNickColor = options.ircNickColor !== false; // default to true
     this.ircNickColors = options.ircNickColors || DEFAULT_NICK_COLORS;
     this.parallelPingFix = options.parallelPingFix === true; // default: false
-    this.channels = _.values(options.channelMapping);
+    this.channels = values(options.channelMapping);
     this.ircStatusNotices = options.ircStatusNotices ?? false;
     this.announceSelfJoin = options.announceSelfJoin ?? false;
     this.webhookOptions = options.webhooks ?? {};
@@ -176,11 +184,11 @@ export default class Bot {
     this.webhooks = {};
 
     // Remove channel passwords from the mapping and lowercase IRC channel names
-    _.forOwn(options.channelMapping, (ircChan, discordChan) => {
+    forOwn(options.channelMapping, (ircChan, discordChan) => {
       this.channelMapping[discordChan] = ircChan.split(' ')[0].toLowerCase();
     });
 
-    this.invertedMapping = _.invert(this.channelMapping);
+    this.invertedMapping = invert(this.channelMapping);
     this.autoSendCommands = options.autoSendCommands || [];
   }
 
@@ -189,7 +197,7 @@ export default class Bot {
     this.discord.login(this.discordToken);
 
     // Extract id and token from Webhook urls and connect.
-    _.forOwn(this.webhookOptions, (url, channel) => {
+    forOwn(this.webhookOptions, (url, channel) => {
       const [id, token] = url.split('/').slice(-2);
       const client = new discord.WebhookClient({ id, token });
       this.webhooks[channel] = {
@@ -525,7 +533,7 @@ export default class Bot {
     // Ignore messages sent by the bot itself:
     if (
       author.id === this.discord.user?.id ||
-      _.keys(this.webhooks).some(
+      keys(this.webhooks).some(
         (channel) => this.webhooks[channel].id === author.id
       )
     )
@@ -912,7 +920,7 @@ export default class Bot {
       */
       const avatarURL =
         (await this.getDiscordAvatar(author, channel)) ?? undefined;
-      const username = _.padEnd(
+      const username = padEnd(
         author.substring(0, USERNAME_MAX_LENGTH),
         USERNAME_MIN_LENGTH,
         '_'

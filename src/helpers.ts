@@ -1,4 +1,4 @@
-import _ from 'lodash';
+import isObject from 'lodash/isObject';
 import { Worker } from 'worker_threads';
 import { ConfigurationError } from './errors';
 
@@ -21,7 +21,7 @@ export function createBots(configFile: any[]): object[] {
         }
       });
     });
-  } else if (_.isObject(configFile)) {
+  } else if (isObject(configFile)) {
     const botWorker = new Worker('./src/botWorker.ts');
     botWorker.postMessage(configFile);
     botWorker.on('message', (event) => {

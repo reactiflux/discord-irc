@@ -4,7 +4,7 @@ import fs from 'fs';
 import program from 'commander';
 import path from 'path';
 import stripJsonComments from 'strip-json-comments';
-import { endsWith } from 'lodash';
+import endsWith from 'lodash/endsWith';
 import * as helpers from './helpers';
 import { ConfigurationError } from './errors';
 import { version } from '../package.json';
