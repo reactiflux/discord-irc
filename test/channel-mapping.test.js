@@ -22,7 +22,7 @@ describe('Channel Mapping', () => {
       validateChannelMapping(wrongMapping);
     }
 
-    (wrap).should.throw('Invalid channel mapping given');
+    wrap.should.throw('Invalid channel mapping given');
   });
 
   it('should not fail if given a proper channel list as JSON', () => {
@@ -31,7 +31,7 @@ describe('Channel Mapping', () => {
       validateChannelMapping(correctMapping);
     }
 
-    (wrap).should.not.throw();
+    wrap.should.not.throw();
   });
 
   it('should clear channel keys from the mapping', () => {

@@ -8,7 +8,8 @@ function simpleInspect(value) {
 
 function formatter(info) {
   const splat = info[Symbol.for('splat')] || [];
-  const stringifiedRest = splat.length > 0 ? ` ${splat.map(simpleInspect).join(' ')}` : '';
+  const stringifiedRest =
+    splat.length > 0 ? ` ${splat.map(simpleInspect).join(' ')}` : '';
 
   const padding = (info.padding && info.padding[info.level]) || '';
   return `${info.timestamp} ${info.level}:${padding} ${info.message}${stringifiedRest}`;
@@ -20,8 +21,8 @@ const logger = winston.createLogger({
   format: format.combine(
     format.colorize(),
     format.timestamp(),
-    format.printf(formatter),
-  )
+    format.printf(formatter)
+  ),
 });
 
 export default logger;

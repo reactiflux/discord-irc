@@ -16,7 +16,7 @@ chai.use(sinonChai);
 describe('Create Bots', function () {
   const sandbox = sinon.createSandbox({
     useFakeTimers: false,
-    useFakeServer: false
+    useFakeServer: false,
   });
 
   beforeEach(function () {
@@ -44,7 +44,7 @@ describe('Create Bots', function () {
       createBots(badConfig);
     }
 
-    (wrap).should.throw('Missing configuration field nickname');
+    wrap.should.throw('Missing configuration field nickname');
   });
 
   it('should throw if a configuration file is neither an object or an array', function () {
@@ -52,10 +52,10 @@ describe('Create Bots', function () {
       createBots(stringConfig);
     }
 
-    (wrap).should.throw('Invalid configuration file given');
+    wrap.should.throw('Invalid configuration file given');
   });
 
-  it('should be possible to run it through require(\'discord-irc\')', function () {
+  it("should be possible to run it through require('discord-irc')", function () {
     const bots = index(singleTestConfig);
     bots.length.should.equal(1);
     this.connectStub.should.have.been.called;

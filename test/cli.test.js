@@ -13,7 +13,7 @@ chai.use(sinonChai);
 describe('CLI', function () {
   const sandbox = sinon.createSandbox({
     useFakeTimers: false,
-    useFakeServer: false
+    useFakeServer: false,
   });
 
   beforeEach(function () {
@@ -49,7 +49,7 @@ describe('CLI', function () {
     process.env.CONFIG_FILE = `${process.cwd()}/test/fixtures/invalid-json-config.json`;
     process.argv = ['node', 'index.js'];
     const wrap = () => cli();
-    (wrap).should.throw('The configuration file contains invalid JSON');
+    wrap.should.throw('The configuration file contains invalid JSON');
   });
 
   it('should be possible to give the config as an option', function () {
@@ -58,7 +58,7 @@ describe('CLI', function () {
       'node',
       'index.js',
       '--config',
-      `${process.cwd()}/test/fixtures/single-test-config.json`
+      `${process.cwd()}/test/fixtures/single-test-config.json`,
     ];
 
     cli();

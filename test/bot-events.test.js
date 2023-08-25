@@ -17,7 +17,7 @@ chai.use(sinonChai);
 describe('Bot Events', function () {
   const sandbox = sinon.createSandbox({
     useFakeTimers: false,
-    useFakeServer: false
+    useFakeServer: false,
   });
 
   const createBot = (optConfig = null) => {
@@ -58,15 +58,20 @@ describe('Bot Events', function () {
     const message = 'registered';
     this.bot.ircClient.emit('registered', message);
     this.infoSpy.should.have.been.calledWithExactly('Connected to IRC');
-    this.debugSpy.should.have.been.calledWithExactly('Registered event: ', message);
+    this.debugSpy.should.have.been.calledWithExactly(
+      'Registered event: ',
+      message
+    );
   });
 
   it('should try to send autoSendCommands on registered IRC event', function () {
     this.bot.ircClient.emit('registered');
     ClientStub.prototype.send.should.have.been.calledTwice;
-    ClientStub.prototype.send.getCall(0)
+    ClientStub.prototype.send
+      .getCall(0)
       .args.should.deep.equal(config.autoSendCommands[0]);
-    ClientStub.prototype.send.getCall(1)
+    ClientStub.prototype.send
+      .getCall(1)
       .args.should.deep.equal(config.autoSendCommands[1]);
   });
 
@@ -75,9 +80,13 @@ describe('Bot Events', function () {
     const ircError = new Error('irc');
     this.bot.discord.emit('error', discordError);
     this.bot.ircClient.emit('error', ircError);
-    this.errorSpy.getCall(0).args[0].should.equal('Received error event from Discord');
+    this.errorSpy
+      .getCall(0)
+      .args[0].should.equal('Received error event from Discord');
     this.errorSpy.getCall(0).args[1].should.equal(discordError);
-    this.errorSpy.getCall(1).args[0].should.equal('Received error event from IRC');
+    this.errorSpy
+      .getCall(1)
+      .args[0].should.equal('Received error event from IRC');
     this.errorSpy.getCall(1).args[1].should.equal(ircError);
   });
 
@@ -91,7 +100,7 @@ describe('Bot Events', function () {
 
   it('should send messages to irc if correct', function () {
     const message = {
-      type: 'message'
+      type: 'message',
     };
 
     this.bot.discord.emit('message', message);
@@ -103,7 +112,11 @@ describe('Bot Events', function () {
     const author = 'user';
     const text = 'hi';
     this.bot.ircClient.emit('message', author, channel, text);
-    this.bot.sendToDiscord.should.have.been.calledWithExactly(author, channel, text);
+    this.bot.sendToDiscord.should.have.been.calledWithExactly(
+      author,
+      channel,
+      text
+    );
   });
 
   it('should send notices to discord', function () {
@@ -112,7 +125,11 @@ describe('Bot Events', function () {
     const text = 'hi';
     const formattedText = `*${text}*`;
     this.bot.ircClient.emit('notice', author, channel, text);
-    this.bot.sendToDiscord.should.have.been.calledWithExactly(author, channel, formattedText);
+    this.bot.sendToDiscord.should.have.been.calledWithExactly(
+      author,
+      channel,
+      formattedText
+    );
   });
 
   it('should not send name change event to discord', function () {
@@ -133,15 +150,31 @@ describe('Bot Events', function () {
     const bot = createBot({ ...config, ircStatusNotices: true });
     const staticChannel = new Set([bot.nickname, user3]);
     bot.connect();
-    bot.ircClient.emit('names', channel1, { [bot.nickname]: '', [oldNick]: '' });
+    bot.ircClient.emit('names', channel1, {
+      [bot.nickname]: '',
+      [oldNick]: '',
+    });
     bot.ircClient.emit('names', channel2, { [bot.nickname]: '', [user3]: '' });
     const channelNicksPre = new Set([bot.nickname, oldNick]);
-    bot.channelUsers.should.deep.equal({ '#channel1': channelNicksPre, '#channel2': staticChannel });
+    bot.channelUsers.should.deep.equal({
+      '#channel1': channelNicksPre,
+      '#channel2': staticChannel,
+    });
     const formattedText = `*${oldNick}* is now known as ${newNick}`;
     const channelNicksAfter = new Set([bot.nickname, newNick]);
-    bot.ircClient.emit('nick', oldNick, newNick, [channel1, channel2, channel3]);
-    bot.sendExactToDiscord.should.have.been.calledWithExactly(channel1, formattedText);
-    bot.channelUsers.should.deep.equal({ '#channel1': channelNicksAfter, '#channel2': staticChannel });
+    bot.ircClient.emit('nick', oldNick, newNick, [
+      channel1,
+      channel2,
+      channel3,
+    ]);
+    bot.sendExactToDiscord.should.have.been.calledWithExactly(
+      channel1,
+      formattedText
+    );
+    bot.channelUsers.should.deep.equal({
+      '#channel1': channelNicksAfter,
+      '#channel2': staticChannel,
+    });
   });
 
   it('should send actions to discord', function () {
@@ -151,7 +184,11 @@ describe('Bot Events', function () {
     const formattedText = '_hi_';
     const message = {};
     this.bot.ircClient.emit('action', author, channel, text, message);
-    this.bot.sendToDiscord.should.have.been.calledWithExactly(author, channel, formattedText);
+    this.bot.sendToDiscord.should.have.been.calledWithExactly(
+      author,
+      channel,
+      formattedText
+    );
   });
 
   it('should keep track of users through names event when irc status notices enabled', function () {
@@ -161,7 +198,10 @@ describe('Bot Events', function () {
     const channel = '#channel';
     // nick => '' means the user is not a special user
     const nicks = {
-      [bot.nickname]: '', user: '', user2: '@', user3: '+'
+      [bot.nickname]: '',
+      user: '',
+      user2: '@',
+      user3: '+',
     };
     bot.ircClient.emit('names', channel, nicks);
     const channelNicks = new Set([bot.nickname, 'user', 'user2', 'user3']);
@@ -206,7 +246,11 @@ describe('Bot Events', function () {
   it('should announce the bot itself when config enabled', function () {
     // self-join is announced before names (which includes own nick)
     // hence don't trigger a names and don't expect anything of bot.channelUsers
-    const bot = createBot({ ...config, ircStatusNotices: true, announceSelfJoin: true });
+    const bot = createBot({
+      ...config,
+      ircStatusNotices: true,
+      announceSelfJoin: true,
+    });
     bot.connect();
     const channel = '#channel';
     const nick = this.bot.nickname;
@@ -278,7 +322,7 @@ describe('Bot Events', function () {
       bot.ircClient.emit('join', '#chaNnel', nick);
       bot.ircClient.emit('quit', nick, reason, ['#chanNel']);
     }
-    (wrap).should.not.throw();
+    wrap.should.not.throw();
   });
 
   it('should be possible to disable join/part/quit messages', function () {
@@ -305,8 +349,16 @@ describe('Bot Events', function () {
     bot.ircClient.emit('part', channel, 'user1', reason);
     bot.ircClient.emit('quit', 'user2', reason, [channel]);
     this.warnSpy.should.have.been.calledTwice;
-    this.warnSpy.getCall(0).args.should.deep.equal([`No channelUsers found for ${channel} when user1 parted.`]);
-    this.warnSpy.getCall(1).args.should.deep.equal([`No channelUsers found for ${channel} when user2 quit, ignoring.`]);
+    this.warnSpy
+      .getCall(0)
+      .args.should.deep.equal([
+        `No channelUsers found for ${channel} when user1 parted.`,
+      ]);
+    this.warnSpy
+      .getCall(1)
+      .args.should.deep.equal([
+        `No channelUsers found for ${channel} when user2 quit, ignoring.`,
+      ]);
   });
 
   it('should not crash if it uses a different name from config', function () {
@@ -318,7 +370,7 @@ describe('Bot Events', function () {
     function wrap() {
       bot.ircClient.emit('join', '#channel', newName);
     }
-    (wrap).should.not.throw;
+    wrap.should.not.throw;
   });
 
   it('should not listen to discord debug messages in production', function () {
@@ -352,7 +404,7 @@ describe('Bot Events', function () {
     secondCall.args[1].should.equal(channel);
   });
 
-  it('should not join channels that aren\'t in the channel mapping', function () {
+  it("should not join channels that aren't in the channel mapping", function () {
     const channel = '#wrong';
     const author = 'user';
     this.bot.ircClient.emit('invite', channel, author);
@@ -363,7 +415,9 @@ describe('Bot Events', function () {
 
     ClientStub.prototype.join.should.not.have.been.called;
     const secondCall = this.debugSpy.getCall(2);
-    secondCall.args[0].should.equal('Channel not found in config, not joining:');
+    secondCall.args[0].should.equal(
+      'Channel not found in config, not joining:'
+    );
     secondCall.args[1].should.equal(channel);
   });
 });

@@ -8,13 +8,13 @@ export default function createDiscordStub(sendStub) {
     constructor() {
       super();
       this.user = {
-        id: 'testid'
+        id: 'testid',
       };
       this.channels = new discord.ChannelManager(this, []);
       this.options = {
         http: {
-          cdn: ''
-        }
+          cdn: '',
+        },
       };
 
       this.users = new discord.UserManager(this, []);
@@ -30,13 +30,14 @@ export default function createDiscordStub(sendStub) {
     addTextChannel(guild, textChannel) {
       const textChannelData = {
         type: discord.Constants.ChannelTypes.TEXT,
-        ...textChannel
+        ...textChannel,
       };
       const textChannelObj = new discord.TextChannel(guild, textChannelData);
       textChannelObj.send = sendStub;
       const permissions = new discord.Collection();
-      textChannelObj.setPermissionStub = (user, perms) => permissions.set(user, perms);
-      textChannelObj.permissionsFor = user => permissions.get(user);
+      textChannelObj.setPermissionStub = (user, perms) =>
+        permissions.set(user, perms);
+      textChannelObj.permissionsFor = (user) => permissions.get(user);
       this.channels.cache.set(textChannelObj.id, textChannelObj);
       return textChannelObj;
     }
@@ -47,9 +48,12 @@ export default function createDiscordStub(sendStub) {
         client: this,
         addTextChannel: (textChannel) => {
           const textChannelObj = this.addTextChannel(guild, textChannel);
-          textChannelObj.guild.channels.cache.set(textChannelObj.id, textChannelObj);
+          textChannelObj.guild.channels.cache.set(
+            textChannelObj.id,
+            textChannelObj
+          );
           return textChannelObj;
-        }
+        },
       };
       guild.roles = new discord.RoleManager(guild, []);
       guild.members = new discord.GuildMemberManager(guild, []);

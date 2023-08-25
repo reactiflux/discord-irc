@@ -5,9 +5,9 @@ name: Publish Docker image
 
 on:
   push:
-    branches: [ main ]
+    branches: [main]
   release:
-    types: [ published ]
+    types: [published]
 
 jobs:
   push_to_registry:
@@ -15,12 +15,12 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-    - uses: actions/checkout@v2
-    - name: Build and push to Docker Hub
-      uses: docker/build-push-action@v1
-      with:
-        username: ${{ secrets.DOCKER_USERNAME }}
-        password: ${{ secrets.DOCKER_PASSWORD }}
-        repository: discordirc/discord-irc
-        tag_with_ref: true
-        tag_with_sha: true
+      - uses: actions/checkout@v2
+      - name: Build and push to Docker Hub
+        uses: docker/build-push-action@v1
+        with:
+          username: ${{ secrets.DOCKER_USERNAME }}
+          password: ${{ secrets.DOCKER_PASSWORD }}
+          repository: discordirc/discord-irc
+          tag_with_ref: true
+          tag_with_sha: true

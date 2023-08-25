@@ -1,7 +1,10 @@
 /* eslint-disable prefer-arrow-callback */
 
 import chai from 'chai';
-import { formatFromDiscordToIRC, formatFromIRCToDiscord } from '../lib/formatting';
+import {
+  formatFromDiscordToIRC,
+  formatFromIRCToDiscord,
+} from '../lib/formatting';
 
 chai.should();
 
@@ -25,8 +28,9 @@ describe('Formatting', () => {
     });
 
     it('should convert nested markdown', () => {
-      formatFromDiscordToIRC('**bold *italics***')
-        .should.equal('\x02bold \x1ditalics\x1d\x02');
+      formatFromDiscordToIRC('**bold *italics***').should.equal(
+        '\x02bold \x1ditalics\x1d\x02'
+      );
     });
   });
 
@@ -52,13 +56,15 @@ describe('Formatting', () => {
     });
 
     it('should convert nested IRC format', () => {
-      formatFromIRCToDiscord('\x02bold \x16italics\x16\x02')
-        .should.equal('**bold *italics***');
+      formatFromIRCToDiscord('\x02bold \x16italics\x16\x02').should.equal(
+        '**bold *italics***'
+      );
     });
 
     it('should convert nested IRC format', () => {
-      formatFromIRCToDiscord('\x02bold \x1funderline\x1f\x02')
-        .should.equal('**bold __underline__**');
+      formatFromIRCToDiscord('\x02bold \x1funderline\x1f\x02').should.equal(
+        '**bold __underline__**'
+      );
     });
   });
 });

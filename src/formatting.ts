@@ -23,10 +23,10 @@ export function formatFromDiscordToIRC(text) {
 }
 
 export function formatFromIRCToDiscord(text) {
-  const blocks = ircFormatting.parse(text).map(block => ({
+  const blocks = ircFormatting.parse(text).map((block) => ({
     // Consider reverse as italic, some IRC clients use that
     ...block,
-    italic: block.italic || block.reverse
+    italic: block.italic || block.reverse,
   }));
   let mdText = '';
 

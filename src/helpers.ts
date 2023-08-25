@@ -21,7 +21,7 @@ export function createBots(configFile: any[]): object[] {
     bot.connect();
     bots.push(bot);
   } else {
-    throw new ConfigurationError("");
+    throw new ConfigurationError('');
   }
 
   return bots;
