@@ -35,13 +35,24 @@ function run() {
 
   const opts = program.opts();
 
-  // If no config option is given, try to use the env variable:
-  if (opts.config) process.env.CONFIG_FILE = opts.config;
-  if (!process.env.CONFIG_FILE)
-    throw new Error('Missing environment variable CONFIG_FILE');
+  // Check if configFile.json exists in the current working directory
+  const localConfigFile = path.resolve(process.cwd(), 'config.json');
+  const localConfigExists = fs.existsSync(localConfigFile);
 
-  const completePath = path.resolve(process.cwd(), process.env.CONFIG_FILE);
-  const config = endsWith(process.env.CONFIG_FILE, '.js')
+  // Determine the config file to use
+  let configFile;
+  if (opts.config) {
+    configFile = opts.config;
+  } else if (localConfigExists) {
+    configFile = localConfigFile;
+  } else if (process.env.CONFIG_FILE) {
+    configFile = process.env.CONFIG_FILE;
+  } else {
+    throw new Error('Missing environment variable CONFIG_FILE');
+  }
+
+  const completePath = path.resolve(process.cwd(), configFile);
+  const config = endsWith(configFile, '.js')
     ? import(completePath)
     : readJSONConfig(completePath);
   helpers.createBots(config);
