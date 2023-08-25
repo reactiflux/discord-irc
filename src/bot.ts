@@ -1,4 +1,4 @@
-import lodash from 'lodash';
+import _ from 'lodash';
 const irc = require('irc-upd');
 import discord, { GatewayIntentBits, GuildMember, GuildChannel } from 'discord.js';
 import logger from './logger';
@@ -24,7 +24,7 @@ function escapeMarkdown(text:string) {
 type Config = {
   server: string,
   nickname: string,
-  channelMapping: lodash.Dictionary<string>,
+  channelMapping: _.Dictionary<string>,
   outgoingToken: string,
   incomingURL: string,
   ircOptions?: any,
@@ -35,7 +35,7 @@ type Config = {
   parallelPingFix?: boolean,
   ircStatusNotices?: boolean,
   announceSelfJoin?: boolean,
-  webhooks?: lodash.Dictionary<string>,
+  webhooks?: _.Dictionary<string>,
   partialMatch?: boolean,
   ignoreUsers?: any,
   format?: any,
@@ -64,7 +64,7 @@ export default class Bot {
   channels: string[];
   ircStatusNotices: boolean;
   announceSelfJoin: boolean;
-  webhookOptions: lodash.Dictionary<string>;
+  webhookOptions: _.Dictionary<string>;
   partialMatch: boolean;
   ignoreUsers: any;
   format: any;
@@ -73,10 +73,10 @@ export default class Bot {
   formatCommandPrelude: string;
   formatDiscord: string;
   formatWebhookAvatarURL: string;
-  channelUsers: lodash.Dictionary<Set<string>>;
-  channelMapping: lodash.Dictionary<string>;
-  webhooks: lodash.Dictionary<Hook>;
-  invertedMapping: lodash.Dictionary<string>;
+  channelUsers: _.Dictionary<Set<string>>;
+  channelMapping: _.Dictionary<string>;
+  webhooks: _.Dictionary<Hook>;
+  invertedMapping: _.Dictionary<string>;
   autoSendCommands: string[];
   ircClient: any;
   constructor(options:Config) {
@@ -104,7 +104,7 @@ export default class Bot {
     this.ircNickColor = options.ircNickColor !== false; // default to true
     this.ircNickColors = options.ircNickColors || DEFAULT_NICK_COLORS;
     this.parallelPingFix = options.parallelPingFix === true; // default: false
-    this.channels = lodash.values(options.channelMapping);
+    this.channels = _.values(options.channelMapping);
     this.ircStatusNotices = options.ircStatusNotices ?? false;
     this.announceSelfJoin = options.announceSelfJoin ?? false;
     this.webhookOptions = options.webhooks ?? {};
@@ -153,11 +153,11 @@ export default class Bot {
     this.webhooks = {};
 
     // Remove channel passwords from the mapping and lowercase IRC channel names
-    lodash.forOwn(options.channelMapping, (ircChan, discordChan) => {
+    _.forOwn(options.channelMapping, (ircChan, discordChan) => {
       this.channelMapping[discordChan] = ircChan.split(' ')[0].toLowerCase();
     });
 
-    this.invertedMapping = lodash.invert(this.channelMapping);
+    this.invertedMapping = _.invert(this.channelMapping);
     this.autoSendCommands = options.autoSendCommands || [];
   }
 
@@ -166,7 +166,7 @@ export default class Bot {
     this.discord.login(this.discordToken);
 
     // Extract id and token from Webhook urls and connect.
-    lodash.forOwn(this.webhookOptions, (url, channel) => {
+    _.forOwn(this.webhookOptions, (url, channel) => {
       const [id, token] = url.split('/').slice(-2);
       const client = new discord.WebhookClient({ id, token });
       this.webhooks[channel] = {
@@ -408,7 +408,7 @@ export default class Bot {
     const { author } = message;
     // Ignore messages sent by the bot itself:
     if (author.id === this.discord.user?.id ||
-        lodash.keys(this.webhooks).some((channel, _, __) => this.webhooks[channel].id === author.id)
+        _.keys(this.webhooks).some((channel, _, __) => this.webhooks[channel].id === author.id)
     ) return;
 
     // Do not send to IRC if this user is on the ignore list.
@@ -416,7 +416,7 @@ export default class Bot {
       return;
     }
 
-    const channel = message.channel as unknown as discord.GuildChannel;
+    const channel = message.channel as discord.GuildChannel;
     const channelName = `#${channel.name}`;
     const ircChannel = this.channelMapping[channel.id] ||
       this.channelMapping[channelName];
@@ -516,7 +516,7 @@ export default class Bot {
   async getDiscordAvatar(nick: string, channel: string) {
     const channelRef = this.findDiscordChannel(channel);
     if (channelRef === null) return null;
-    const guildMembers = await (channelRef as unknown as GuildChannel).guild.members.fetch();
+    const guildMembers = await (channelRef as GuildChannel).guild.members.fetch();
     const findByNicknameOrUsername = (caseSensitive: boolean) =>
       (member: GuildMember) => {
         if (caseSensitive) {
@@ -702,7 +702,7 @@ export default class Bot {
       }
       */
       const avatarURL = await this.getDiscordAvatar(author, channel) ?? undefined;
-      const username = lodash.padEnd(author.substring(0, USERNAME_MAX_LENGTH), USERNAME_MIN_LENGTH, '_');
+      const username = _.padEnd(author.substring(0, USERNAME_MAX_LENGTH), USERNAME_MIN_LENGTH, '_');
       webhook.client.send({
         username,
         content: withMentions,
