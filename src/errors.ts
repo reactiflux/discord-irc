@@ -1,7 +1,6 @@
 export class ConfigurationError extends Error {
   constructor(message: string) {
-    super(message);
+    super(message || 'Invalid configuration file given');
     this.name = 'ConfigurationError';
-    this.message = message || 'Invalid configuration file given';
   }
 }

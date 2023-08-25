@@ -45,11 +45,13 @@
   },
   "dependencies": {
     "commander": "^7.2.0",
+    "consola": "^3.2.3",
     "discord.js": "^14.13.0",
     "irc-colors": "1.5.0",
     "irc-formatting": "1.0.0-rc3",
     "irc-upd": "^0.11.0",
     "lodash-es": "^4.17.21",
+    "prettyjson": "^1.2.5",
     "simple-markdown": "^0.7.3",
     "strip-json-comments": "^3.1.1",
     "tsx": "^3.12.7",

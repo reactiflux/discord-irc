@@ -1,10 +1,11 @@
 #!/usr/bin/env node
 
-import { createBots } from './helpers';
+import { createBots } from './helpers.ts';
+import cli from './cli.ts';
 
 /* istanbul ignore next */
-if (!module.parent) {
-  require('./cli').default();
+if (import.meta.main) {
+  await cli();
 }
 
 export default createBots;

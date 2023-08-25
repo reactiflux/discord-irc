@@ -1,13 +1,13 @@
 #!/usr/bin/env node
 
-import fs from 'fs';
+import fs from 'node:fs';
 import program from 'commander';
-import path from 'path';
+import path from 'node:path';
 import stripJsonComments from 'strip-json-comments';
-import endsWith from 'lodash/endsWith';
-import * as helpers from './helpers';
-import { ConfigurationError } from './errors';
-import { version } from '../package.json';
+import * as helpers from './helpers.ts';
+import { ConfigurationError } from './errors.ts';
+import packageJson from '../package.json' assert { type: 'json' };
+import process from 'node:process';
 
 function readJSONConfig(filePath: string) {
   const configFile = fs.readFileSync(filePath, { encoding: 'utf8' });
@@ -26,7 +26,7 @@ function readJSONConfig(filePath: string) {
 
 async function run() {
   program
-    .version(version)
+    .version(packageJson.version)
     .option(
       '-c, --config <path>',
       'Sets the path to the config file, otherwise read from the env variable CONFIG_FILE.'
@@ -52,7 +52,7 @@ async function run() {
   }
 
   const completePath = path.resolve(process.cwd(), configFile);
-  const config = endsWith(configFile, '.js')
+  const config = configFile.endsWith('.js')
     ? await import(completePath)
     : readJSONConfig(completePath);
   helpers.createBots(config);
