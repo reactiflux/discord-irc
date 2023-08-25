@@ -1,6 +1,6 @@
-import ircFormatting from 'irc-formatting';
-import SimpleMarkdown from 'simple-markdown';
-import colors from 'irc-colors';
+import ircFormatting from 'npm:irc-formatting@1.0.0-rc3';
+import SimpleMarkdown from 'npm:simple-markdown';
+import colors from 'npm:irc-colors';
 
 function mdNodeToIRC(node) {
   let { content } = node;

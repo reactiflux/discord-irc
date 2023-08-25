@@ -1,4 +1,4 @@
-import isObject from 'lodash-es/isObject.js';
+import isObject from 'npm:lodash-es/isObject.js';
 import { ConfigurationError } from './errors.ts';
 
 /**

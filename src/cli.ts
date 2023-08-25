@@ -1,12 +1,11 @@
 #!/usr/bin/env node
 
 import fs from 'node:fs';
-import program from 'commander';
+import { program } from 'npm:commander';
 import path from 'node:path';
-import stripJsonComments from 'strip-json-comments';
+import stripJsonComments from 'npm:strip-json-comments';
 import * as helpers from './helpers.ts';
 import { ConfigurationError } from './errors.ts';
-import packageJson from '../package.json' assert { type: 'json' };
 import process from 'node:process';
 
 function readJSONConfig(filePath: string) {
@@ -16,7 +15,7 @@ function readJSONConfig(filePath: string) {
   } catch (err) {
     if (err instanceof SyntaxError) {
       throw new ConfigurationError(
-        'The configuration file contains invalid JSON'
+        'The configuration file contains invalid JSON',
       );
     } else {
       throw err;
@@ -26,10 +25,9 @@ function readJSONConfig(filePath: string) {
 
 async function run() {
   program
-    .version(packageJson.version)
     .option(
       '-c, --config <path>',
-      'Sets the path to the config file, otherwise read from the env variable CONFIG_FILE.'
+      'Sets the path to the config file, otherwise read from the env variable CONFIG_FILE.',
     )
     .parse(process.argv);
 
