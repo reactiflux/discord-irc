@@ -1,5 +1,6 @@
 {
   "version": "3.0.0",
+  "name": "discord-irc",
   "license": "MIT",
   "main": "src/index.ts",
   "files": [
@@ -23,7 +24,6 @@
     "src/**/*.{js,jsx,ts,tsx}": "eslint --cache --fix",
     "**/*": "prettier --write --ignore-unknown"
   },
-  "name": "discord-irc",
   "author": "Reactiflux",
   "contributors": [
     "Isaac Aronson i@pingas.org https://github.com/aronson"
