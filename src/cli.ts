@@ -9,7 +9,7 @@ import * as helpers from './helpers';
 import { ConfigurationError } from './errors';
 import { version } from '../package.json';
 
-function readJSONConfig(filePath) {
+function readJSONConfig(filePath: string) {
   const configFile = fs.readFileSync(filePath, { encoding: 'utf8' });
   try {
     return JSON.parse(stripJsonComments(configFile));
@@ -24,7 +24,7 @@ function readJSONConfig(filePath) {
   }
 }
 
-function run() {
+async function run() {
   program
     .version(version)
     .option(
@@ -53,7 +53,7 @@ function run() {
 
   const completePath = path.resolve(process.cwd(), configFile);
   const config = endsWith(configFile, '.js')
-    ? import(completePath)
+    ? await import(completePath)
     : readJSONConfig(completePath);
   helpers.createBots(config);
 }
