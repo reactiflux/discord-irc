@@ -1,23 +1,17 @@
 {
-  "version": "0.1.0",
+  "version": "3.0.0",
   "license": "MIT",
-  "main": "dist/index.js",
-  "typings": "dist/index.d.ts",
+  "main": "src/index.ts",
   "files": [
     "dist",
     "src"
   ],
   "engines": {
-    "node": ">=10"
+    "node": ">=16.6.0"
   },
   "scripts": {
     "start": "npx tsx src",
-    "build": "tsdx build",
-    "test": "tsdx test",
-    "lint": "tsdx lint",
-    "prepare": "tsdx build",
-    "size": "size-limit",
-    "analyze": "size-limit --why"
+    "lint": "tsdx lint"
   },
   "husky": {
     "hooks": {
@@ -32,17 +26,6 @@
   },
   "name": "discord-irc",
   "author": "Isaac Aronson",
-  "module": "dist/discord-irc.esm.js",
-  "size-limit": [
-    {
-      "path": "dist/discord-irc.cjs.production.min.js",
-      "limit": "10 KB"
-    },
-    {
-      "path": "dist/discord-irc.esm.js",
-      "limit": "10 KB"
-    }
-  ],
   "devDependencies": {
     "@size-limit/preset-small-lib": "^8.2.6",
     "@types/lodash-es": "^4.17.8",
@@ -51,7 +34,6 @@
     "eslint-config-airbnb-base": "^14.2.1",
     "eslint-plugin-import": "^2.22.1",
     "husky": "^8.0.3",
-    "size-limit": "^8.2.6",
     "ts-node": "^10.9.1",
     "tsdx": "^0.14.1",
     "tslib": "^2.6.2",
@@ -68,7 +50,6 @@
     "simple-markdown": "^0.7.3",
     "source-map-loader": "^4.0.1",
     "strip-json-comments": "^3.1.1",
-    "underscore": "^1.13.6",
     "winston": "^3.10.0"
   }
 }

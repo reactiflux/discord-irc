@@ -1,9 +1,8 @@
-import _ from 'underscore';
 import lodash from 'lodash';
 const irc = require('irc-upd');
-import discord, { GatewayIntentBits, GuildMember, Partials, GuildChannel, TextChannel } from 'discord.js';
+import discord, { GatewayIntentBits, GuildMember, GuildChannel } from 'discord.js';
 import logger from './logger';
-import { ConfigurationError } from './errors';
+// import { ConfigurationError } from './errors';
 import { validateChannelMapping } from './validators';
 import { formatFromDiscordToIRC, formatFromIRCToDiscord } from './formatting';
 
@@ -11,7 +10,7 @@ import { formatFromDiscordToIRC, formatFromIRCToDiscord } from './formatting';
 const USERNAME_MIN_LENGTH = 2;
 const USERNAME_MAX_LENGTH = 32;
 
-const REQUIRED_FIELDS = ['server', 'nickname', 'channelMapping', 'discordToken'];
+// const REQUIRED_FIELDS = ['server', 'nickname', 'channelMapping', 'discordToken'];
 const DEFAULT_NICK_COLORS = ['light_blue', 'dark_blue', 'light_red', 'dark_red', 'light_green',
   'dark_green', 'magenta', 'light_magenta', 'orange', 'yellow', 'cyan', 'light_cyan'];
 const patternMatch = /{\$(.+?)}/g;
@@ -25,7 +24,7 @@ function escapeMarkdown(text:string) {
 type Config = {
   server: string,
   nickname: string,
-  channelMapping: _.Dictionary<string>,
+  channelMapping: lodash.Dictionary<string>,
   outgoingToken: string,
   incomingURL: string,
   ircOptions?: any,
@@ -36,7 +35,7 @@ type Config = {
   parallelPingFix?: boolean,
   ircStatusNotices?: boolean,
   announceSelfJoin?: boolean,
-  webhooks?: _.Dictionary<string>,
+  webhooks?: lodash.Dictionary<string>,
   partialMatch?: boolean,
   ignoreUsers?: any,
   format?: any,
@@ -65,7 +64,7 @@ export default class Bot {
   channels: string[];
   ircStatusNotices: boolean;
   announceSelfJoin: boolean;
-  webhookOptions: _.Dictionary<string>;
+  webhookOptions: lodash.Dictionary<string>;
   partialMatch: boolean;
   ignoreUsers: any;
   format: any;
@@ -74,22 +73,21 @@ export default class Bot {
   formatCommandPrelude: string;
   formatDiscord: string;
   formatWebhookAvatarURL: string;
-  channelUsers: _.Dictionary<Set<string>>;
-  channelMapping: _.Dictionary<string>;
-  webhooks: _.Dictionary<Hook>;
-  invertedMapping: _.Dictionary<string>;
+  channelUsers: lodash.Dictionary<Set<string>>;
+  channelMapping: lodash.Dictionary<string>;
+  webhooks: lodash.Dictionary<Hook>;
+  invertedMapping: lodash.Dictionary<string>;
   autoSendCommands: string[];
   ircClient: any;
   constructor(options:Config) {
-    REQUIRED_FIELDS.forEach((field) => {
+    /* REQUIRED_FIELDS.forEach((field) => {
       if (!options[field]) {
         throw new ConfigurationError(`Missing configuration field ${field}`);
       }
-    });
+    }); */
     validateChannelMapping(options.channelMapping);
 
     this.discord = new discord.Client({
-      partials: [Partials.Channel],
       intents: [
         GatewayIntentBits.Guilds,
         GatewayIntentBits.GuildMessages,
@@ -106,7 +104,7 @@ export default class Bot {
     this.ircNickColor = options.ircNickColor !== false; // default to true
     this.ircNickColors = options.ircNickColors || DEFAULT_NICK_COLORS;
     this.parallelPingFix = options.parallelPingFix === true; // default: false
-    this.channels = _.values(options.channelMapping);
+    this.channels = lodash.values(options.channelMapping);
     this.ircStatusNotices = options.ircStatusNotices ?? false;
     this.announceSelfJoin = options.announceSelfJoin ?? false;
     this.webhookOptions = options.webhooks ?? {};
@@ -155,11 +153,11 @@ export default class Bot {
     this.webhooks = {};
 
     // Remove channel passwords from the mapping and lowercase IRC channel names
-    _.forEach(options.channelMapping, (ircChan, discordChan) => {
+    lodash.forOwn(options.channelMapping, (ircChan, discordChan) => {
       this.channelMapping[discordChan] = ircChan.split(' ')[0].toLowerCase();
     });
 
-    this.invertedMapping = _.invert(this.channelMapping);
+    this.invertedMapping = lodash.invert(this.channelMapping);
     this.autoSendCommands = options.autoSendCommands || [];
   }
 
@@ -168,7 +166,7 @@ export default class Bot {
     this.discord.login(this.discordToken);
 
     // Extract id and token from Webhook urls and connect.
-    _.forEach(this.webhookOptions, (url, channel) => {
+    lodash.forOwn(this.webhookOptions, (url, channel) => {
       const [id, token] = url.split('/').slice(-2);
       const client = new discord.WebhookClient({ id, token });
       this.webhooks[channel] = {
@@ -410,7 +408,7 @@ export default class Bot {
     const { author } = message;
     // Ignore messages sent by the bot itself:
     if (author.id === this.discord.user?.id ||
-        _.keys(this.webhooks).some((channel, _, __) => this.webhooks[channel].id === author.id)
+        lodash.keys(this.webhooks).some((channel, _, __) => this.webhooks[channel].id === author.id)
     ) return;
 
     // Do not send to IRC if this user is on the ignore list.
@@ -541,7 +539,7 @@ export default class Bot {
 
     // No matching user or more than one => default avatar
     if (users && users.size === 1) {
-      const url = users.first()?.user.avatarURL({ size: 128 });
+      const url = users.first()?.user.displayAvatarURL({ size: 128 });
       if (url) return url;
     }
 
