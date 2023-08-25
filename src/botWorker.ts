@@ -1,9 +1,9 @@
-// import { parentPort } from 'node:worker_threads';
+//import { parentPort } from 'node:worker_threads';
 import Bot from './bot.ts';
 
-self.onmessage = (event) => {
+self.onmessage = async (event) => {
   const bot = new Bot(event.data);
-  bot.connect();
+  await bot.connect();
   self.postMessage({ status: 'connected' });
 };
 

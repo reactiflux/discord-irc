@@ -15,7 +15,22 @@
     "proseWrap": "preserve",
     "include": ["src/"]
   },
+  "tasks": [
+    {
+      "type": "deno",
+      "command": "run",
+      "args": [
+        "-A",
+        "src/index.ts"
+      ],
+      "problemMatcher": [
+        "$deno"
+      ],
+      "label": "deno: run"
+    }
+  ],
   "imports": {
-    "dlog": "https://deno.land/x/dlog2@2.0/classic.ts"
+    "dlog": "https://deno.land/x/dlog2@2.0/classic.ts",
+    "irc": "https://deno.land/x/irc@v0.12.5/mod.ts"
   }
 }
