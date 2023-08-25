@@ -1,4 +1,4 @@
-import { forOwn, invert, padEnd } from 'npm:lodash-es';
+import { forOwn, invert } from 'npm:lodash-es';
 import { Client, ClientOptions } from 'irc';
 import discord, {
   GatewayIntentBits,
@@ -20,7 +20,7 @@ const USERNAME_MIN_LENGTH = 2;
 const USERNAME_MAX_LENGTH = 32;
 
 // Configure debug logging with environment
-const debug = (Deno.env.get("DEBUG") ?? "false").toLowerCase() === 'true';
+const debug = (Deno.env.get('DEBUG') ?? 'false').toLowerCase() === 'true';
 
 // const REQUIRED_FIELDS = ['server', 'nickname', 'channelMapping', 'discordToken'];
 const DEFAULT_NICK_COLORS = [
@@ -192,21 +192,21 @@ export default class Bot {
     this.webhooks = {};
 
     // Remove channel passwords from the mapping and lowercase IRC channel names
-    forOwn(options.channelMapping, (ircChan:string, discordChan:string) => {
+    forOwn(options.channelMapping, (ircChan: string, discordChan: string) => {
       this.channelMapping[discordChan] = ircChan.split(' ')[0]
         .toLowerCase();
     });
 
     this.invertedMapping = invert(this.channelMapping);
     this.autoSendCommands = options.autoSendCommands || [];
-    const ircOptions:ClientOptions = {
+    const ircOptions: ClientOptions = {
       nick: this.nickname,
       username: this.nickname,
       realname: this.nickname,
       password: this.ircOptions.password,
       reconnect: true,
-      ...this.ircOptions
-    }
+      ...this.ircOptions,
+    };
 
     this.ircClient = new Client(ircOptions);
   }
@@ -216,7 +216,7 @@ export default class Bot {
     await this.discord.login(this.discordToken);
 
     // Extract id and token from Webhook urls and connect.
-    forOwn(this.webhookOptions, (url:string, channel:string) => {
+    forOwn(this.webhookOptions, (url: string, channel: string) => {
       const [id, token] = url.split('/').slice(-2);
       const client = new discord.WebhookClient({ id, token });
       this.webhooks[channel] = {
@@ -228,10 +228,9 @@ export default class Bot {
     this.attachListeners();
     await this.ircClient.connect(this.server);
     forOwn(Object.keys(this.invertedMapping), (ircChannel: string) => {
-        this.logger.info(`Joining channel ${ircChannel}`);
-        this.ircClient.join(ircChannel);
-      }
-    );
+      this.logger.info(`Joining channel ${ircChannel}`);
+      this.ircClient.join(ircChannel);
+    });
   }
 
   disconnect() {
@@ -307,14 +306,21 @@ export default class Bot {
     this.ircClient.on(
       'privmsg:channel',
       async (event) => {
-        await this.sendToDiscord(event.source?.name ?? "", event.params.target, event.params.text);
+        await this.sendToDiscord(
+          event.source?.name ?? '',
+          event.params.target,
+          event.params.text,
+        );
       },
     );
 
     this.ircClient.on(
       'notice',
       (event) => {
-        debug && this.logger.debug(`Received notice:\n${JSON.stringify(event.params.text)}`);
+        debug &&
+          this.logger.debug(
+            `Received notice:\n${JSON.stringify(event.params.text)}`,
+          );
       },
     );
 
@@ -324,11 +330,11 @@ export default class Bot {
         Object.values(this.channelMapping).forEach((channelName) => {
           const channel = channelName.toLowerCase();
           const newNick = event.params.nick;
-          const oldNick = event.source?.name ?? "";
+          const oldNick = event.source?.name ?? '';
           this.logger.error(JSON.stringify(this.channelUsers));
           if (this.channelUsers[channelName]) {
             let users = this.channelUsers[channel];
-            const index = users.indexOf(oldNick)
+            const index = users.indexOf(oldNick);
             if (index !== -1) {
               users = users.splice(index, 1);
               users.push(newNick);
@@ -349,7 +355,7 @@ export default class Bot {
 
     this.ircClient.on('join', async (event) => {
       const channelName = event.params.channel;
-      const nick = event.source?.name ?? "";
+      const nick = event.source?.name ?? '';
       debug && this.logger.debug(`Received join: ${channelName} -- ${nick}`);
       if (nick === this.nickname && !this.announceSelfJoin) return;
       const channel = channelName.toLowerCase();
@@ -369,7 +375,7 @@ export default class Bot {
       'part',
       async (event) => {
         const channelName = event.params.channel;
-        const nick = event.source?.name ?? "";
+        const nick = event.source?.name ?? '';
         const reason = event.params.comment;
         debug && this.logger.debug(
           `Received part: ${channelName} -- ${nick} -- ${reason}`,
@@ -403,8 +409,8 @@ export default class Bot {
     this.ircClient.on(
       'quit',
       (event) => {
-        const nick = event.source?.name ?? "";
-        const reason = event.params.comment ?? "";
+        const nick = event.source?.name ?? '';
+        const reason = event.params.comment ?? '';
         debug && this.logger.debug(
           `Received quit: ${nick}`,
         );
@@ -428,7 +434,7 @@ export default class Bot {
             `*${nick}* has quit (${reason})`,
           );
         });
-        console.log("quit");
+        console.log('quit');
         console.log(event);
       },
     );
@@ -440,11 +446,15 @@ export default class Bot {
         `Received names: ${channelName}\n${JSON.stringify(nicks, null, 2)}`,
       );
       const channel = channelName.toLowerCase();
-      this.channelUsers[channel] = nicks.map(n => n.nick);
+      this.channelUsers[channel] = nicks.map((n) => n.nick);
     });
 
     this.ircClient.on('ctcp_action', async (event) => {
-      await this.sendToDiscord(event.source?.name ?? "", event.params.target, `_${event.params.text}_`);
+      await this.sendToDiscord(
+        event.source?.name ?? '',
+        event.params.target,
+        `_${event.params.text}_`,
+      );
     });
 
     this.ircClient.on('invite', (event) => {
@@ -989,8 +999,8 @@ export default class Bot {
       */
       const avatarURL = (await this.getDiscordAvatar(author, channel)) ??
         undefined;
-      const username = padEnd(
-        author.substring(0, USERNAME_MAX_LENGTH),
+      const username = 
+        author.substring(0, USERNAME_MAX_LENGTH).padEnd(
         USERNAME_MIN_LENGTH,
         '_',
       );
