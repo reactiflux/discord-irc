@@ -1,5 +1,5 @@
-import isObject from 'npm:lodash-es/isObject.js';
 import { ConfigurationError } from './errors.ts';
+import { isObject } from './helpers.ts';
 
 /**
  * Validates a given channel mapping, throwing an error if it's invalid

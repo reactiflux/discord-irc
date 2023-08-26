@@ -1,5 +1,3 @@
-import isObject from 'npm:lodash-es/isObject.js';
-// import { Worker } from 'node:worker_threads';
 import { ConfigurationError } from './errors.ts';
 
 export function invert(obj: any) {
@@ -12,6 +10,10 @@ export function invert(obj: any) {
     }),
     {},
   );
+}
+
+export function isObject(a: any) {
+  return a instanceof Object;
 }
 
 /**
