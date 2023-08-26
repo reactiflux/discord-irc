@@ -1,4 +1,4 @@
-import { forOwn, invert } from 'npm:lodash-es';
+import { invert } from 'npm:lodash-es';
 import { Client, ClientOptions } from 'irc';
 import discord, {
   GatewayIntentBits,
@@ -192,7 +192,7 @@ export default class Bot {
     this.webhooks = {};
 
     // Remove channel passwords from the mapping and lowercase IRC channel names
-    forOwn(options.channelMapping, (ircChan: string, discordChan: string) => {
+    Object.entries(options.channelMapping).forEach(([discordChan, ircChan]) => {
       this.channelMapping[discordChan] = ircChan.split(' ')[0]
         .toLowerCase();
     });
@@ -216,7 +216,7 @@ export default class Bot {
     await this.discord.login(this.discordToken);
 
     // Extract id and token from Webhook urls and connect.
-    forOwn(this.webhookOptions, (url: string, channel: string) => {
+    Object.entries(this.webhookOptions).forEach(([channel, url]) => {
       const [id, token] = url.split('/').slice(-2);
       const client = new discord.WebhookClient({ id, token });
       this.webhooks[channel] = {
@@ -227,7 +227,7 @@ export default class Bot {
 
     this.attachListeners();
     await this.ircClient.connect(this.server);
-    forOwn(Object.keys(this.invertedMapping), (ircChannel: string) => {
+    Object.entries(this.invertedMapping).forEach(([ircChannel, _]) => {
       this.logger.info(`Joining channel ${ircChannel}`);
       this.ircClient.join(ircChannel);
     });
@@ -999,8 +999,7 @@ export default class Bot {
       */
       const avatarURL = (await this.getDiscordAvatar(author, channel)) ??
         undefined;
-      const username = 
-        author.substring(0, USERNAME_MAX_LENGTH).padEnd(
+      const username = author.substring(0, USERNAME_MAX_LENGTH).padEnd(
         USERNAME_MIN_LENGTH,
         '_',
       );
