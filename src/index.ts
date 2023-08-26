@@ -1,4 +1,4 @@
-#!/usr/bin/env node
+#!/usr/bin/env -S deno run -A
 
 import { createBots } from './helpers.ts';
 import cli from './cli.ts';
