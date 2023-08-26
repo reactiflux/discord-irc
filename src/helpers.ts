@@ -2,6 +2,18 @@ import isObject from 'npm:lodash-es/isObject.js';
 // import { Worker } from 'node:worker_threads';
 import { ConfigurationError } from './errors.ts';
 
+export function invert(obj: any) {
+  // WARNING: This is not a drop in replacement solution and
+  // it might not work for some edge cases. Test your code!
+  return Object.entries(obj).reduce(
+    (acc, [key, value]) => ({
+      ...acc,
+      [value as string]: key,
+    }),
+    {},
+  );
+}
+
 /**
  * Reads from the provided config file and returns an array of bots
  * @return {object[]}

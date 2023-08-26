@@ -1,4 +1,3 @@
-import { invert } from 'npm:lodash-es';
 import { Client, ClientOptions } from 'irc';
 import discord, {
   GatewayIntentBits,
@@ -14,6 +13,7 @@ import {
   formatFromIRCToDiscord,
 } from './formatting.ts';
 import { wrap } from './colors.ts';
+import { invert } from './helpers.ts';
 
 // Usernames need to be between 2 and 32 characters for webhooks:
 const USERNAME_MIN_LENGTH = 2;
