@@ -16,7 +16,10 @@
     "include": ["src/"]
   },
   "tasks": {
-    "start": "deno run -A src/index.ts"
+    "start": "deno run -A src/index.ts",
+    "prepare": "deno compile -A src/index.ts --output discord-irc",
+    "prepareAndStart": "deno task prepare && ./discord-irc",
+    "startPrepared": "./discord-irc"
   },
   "imports": {
     "dlog": "https://deno.land/x/dlog2@2.0/classic.ts",

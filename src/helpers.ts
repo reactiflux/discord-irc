@@ -1,4 +1,5 @@
 import { ConfigurationError } from './errors.ts';
+import {} from './botWorker.ts';
 
 export function invert(obj: any) {
   // WARNING: This is not a drop in replacement solution and

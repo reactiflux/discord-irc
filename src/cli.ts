@@ -1,4 +1,4 @@
-#!/usr/bin/env node
+#!/usr/bin/env -S deno run -A
 
 import fs from 'node:fs';
 import { program } from 'npm:commander';

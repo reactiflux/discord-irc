@@ -108,7 +108,7 @@ export default class Bot {
   channelMapping: Dictionary<string>;
   webhooks: Dictionary<Hook>;
   invertedMapping: Dictionary<string>;
-  autoSendCommands: string[];
+  autoSendCommands: any;
   ircClient: Client;
   constructor(options: Config) {
     /* REQUIRED_FIELDS.forEach((field) => {
@@ -249,9 +249,9 @@ export default class Bot {
       debug && this.logger.debug(
         `Registered event:\n${JSON.stringify(message, null, 2)}`,
       );
-      this.autoSendCommands.forEach((element) => {
-        this.ircClient.send(...element);
-      });
+      this.autoSendCommands.forEach((element: [any, string]) =>
+        this.ircClient.send(...element)
+      );
     });
 
     this.ircClient.on('error', (error) => {
