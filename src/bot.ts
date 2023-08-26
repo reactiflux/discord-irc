@@ -331,7 +331,6 @@ export default class Bot {
           const channel = channelName.toLowerCase();
           const newNick = event.params.nick;
           const oldNick = event.source?.name ?? '';
-          this.logger.error(JSON.stringify(this.channelUsers));
           if (this.channelUsers[channelName]) {
             let users = this.channelUsers[channel];
             const index = users.indexOf(oldNick);
