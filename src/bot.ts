@@ -204,7 +204,10 @@ export default class Bot {
       username: this.nickname,
       realname: this.nickname,
       password: this.ircOptions.password,
-      reconnect: true,
+      reconnect: {
+        attempts: Number.MAX_SAFE_INTEGER,
+        delay: 10,
+      },
       ...this.ircOptions,
     };
 
