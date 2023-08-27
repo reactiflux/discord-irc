@@ -37,7 +37,6 @@ import {
   createDiscordMessageListener,
   createDiscordReadyListener,
 } from './discordListeners.ts';
-import { ChannelTypes } from 'https://raw.githubusercontent.com/harmonyland/harmony/main/src/types/channel.ts';
 import { AllWebhookMessageOptions } from 'https://raw.githubusercontent.com/harmonyland/harmony/main/src/structures/webhook.ts';
 
 // Usernames need to be between 2 and 32 characters for webhooks:
@@ -440,8 +439,8 @@ export default class Bot {
         const channels = await this.discord.channels.array();
         discordChannel = channels.find(
           (c) =>
-            c.type === ChannelTypes.GUILD_TEXT &&
-            c.toString() === discordChannelName.slice(1),
+            c.isGuildText() &&
+            c.name === discordChannelName.slice(1),
         );
       }
       if (!discordChannel) {
@@ -568,6 +567,7 @@ export default class Bot {
     }
     const members = await guild?.members.fetchList();
     if (!members) return;
+    console.log(members);
     const roles = await guild?.roles.fetchAll();
     if (!roles) return;
     const channels = await guild?.channels.array();
@@ -597,7 +597,7 @@ export default class Bot {
           const reference = startRef || atRef;
 
           // @username => mention, case insensitively
-          const user = members.find(
+          const user = members?.find(
             (x) =>
               Bot.caseComp(x.user.username, reference) ||
               Bot.caseComp(x.nick ?? '', reference) ||
