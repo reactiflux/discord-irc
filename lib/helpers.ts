@@ -1,5 +1,6 @@
 import { ConfigurationError } from './errors.ts';
 import {} from './botWorker.ts';
+import { Config } from './config.ts';
 
 export function invert(obj: any) {
   // WARNING: This is not a drop in replacement solution and
@@ -22,6 +23,20 @@ export async function forEachAsync<T>(
   }
 }
 
+export async function replaceAsync(
+  str: string,
+  regex: RegExp,
+  asyncFn: (match: any, ...args: any) => Promise<any>,
+) {
+  const promises: Promise<any>[] = [];
+  str.replace(regex, (match, ...args) => {
+    promises.push(asyncFn(match, ...args));
+    return match;
+  });
+  const data = await Promise.all(promises);
+  return str.replace(regex, () => data.shift());
+}
+
 export function isObject(a: any) {
   return a instanceof Object;
 }
@@ -40,7 +55,9 @@ export function escapeMarkdown(text: string) {
  * Reads from the provided config file and returns an array of bots
  * @return {object[]}
  */
-export function createBots(configFile: any[]): object[] {
+export function createBots(
+  configFile: Config | Config[],
+): Promise<object[]> {
   const bots: Worker[] = [];
 
   // The config file can be both an array and an object

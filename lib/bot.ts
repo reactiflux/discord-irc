@@ -1,17 +1,22 @@
-import { Client, ClientOptions } from 'irc';
-import discord, {
-  GatewayIntentBits,
-  GuildChannel,
-  GuildMember,
-} from 'npm:discord.js';
+import { Client as IrcClient, ClientOptions } from 'irc';
 import Dlog from 'dlog';
+import {
+  AllowedMentionType,
+  Client,
+  GatewayIntents,
+  Guild,
+  Member,
+  Message,
+  User,
+  Webhook,
+} from 'harmony';
 import { validateChannelMapping } from './validators.ts';
 import {
   formatFromDiscordToIRC,
   formatFromIRCToDiscord,
 } from './formatting.ts';
 import { DEFAULT_NICK_COLORS, wrap } from './colors.ts';
-import { Dictionary, invert } from './helpers.ts';
+import { Dictionary, forEachAsync, invert, replaceAsync } from './helpers.ts';
 import { Config } from './config.ts';
 import {
   createIrcActionListener,
@@ -31,8 +36,9 @@ import {
   createDiscordErrorListener,
   createDiscordMessageListener,
   createDiscordReadyListener,
-  createDiscordWarningListener,
 } from './discordListeners.ts';
+import { ChannelTypes } from 'https://raw.githubusercontent.com/harmonyland/harmony/main/src/types/channel.ts';
+import { AllWebhookMessageOptions } from 'https://raw.githubusercontent.com/harmonyland/harmony/main/src/structures/webhook.ts';
 
 // Usernames need to be between 2 and 32 characters for webhooks:
 const USERNAME_MIN_LENGTH = 2;
@@ -43,7 +49,7 @@ const patternMatch = /{\$(.+?)}/g;
 
 type Hook = {
   id: string;
-  client: discord.WebhookClient;
+  client: Webhook;
 };
 
 /**
@@ -51,7 +57,7 @@ type Hook = {
  * @param {object} options - server, nickname, channelMapping, outgoingToken, incomingURL, partialMatch
  */
 export default class Bot {
-  discord: discord.Client<boolean>;
+  discord: Client;
   logger: Dlog;
   options: Config;
   channels: string[];
@@ -65,7 +71,7 @@ export default class Bot {
   channelMapping: Dictionary<string>;
   webhooks: Dictionary<Hook>;
   invertedMapping: Dictionary<string>;
-  ircClient: Client;
+  ircClient: IrcClient;
   ircNickColors: string[] = DEFAULT_NICK_COLORS;
   debug: boolean = (Deno.env.get('DEBUG') ?? Deno.env.get('VERBOSE') ?? 'false')
     .toLowerCase() === 'true';
@@ -79,13 +85,14 @@ export default class Bot {
     }); */
     validateChannelMapping(options.channelMapping);
 
-    this.discord = new discord.Client({
+    this.discord = new Client({
       intents: [
-        GatewayIntentBits.Guilds,
-        GatewayIntentBits.GuildMessages,
-        GatewayIntentBits.MessageContent,
-        GatewayIntentBits.GuildMembers,
+        GatewayIntents.GUILDS,
+        GatewayIntents.GUILD_MEMBERS,
+        GatewayIntents.GUILD_MESSAGES,
+        GatewayIntents.MESSAGE_CONTENT,
       ],
+      token: options.discordToken,
     });
 
     this.options = options;
@@ -149,22 +156,25 @@ export default class Bot {
       ...options.ircOptions,
     };
 
-    this.ircClient = new Client(ircOptions);
+    this.ircClient = new IrcClient(ircOptions);
   }
 
   async connect() {
     this.debug && this.logger.debug('Connecting to IRC and Discord');
-    await this.discord.login(this.options.discordToken);
+    this.discord.connect();
 
     // Extract id and token from Webhook urls and connect.
-    Object.entries(this.webhookOptions).forEach(([channel, url]) => {
-      const [id, token] = url.split('/').slice(-2);
-      const client = new discord.WebhookClient({ id, token });
-      this.webhooks[channel] = {
-        id,
-        client,
-      };
-    });
+    await forEachAsync(
+      Object.entries(this.webhookOptions),
+      async ([channel, url]) => {
+        const [id, _] = url.split('/').slice(-2);
+        const client = await Webhook.fromURL(url, this.discord);
+        this.webhooks[channel] = {
+          id,
+          client,
+        };
+      },
+    );
 
     this.attachDiscordListeners();
     this.attachIrcListeners();
@@ -178,13 +188,11 @@ export default class Bot {
   disconnect() {
     this.ircClient.disconnect();
     this.discord.destroy();
-    Object.values(this.webhooks).forEach((x) => x.client.destroy());
   }
 
   private attachDiscordListeners() {
     this.discord.on('ready', createDiscordReadyListener(this));
     this.discord.on('error', createDiscordErrorListener(this));
-    this.discord.on('warn', createDiscordWarningListener(this));
     this.discord.on('messageCreate', createDiscordMessageListener(this));
     if (this.debug) {
       this.discord.on('debug', createDiscordDebugListener(this));
@@ -205,25 +213,19 @@ export default class Bot {
     this.ircClient.on('invite', createIrcInviteListener(this));
   }
 
-  async getDiscordNicknameOnServer(user: discord.User, guild: discord.Guild) {
+  async getDiscordNicknameOnServer(user: User, guild: Guild) {
     if (guild) {
-      const members = await guild.members.fetch();
-      const userDetails = members.get(user.id);
-      if (userDetails) {
-        const value = userDetails.nickname || user.displayName;
-        this.debug && this.logger.debug(`Got username value: ${value}`);
-        return value;
-      }
+      const member = await guild.members.fetch(user.id);
+      const value = member.nick || user.displayName || user.username;
+      return value;
     }
-    const value = user.username;
-    this.debug && this.logger.debug(`Got username value: ${value}`);
     return user.username;
   }
 
   async replaceUserMentions(
     content: string,
-    mention: discord.User,
-    message: discord.Message<boolean>,
+    mention: User,
+    message: Message,
   ): Promise<string> {
     if (!message.guild) return '';
     const displayName = await this.getDiscordNicknameOnServer(
@@ -238,20 +240,24 @@ export default class Bot {
     return text.replace(/\n|\r\n|\r/g, ' ');
   }
 
-  replaceChannelMentions(text: string): string {
-    return text.replace(/<#(\d+)>/g, (_, channelId: string) => {
-      const channel = this.discord.channels.cache.get(channelId);
-      if (channel) return `#${(channel as GuildChannel)?.name}`;
-      return '#deleted-channel';
-    });
+  async replaceChannelMentions(text: string): Promise<string> {
+    return await replaceAsync(
+      text,
+      /<#(\d+)>/g,
+      async (_, channelId: string) => {
+        const channel = await this.discord.channels.fetch(channelId);
+        if (channel) return `#${channel?.toString()}`;
+        return '#deleted-channel';
+      },
+    );
   }
 
-  replaceRoleMentions(
+  async replaceRoleMentions(
     text: string,
-    message: discord.Message<boolean>,
-  ): string {
-    return text.replace(/<@&(\d+)>/g, (_, roleId) => {
-      const role = message.guild?.roles.cache.get(roleId);
+    message: Message,
+  ): Promise<string> {
+    return await replaceAsync(text, /<@&(\d+)>/g, async (_, roleId) => {
+      const role = await message.guild?.roles.fetch(roleId);
       if (role) return `@${role.name}`;
       return '@deleted-role';
     });
@@ -261,15 +267,15 @@ export default class Bot {
     return text.replace(/<a?(:\w+:)\d+>/g, (_, emoteName) => emoteName);
   }
 
-  async parseText(message: discord.Message<boolean>) {
+  async parseText(message: Message) {
     let text = message.content;
     for (const mention of message.mentions.users.values()) {
       text = await this.replaceUserMentions(text, mention, message);
     }
 
     return this.replaceEmotes(
-      this.replaceRoleMentions(
-        this.replaceChannelMentions(this.replaceNewlines(text)),
+      await this.replaceRoleMentions(
+        await this.replaceChannelMentions(this.replaceNewlines(text)),
         message,
       ),
     );
@@ -316,7 +322,7 @@ export default class Bot {
     );
   }
 
-  async sendToIRC(message: discord.Message<boolean>) {
+  async sendToIRC(message: Message) {
     const { author } = message;
     // Ignore messages sent by the bot itself:
     if (
@@ -333,7 +339,8 @@ export default class Bot {
       return;
     }
 
-    const channel = message.channel as discord.GuildChannel;
+    const channel = message.channel;
+    if (!channel.isGuildText()) return;
     const channelName = `#${channel.name}`;
     const ircChannel = this.channelMapping[channel.id] ||
       this.channelMapping[channelName];
@@ -405,7 +412,7 @@ export default class Bot {
           this.ircClient.privmsg(ircChannel, text);
         }
 
-        if (message.attachments && message.attachments.size) {
+        if (message.attachments && message.attachments.length) {
           message.attachments.forEach((a) => {
             patternMap.attachmentURL = a.url;
             const urlMessage = Bot.substitutePattern(
@@ -423,24 +430,20 @@ export default class Bot {
     }
   }
 
-  findDiscordChannel(ircChannel: string) {
+  async findDiscordChannel(ircChannel: string) {
     const discordChannelName = this.invertedMapping[ircChannel.toLowerCase()];
     if (discordChannelName) {
       // #channel -> channel before retrieving and select only text channels:
-      let discordChannel: discord.Channel | undefined = undefined;
+      let discordChannel = await this.discord.channels.get(discordChannelName);
 
-      if (this.discord.channels.cache.has(discordChannelName)) {
-        discordChannel = this.discord.channels.cache.get(
-          discordChannelName,
-        );
-      } else if (discordChannelName.startsWith('#')) {
-        discordChannel = this.discord.channels.cache.find(
+      if (!discordChannel && discordChannelName.startsWith('#')) {
+        const channels = await this.discord.channels.array();
+        discordChannel = channels.find(
           (c) =>
-            c.type === discord.ChannelType.GuildText &&
-            c.name === discordChannelName.slice(1),
+            c.type === ChannelTypes.GUILD_TEXT &&
+            c.toString() === discordChannelName.slice(1),
         );
       }
-
       if (!discordChannel) {
         this.logger.info(
           `Tried to send a message to a channel the bot isn't in: ${discordChannelName}`,
@@ -458,26 +461,25 @@ export default class Bot {
   }
 
   async getDiscordAvatar(nick: string, channel: string) {
-    const channelRef = this.findDiscordChannel(channel);
+    const channelRef = await this.findDiscordChannel(channel);
     if (channelRef === null) return null;
-    const guildMembers = await (
-      channelRef as GuildChannel
-    ).guild.members.fetch();
+    if (!channelRef.isGuildText()) return null;
+    const guildMembers = await channelRef.guild.members.array();
     const findByNicknameOrUsername =
-      (caseSensitive: boolean) => (member: GuildMember) => {
+      (caseSensitive: boolean) => (member: Member) => {
         if (caseSensitive) {
           return (
             member.user.username === nick ||
-            member.nickname === nick ||
+            member.nick === nick ||
             member.displayName === nick
           );
         }
         const nickLowerCase = nick.toLowerCase();
         return (
           member.user.username.toLowerCase() === nickLowerCase ||
-          (member.nickname &&
-            member.nickname.toLowerCase() === nickLowerCase) ||
-          member.displayName.toLowerCase() === nickLowerCase
+          (member.nick &&
+            member.nick.toLowerCase() === nickLowerCase) ||
+          member.displayName?.toLowerCase() === nickLowerCase
         );
       };
 
@@ -485,13 +487,13 @@ export default class Bot {
     let users = guildMembers.filter(findByNicknameOrUsername(true));
 
     // Now let's search case insensitive.
-    if (users.size === 0) {
+    if (users.length === 0) {
       users = guildMembers.filter(findByNicknameOrUsername(false));
     }
 
     // No matching user or more than one => default avatar
-    if (users && users.size === 1) {
-      const url = users.first()?.user.displayAvatarURL({ size: 128 });
+    if (users && users.length === 1) {
+      const url = users[0]?.user.avatarURL();
       if (url) return url;
     }
 
@@ -517,9 +519,9 @@ export default class Bot {
   }
 
   async sendToDiscord(author: string, channel: string, text: string) {
-    const discordChannel = this.findDiscordChannel(channel);
+    const discordChannel = await this.findDiscordChannel(channel);
     if (!discordChannel) return;
-    const channelName = (discordChannel as GuildChannel).name;
+    const channelName = discordChannel.mention;
 
     // Do not send to Discord if this user is on the ignore list.
     if (this.ignoredIrcUser(author)) {
@@ -550,24 +552,26 @@ export default class Bot {
           this.formatCommandPrelude,
           patternMap,
         );
-        if (discordChannel.type === discord.ChannelType.GuildText) {
+        if (discordChannel.isGuildText()) {
           discordChannel.send(prelude);
         }
       }
-      if (discordChannel.type === discord.ChannelType.GuildText) {
+      if (discordChannel.isGuildText()) {
         discordChannel.send(text);
       }
       return;
     }
 
-    let guild: discord.Guild | undefined = undefined;
-    if (discordChannel.type === discord.ChannelType.GuildText) {
+    let guild: Guild | undefined = undefined;
+    if (discordChannel.isGuildText()) {
       guild = discordChannel.guild;
     }
-    const members = await guild?.members.fetch();
+    const members = await guild?.members.fetchList();
     if (!members) return;
-    const roles = await guild?.roles.fetch();
+    const roles = await guild?.roles.fetchAll();
     if (!roles) return;
+    const channels = await guild?.channels.array();
+    if (!channels) return;
 
     const processQuickUsernames = (input: string) => {
       return input.replace(/@([^\s#]+)/g, (match, username) => {
@@ -577,9 +581,10 @@ export default class Bot {
         const user = members?.find(
           (x) =>
             Bot.caseComp(x.user.username, username) ||
+            Bot.caseComp(x.nick ?? '', username) ||
             Bot.caseComp(x.user.displayName, username),
         );
-        if (user) return user.toString();
+        if (user) return `<@${user.id}>`;
 
         return match;
       });
@@ -595,26 +600,27 @@ export default class Bot {
           const user = members.find(
             (x) =>
               Bot.caseComp(x.user.username, reference) ||
+              Bot.caseComp(x.nick ?? '', reference) ||
               Bot.caseComp(x.user.displayName, reference),
           );
-          if (user) return user.toString();
+          if (user) return `<@${user.id}>`;
 
           if (!this.options.allowRolePings) return match;
           // @role => mention, case insensitively
           const role = roles.find(
             (x) => x.mentionable && Bot.caseComp(x.name, reference),
           );
-          if (role) return role.toString();
+          if (role) return `<@&${role.id}>`;
           return match;
         },
       );
     };
 
-    const processEmoji = (input: string) => {
-      return input.replace(/:(\w+):/g, (match, ident) => {
+    const processEmoji = async (input: string) => {
+      return await replaceAsync(input, /:(\w+):/g, async (match, ident) => {
         // :emoji: => mention, case sensitively
-        const emoji = guild?.emojis.cache.find((x) =>
-          x.name === ident && x.requiresColons
+        const emoji = (await guild?.emojis.array())?.find((x) =>
+          x.name === ident && x.requireColons
         );
         if (emoji) return emoji.toString();
 
@@ -629,15 +635,13 @@ export default class Bot {
         // but these seem likely to be common around channel references)
 
         // discord matches channel names case insensitively
-        const chan = guild?.channels.cache.find((x) =>
-          Bot.caseComp(x.name, channelName)
-        );
+        const chan = channels.find((x) => Bot.caseComp(x.name, channelName));
         return (chan || match).toString();
       });
     };
 
     const withMentions = processChannels(
-      processEmoji(
+      await processEmoji(
         processMentionables(processQuickUsernames(withFormat)),
       ),
     );
@@ -645,7 +649,7 @@ export default class Bot {
     // Webhooks first
     const webhook = this.findWebhook(channel);
     if (webhook) {
-      if (discordChannel.type === discord.ChannelType.GuildText) {
+      if (discordChannel.isGuildText()) {
         this.debug && this.logger.debug(
           `Sending message to Discord via webhook ${withMentions} ${channel} -> #${discordChannel.name}`,
         );
@@ -664,19 +668,21 @@ export default class Bot {
         USERNAME_MIN_LENGTH,
         '_',
       );
-      webhook.client
-        .send({
-          username,
-          content: withMentions,
-          avatarURL,
-          allowedMentions: {
-            parse: canPingEveryone
-              ? ['users', 'roles', 'everyone']
-              : ['users', 'roles'],
-            repliedUser: true,
-          },
-        })
-        .catch(this.logger.error);
+      const payload: AllWebhookMessageOptions = {
+        name: username,
+        avatar: avatarURL,
+        allowedMentions: {
+          parse: canPingEveryone
+            ? [
+              AllowedMentionType.Roles,
+              AllowedMentionType.Users,
+              AllowedMentionType.Everyone,
+            ]
+            : [AllowedMentionType.Roles, AllowedMentionType.Users],
+          replied_user: true,
+        },
+      };
+      webhook.client.send(withMentions, payload);
       return;
     }
 
@@ -685,7 +691,7 @@ export default class Bot {
     // Add bold formatting:
     // Use custom formatting from config / default formatting with bold author
     const withAuthor = Bot.substitutePattern(this.formatDiscord, patternMap);
-    if (discordChannel.type === discord.ChannelType.GuildText) {
+    if (discordChannel.isGuildText()) {
       this.debug && this.logger.debug(
         `Sending message to Discord ${withAuthor} ${channel} -> #${discordChannel.name}`,
       );
@@ -695,10 +701,10 @@ export default class Bot {
 
   /* Sends a message to Discord exactly as it appears */
   async sendExactToDiscord(channel: string, text: string) {
-    const discordChannel = this.findDiscordChannel(channel);
+    const discordChannel = await this.findDiscordChannel(channel);
     if (!discordChannel) return;
 
-    if (discordChannel.type === discord.ChannelType.GuildText) {
+    if (discordChannel.isGuildText()) {
       this.debug && this.logger.debug(
         `Sending special message to Discord ${text} ${channel} -> #${discordChannel.name}`,
       );

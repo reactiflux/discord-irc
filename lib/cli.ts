@@ -3,27 +3,11 @@
 import fs from 'node:fs';
 import { program } from 'npm:commander';
 import path from 'node:path';
-import stripJsonComments from 'npm:strip-json-comments';
 import * as helpers from './helpers.ts';
-import { ConfigurationError } from './errors.ts';
 import process from 'node:process';
+import { Config } from './config.ts';
 
-function readJSONConfig(filePath: string) {
-  const configFile = fs.readFileSync(filePath, { encoding: 'utf8' });
-  try {
-    return JSON.parse(stripJsonComments(configFile));
-  } catch (err) {
-    if (err instanceof SyntaxError) {
-      throw new ConfigurationError(
-        'The configuration file contains invalid JSON',
-      );
-    } else {
-      throw err;
-    }
-  }
-}
-
-async function run() {
+function run() {
   program
     .option(
       '-c, --config <path>',
@@ -50,9 +34,9 @@ async function run() {
   }
 
   const completePath = path.resolve(process.cwd(), configFile);
-  const config = configFile.endsWith('.js')
-    ? await import(completePath)
-    : readJSONConfig(completePath);
+  const config = JSON.parse(fs.readFileSync(completePath).toString()) as
+    | Config
+    | Config[];
   helpers.createBots(config);
 }
 

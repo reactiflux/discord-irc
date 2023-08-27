@@ -1,6 +1,6 @@
-import { GuildChannel, Message } from 'npm:discord.js';
 import Bot from './bot.ts';
 import { escapeMarkdown } from './helpers.ts';
+import { Message } from 'harmony';
 
 export function createDiscordReadyListener(bot: Bot) {
   return () => {
@@ -28,12 +28,13 @@ export function createDiscordMessageListener(bot: Bot) {
   return async (message: Message) => {
     // Show the IRC channel's /names list when asked for in Discord
     if (message.content.toLowerCase() === '/names') {
-      const channelName = `#${(message.channel as GuildChannel)?.name}`;
+      if (!message.channel.isGuildText()) return;
+      const channelName = `#${message.channel.name}`;
       // return early if message was in channel we don't post to
       if (
         !(
           Object.keys(bot.channelMapping).find((c) => c === channelName) ||
-          Object.keys(bot.channelMapping).find((c) => c === message.channelId)
+          Object.keys(bot.channelMapping).find((c) => c === message.channel.id)
         )
       ) {
         return;

@@ -23,6 +23,7 @@
   },
   "imports": {
     "dlog": "https://deno.land/x/dlog2@2.0/classic.ts",
-    "irc": "https://deno.land/x/irc@v0.12.5/mod.ts"
+    "irc": "https://deno.land/x/irc@v0.12.5/mod.ts",
+    "harmony" : "https://raw.githubusercontent.com/harmonyland/harmony/main/mod.ts"
   }
 }
