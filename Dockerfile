@@ -1,5 +1,4 @@
 FROM denoland/deno
-ENV LIBRARY_PATH=/lib:/usr/lib
 
 RUN mkdir /bot
 COPY . /bot
