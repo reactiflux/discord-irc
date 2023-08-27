@@ -17,7 +17,7 @@
   },
   "tasks": {
     "start": "deno run -A lib/index.ts",
-    "prepare": "deno compile -A lib/index.ts --include lib/botWorker.ts --output discord-irc",
+    "prepare": "deno compile -A lib/index.ts --output discord-irc",
     "prepareAndStart": "deno task prepare && ./discord-irc",
     "startPrepared": "./discord-irc"
   },

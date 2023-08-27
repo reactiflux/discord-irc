@@ -1,5 +1,6 @@
 import { ConfigurationError } from './errors.ts';
 import { Config } from './config.ts';
+import Bot from './bot.ts';
 
 export async function exists(filename: string): Promise<boolean> {
   try {
@@ -72,35 +73,21 @@ export function escapeMarkdown(text: string) {
  */
 export function createBots(
   configFile: Config | Config[],
-): Worker[] {
-  const bots: Worker[] = [];
+): Bot[] {
+  const bots: Bot[] = [];
 
   // The config file can be both an array and an object
   // The config file can be both an array and an object
   if (Array.isArray(configFile)) {
     configFile.forEach((config) => {
-      const botWorker = new Worker(
-        new URL('./botWorker.ts', import.meta.url).href,
-        { type: 'module' },
-      );
-      botWorker.postMessage(config);
-      botWorker.onmessage = (event) => {
-        if (event.data === 'connected') {
-          bots.push(botWorker);
-        }
-      };
+      const bot = new Bot(config);
+      bot.connect();
+      bots.push(bot);
     });
   } else if (isObject(configFile)) {
-    const botWorker = new Worker(
-      new URL('./botWorker.ts', import.meta.url).href,
-      { type: 'module' },
-    );
-    botWorker.postMessage(configFile);
-    botWorker.onmessage = (event) => {
-      if (event.data === 'connected') {
-        bots.push(botWorker);
-      }
-    };
+    const bot = new Bot(configFile);
+    bot.connect();
+    bots.push(bot);
   } else {
     throw new ConfigurationError('');
   }
