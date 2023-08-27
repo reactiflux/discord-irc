@@ -590,7 +590,7 @@ export default class Bot {
 
     const processMentionables = (input: string) => {
       return input.replace(
-        /^([^@\s:,]+)[:,]|@([^\s]+)/g,
+        /^([^@\s:,]+)[:,]|@([^\s]+(?:\s[^\s]+)*)/g,
         (match, startRef, atRef) => {
           const reference = startRef || atRef;
 
