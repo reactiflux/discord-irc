@@ -1,10 +1,13 @@
-FROM denoland/deno
+FROM denoland/deno AS builder
+WORKDIR /app
 
-RUN mkdir /bot
-COPY . /bot
-
-WORKDIR /bot
+COPY . .
 
 RUN deno task prepare
 
-ENTRYPOINT ["/bot/discord-irc"]
+FROM debian:stable-slim
+WORKDIR /app
+
+COPY --from=builder /app/discord-irc .
+
+ENTRYPOINT ["/app/discord-irc"]
