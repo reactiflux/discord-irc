@@ -577,6 +577,7 @@ export default class Bot {
         const user = members?.find(
           (x) =>
             Bot.caseComp(x.user.username, username) ||
+            Bot.caseComp(x.nickname ?? '', username) ||
             Bot.caseComp(x.user.displayName, username),
         );
         if (user) return user.toString();
@@ -595,6 +596,7 @@ export default class Bot {
           const user = members.find(
             (x) =>
               Bot.caseComp(x.user.username, reference) ||
+              Bot.caseComp(x.nickname ?? '', reference) ||
               Bot.caseComp(x.user.displayName, reference),
           );
           if (user) return user.toString();
