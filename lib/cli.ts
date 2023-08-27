@@ -1,27 +1,9 @@
 #!/usr/bin/env -S deno run -A
 
-import fs from 'node:fs';
+import { join } from 'path';
 import { program } from 'npm:commander';
-import path from 'node:path';
-import stripJsonComments from 'npm:strip-json-comments';
 import * as helpers from './helpers.ts';
-import { ConfigurationError } from './errors.ts';
-import process from 'node:process';
-
-function readJSONConfig(filePath: string) {
-  const configFile = fs.readFileSync(filePath, { encoding: 'utf8' });
-  try {
-    return JSON.parse(stripJsonComments(configFile));
-  } catch (err) {
-    if (err instanceof SyntaxError) {
-      throw new ConfigurationError(
-        'The configuration file contains invalid JSON',
-      );
-    } else {
-      throw err;
-    }
-  }
-}
+import { Config } from './config.ts';
 
 async function run() {
   program
@@ -29,13 +11,13 @@ async function run() {
       '-c, --config <path>',
       'Sets the path to the config file, otherwise read from the env variable CONFIG_FILE.',
     )
-    .parse(process.argv);
+    .parse(Deno.args);
 
   const opts = program.opts();
 
   // Check if configFile.json exists in the current working directory
-  const localConfigFile = path.resolve(process.cwd(), 'config.json');
-  const localConfigExists = fs.existsSync(localConfigFile);
+  const localConfigFile = join(Deno.cwd(), 'config.json');
+  const localConfigExists = await helpers.exists(localConfigFile);
 
   // Determine the config file to use
   let configFile;
@@ -43,16 +25,20 @@ async function run() {
     configFile = opts.config;
   } else if (localConfigExists) {
     configFile = localConfigFile;
-  } else if (process.env.CONFIG_FILE) {
-    configFile = process.env.CONFIG_FILE;
+  } else if (Deno.env.get('CONFIG_FILE')) {
+    configFile = Deno.env.get('CONFIG_FILE');
   } else {
     throw new Error('Missing environment variable CONFIG_FILE');
   }
 
-  const completePath = path.resolve(process.cwd(), configFile);
-  const config = configFile.endsWith('.js')
-    ? await import(completePath)
-    : readJSONConfig(completePath);
+  const completePath = configFile.startsWith('/')
+    ? configFile
+    : join(Deno.cwd(), configFile);
+  const config = JSON.parse(
+    new TextDecoder().decode(Deno.readFileSync(completePath)),
+  ) as
+    | Config
+    | Config[];
   helpers.createBots(config);
 }
 

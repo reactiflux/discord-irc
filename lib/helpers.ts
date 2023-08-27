@@ -1,6 +1,22 @@
 import { ConfigurationError } from './errors.ts';
 import {} from './botWorker.ts';
 
+export async function exists(filename: string): Promise<boolean> {
+  try {
+    await Deno.stat(filename);
+    // successful, file or directory must exist
+    return true;
+  } catch (error) {
+    if (error && error.kind === Deno.errors.NotFound) {
+      // file or directory does not exist
+      return false;
+    } else {
+      // unexpected error, maybe permissions, pass it along
+      throw error;
+    }
+  }
+}
+
 export function invert(obj: any) {
   // WARNING: This is not a drop in replacement solution and
   // it might not work for some edge cases. Test your code!
