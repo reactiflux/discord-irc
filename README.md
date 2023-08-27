@@ -43,17 +43,11 @@ discordIRC(config);
 ## Docker
 
 As an alternative to running discord-irc directly on your machine, we provide a [Docker container image](https://hub.docker.com/r/discordirc/discord-irc).
-After creating a configuration file, you can fetch the image from Docker Hub and run it with the following command:
-
-```bash
-docker run -v /path/to/config:/config/config.json discordirc/discord-irc
-```
-
-If you've checked out the repository already, you can build the Docker image locally and run that instead:
+After creating a configuration file, you can build the Docker image locally and run thata:
 
 ```bash
 docker build -t discord-irc .
-docker run -v /path/to/config:/config/config.json discord-irc
+docker run -v /path/to/config:/bot/config.json discord-irc
 ```
 
 Note that the path to the config file on the host (`/path/to/config`) _must_ be a valid absolute path to a config file.

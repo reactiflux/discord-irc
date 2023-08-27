@@ -1,4 +1,4 @@
-FROM node:16-alpine
+FROM denoland/deno
 ENV LIBRARY_PATH=/lib:/usr/lib
 
 RUN mkdir /bot
@@ -6,10 +6,7 @@ COPY . /bot
 
 WORKDIR /bot
 
-RUN apk add --update tini && \
-	npm install && \
-	npm run build && \
+RUN deno task prepare && \
 	mkdir /config
 
-ENTRYPOINT ["/sbin/tini", "--"]
-CMD ["npm", "start", "--", "--config", "/config/config.json"]
+ENTRYPOINT ["/bot/discord-irc"]
