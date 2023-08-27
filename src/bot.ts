@@ -483,7 +483,7 @@ export default class Bot {
   }
 
   isCommandMessage(message: string) {
-    return this.options.commandCharacters?.some((prefix: any) =>
+    return this.options.commandCharacters?.some((prefix: string) =>
       message.startsWith(prefix)
     ) ?? false;
   }
@@ -494,12 +494,12 @@ export default class Bot {
     ) ?? false;
   }
 
-  ignoredDiscordUser(discordUser: { username: string; id: any }) {
+  ignoredDiscordUser(discordUser: { username: string; id: string }) {
     const ignoredName = this.options.ignoreUsers?.discord.some(
-      (i: string) => i.toLowerCase() === discordUser.username.toLowerCase(),
+      (i) => i.toLowerCase() === discordUser.username.toLowerCase(),
     );
     const ignoredId = this.options.ignoreUsers?.discordIds.some(
-      (i: any) => i === discordUser.id,
+      (i) => i === discordUser.id,
     );
     return ignoredName || ignoredId || false;
   }
