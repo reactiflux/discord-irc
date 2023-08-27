@@ -8,29 +8,28 @@
 
 ## Installation and usage
 
-**Note**: discord-irc requires Node.js version 12 or newer, as it depends on [discord.js](https://github.com/hydrabolt/discord.js).
-Future versions may require newer Node.js versions, though we should support active releases.
+**Note**: discord-irc requires Deno, as it depends on [discord.js](https://github.com/hydrabolt/discord.js).
+Future versions may require newer Deno versions, though we should support active releases.
+Please see the [official install instructions](https://deno.land/manual/getting_started/installation) to install Deno for your platform.
 
 Before you can run discord-irc you need to create a configuration file by
-following the instructions [here](https://github.com/reactiflux/discord-irc#configuration).
-After you've done that you can replace `/path/to/config.json` in the commands
-below with the path to your newly created configuration file - or just `config.json` if it's
-in the same directory as the one you're starting the bot from.
+following the instructions [here](https://github.com/aronson/discord-irc#configuration).
+Place config.json in the same directory as the cloned sources.
 
-When you've done that you can install and start the bot either through npm:
+When you've done that you can install and start the bot through cloning the repository:
 
 ```bash
-$ npm install -g discord-irc
-$ discord-irc --config /path/to/config.json
-```
+## Clone the repo
+git clone https://github.com/aronson/discord-irc.git
+## copy your config.json in
+cp /path/to/config.json discord-irc
+## Enter source directory
+cd discord-irc
+## Start with deno.
+deno task start
 
-or by cloning the repository:
-
-```bash
-In the repository folder:
-$ npm install
-$ npm run build
-$ npm start -- --config /path/to/config.json # Note the extra double dash
+## For custom path
+CONFIG_FILE=/path/to/config.json deno task start
 ```
 
 It can also be used as a module:
@@ -95,14 +94,9 @@ First you need to create a Discord bot user, which you can do by following the i
       1234567890: '#channel', // Use a discord channel ID instead of its name (so you can rename it or to disambiguate)
     },
     ircOptions: {
-      // Optional node-irc options
-      floodProtection: false, // On by default
-      floodProtectionDelay: 1000, // 500 by default
-      port: '6697', // 6697 by default
-      secure: true, // enable SSL, false by default
-      sasl: true, // false by default
-      username: 'test', // nodeirc by default
-      password: 'p455w0rd', // empty by default
+      // Deno/irc options, see https://github.com/jeromeludmann/deno-irc/blob/main/API.md#options
+      username: 'test',
+      password: 'p455w0rd'
     },
     format: {
       // Optional custom formatting options
@@ -149,7 +143,7 @@ First you need to create a Discord bot user, which you can do by following the i
 ];
 ```
 
-The `ircOptions` object is passed directly to irc-upd ([available options](https://node-irc-upd.readthedocs.io/en/latest/API.html#irc.Client)).
+The `ircOptions` object is passed directly to deno/irc ([available options](https://github.com/jeromeludmann/deno-irc/blob/main/API.md#options)).
 
 To retrieve a discord channel ID, write `\#channel` on the relevant server – it should produce something of the form `<#1234567890>`, which you can then use in the `channelMapping` config.
 
@@ -171,26 +165,15 @@ discord-irc's config as follows:
   }
 ```
 
-### Encodings
-
-If you encounter trouble with some characters being corrupted from some clients (particularly umlauted characters, such as `ä` or `ö`), try installing the optional dependencies `iconv` and `node-icu-charset-detector`.
-The bot will produce a warning when started if the IRC library is unable to convert between encodings.
-
-Further information can be found in [the installation section of irc-upd](https://github.com/Throne3d/node-irc#character-set-detection).
-
-## Tests
+## Tests (TODO)
 
 Run the tests with:
 
 ```bash
-$ npm test
+deno test
 ```
 
 ## Style Guide
 
-discord-irc follows the [Airbnb Style Guide](https://github.com/airbnb/javascript).
-[ESLint](http://eslint.org/) is used to make sure this is followed correctly, which can be run with:
-
-```bash
-$ npm run lint
-```
+discord-irc follows the deno standard styles with some tweaks.
+Please use `deno lint` and `deno fmt` to make sure this is followed correctly.
