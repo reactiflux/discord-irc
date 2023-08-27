@@ -1,6 +1,6 @@
 #!/usr/bin/env -S deno run -A
 
-import { join } from 'path';
+import { resolve as resolvePath } from 'path';
 import { program } from 'npm:commander';
 import * as helpers from './helpers.ts';
 import { Config } from './config.ts';
@@ -15,28 +15,19 @@ async function run() {
 
   const opts = program.opts();
 
-  // Check if configFile.json exists in the current working directory
-  const localConfigFile = join(Deno.cwd(), 'config.json');
-  const localConfigExists = await helpers.exists(localConfigFile);
-
-  // Determine the config file to use
-  let configFile;
+  let configFilePath: string;
   if (opts.config) {
-    configFile = opts.config;
-  } else if (localConfigExists) {
-    configFile = localConfigFile;
-  } else if (Deno.env.get('CONFIG_FILE')) {
-    configFile = Deno.env.get('CONFIG_FILE');
+    configFilePath = opts.config;
   } else {
-    throw new Error('Missing environment variable CONFIG_FILE');
+    configFilePath = Deno.env.get('CONFIG_FILE') ?? './config.json';
+  }
+  configFilePath = resolvePath(configFilePath);
+
+  if (!await helpers.exists(configFilePath)) {
+    throw new Error('Config file could not be found.');
   }
 
-  const completePath = configFile.startsWith('/')
-    ? configFile
-    : join(Deno.cwd(), configFile);
-  const config = JSON.parse(
-    new TextDecoder().decode(Deno.readFileSync(completePath)),
-  ) as
+  const config = JSON.parse(await Deno.readTextFile(configFilePath)) as
     | Config
     | Config[];
   helpers.createBots(config);
