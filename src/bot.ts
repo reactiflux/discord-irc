@@ -125,7 +125,7 @@ export default class Bot {
       password: options.ircOptions?.password,
       reconnect: {
         attempts: Number.MAX_SAFE_INTEGER,
-        delay: 10,
+        delay: 3,
       },
       ...options.ircOptions,
     };
