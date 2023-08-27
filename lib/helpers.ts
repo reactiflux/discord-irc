@@ -1,13 +1,13 @@
 import { ConfigurationError } from './errors.ts';
 import {} from './botWorker.ts';
 
-export async function exists(filename: string): Promise<boolean> {
+export async function exists(filename: string) {
   try {
     await Deno.stat(filename);
     // successful, file or directory must exist
     return true;
   } catch (error) {
-    if (error && error.kind === Deno.errors.NotFound) {
+    if (error instanceof Deno.errors.NotFound) {
       // file or directory does not exist
       return false;
     } else {
