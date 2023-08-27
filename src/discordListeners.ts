@@ -65,8 +65,17 @@ export function createDiscordMessageListener(bot: Bot) {
   };
 }
 
+const ignoreMessages = [/Heartbeat ack/, /heartbeat sent/];
+
+function containsIgnoredMessage(str: string): boolean {
+  return ignoreMessages.some((regex) => regex.test(str));
+}
+
 export function createDiscordDebugListener(bot: Bot) {
   return (message: string) => {
+    if (!bot.verbose && containsIgnoredMessage(message)) {
+      return;
+    }
     bot.debug &&
       bot.logger.debug(
         `Received debug event from Discord: ${

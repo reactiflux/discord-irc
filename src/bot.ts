@@ -67,7 +67,10 @@ export default class Bot {
   invertedMapping: Dictionary<string>;
   ircClient: Client;
   ircNickColors: string[] = DEFAULT_NICK_COLORS;
-  debug: boolean = (Deno.env.get('DEBUG') ?? 'false').toLowerCase() === 'true';
+  debug: boolean = (Deno.env.get('DEBUG') ?? Deno.env.get('VERBOSE') ?? 'false')
+    .toLowerCase() === 'true';
+  verbose: boolean =
+    (Deno.env.get('VERBOSE') ?? 'false').toLowerCase() === 'true';
   constructor(options: Config) {
     /* REQUIRED_FIELDS.forEach((field) => {
       if (!options[field]) {
