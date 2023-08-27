@@ -2,6 +2,21 @@ interface Codes {
   [key: string]: string;
 }
 
+export const DEFAULT_NICK_COLORS = [
+  'light_blue',
+  'dark_blue',
+  'light_red',
+  'dark_red',
+  'light_green',
+  'dark_green',
+  'magenta',
+  'light_magenta',
+  'orange',
+  'yellow',
+  'cyan',
+  'light_cyan',
+];
+
 const codes: Codes = {
   white: '\u000300',
   black: '\u000301',

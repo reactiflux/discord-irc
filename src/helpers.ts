@@ -13,8 +13,27 @@ export function invert(obj: any) {
   );
 }
 
+export async function forEachAsync<T>(
+  array: Array<T>,
+  callback: (item: T, index: number) => Promise<void>,
+) {
+  for (let index = 0; index < array.length; index++) {
+    await callback(array[index], index);
+  }
+}
+
 export function isObject(a: any) {
   return a instanceof Object;
+}
+
+export interface Dictionary<T> {
+  [index: string]: T;
+}
+
+export function escapeMarkdown(text: string) {
+  const unescaped = text.replace(/\\(\*|_|`|~|\\)/g, '$1'); // unescape any "backslashed" character
+  const escaped = unescaped.replace(/(\*|_|`|~|\\)/g, '\\$1'); // escape *, _, `, ~, \
+  return escaped;
 }
 
 /**
