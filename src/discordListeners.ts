@@ -28,8 +28,7 @@ export function createDiscordMessageListener(bot: Bot) {
   return async (message: Message) => {
     // Show the IRC channel's /names list when asked for in Discord
     if (message.content.toLowerCase() === '/names') {
-      const channelName = `#${(message.channel as GuildChannel)
-        ?.name}`;
+      const channelName = `#${(message.channel as GuildChannel)?.name}`;
       // return early if message was in channel we don't post to
       if (
         !(
