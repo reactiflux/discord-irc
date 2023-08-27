@@ -30,6 +30,15 @@ export function createDiscordMessageListener(bot: Bot) {
     if (message.content.toLowerCase() === '/names') {
       const channelName = `#${(message.channel as GuildChannel)
         ?.name}`;
+      // return early if message was in channel we don't post to
+      if (
+        !(
+          Object.keys(bot.channelMapping).find((c) => c === channelName) ||
+          Object.keys(bot.channelMapping).find((c) => c === message.channelId)
+        )
+      ) {
+        return;
+      }
       const ircChannel = bot.channelMapping[message.channel.id] ||
         bot.channelMapping[channelName];
       if (bot.channelUsers[ircChannel]) {
