@@ -5,23 +5,38 @@ import discord, {
   GuildMember,
 } from 'npm:discord.js';
 import Dlog from 'dlog';
-
-// import { ConfigurationError } from './errors';
 import { validateChannelMapping } from './validators.ts';
 import {
   formatFromDiscordToIRC,
   formatFromIRCToDiscord,
 } from './formatting.ts';
 import { DEFAULT_NICK_COLORS, wrap } from './colors.ts';
-import { Dictionary, escapeMarkdown, forEachAsync, invert } from './helpers.ts';
+import { Dictionary, invert } from './helpers.ts';
 import { Config } from './config.ts';
+import {
+  createIrcActionListener,
+  createIrcErrorListener,
+  createIrcInviteListener,
+  createIrcJoinListener,
+  createIrcNickListener,
+  createIrcNicklistListener,
+  createIrcNoticeListener,
+  createIrcPartListener,
+  createIrcPrivMessageListener,
+  createIrcQuitListener,
+  createIrcRegisterListener,
+} from './ircListeners.ts';
+import {
+  createDiscordDebugListener,
+  createDiscordErrorListener,
+  createDiscordMessageListener,
+  createDiscordReadyListener,
+  createDiscordWarningListener,
+} from './discordListeners.ts';
 
 // Usernames need to be between 2 and 32 characters for webhooks:
 const USERNAME_MIN_LENGTH = 2;
 const USERNAME_MAX_LENGTH = 32;
-
-// Configure debug logging with environment
-const debug = (Deno.env.get('DEBUG') ?? 'false').toLowerCase() === 'true';
 
 // const REQUIRED_FIELDS = ['server', 'nickname', 'channelMapping', 'discordToken'];
 const patternMatch = /{\$(.+?)}/g;
@@ -52,6 +67,7 @@ export default class Bot {
   invertedMapping: Dictionary<string>;
   ircClient: Client;
   ircNickColors: string[] = DEFAULT_NICK_COLORS;
+  debug: boolean = (Deno.env.get('DEBUG') ?? 'false').toLowerCase() === 'true';
   constructor(options: Config) {
     /* REQUIRED_FIELDS.forEach((field) => {
       if (!options[field]) {
@@ -134,7 +150,7 @@ export default class Bot {
   }
 
   async connect() {
-    debug && this.logger.debug('Connecting to IRC and Discord');
+    this.debug && this.logger.debug('Connecting to IRC and Discord');
     await this.discord.login(this.options.discordToken);
 
     // Extract id and token from Webhook urls and connect.
@@ -147,7 +163,8 @@ export default class Bot {
       };
     });
 
-    this.attachListeners();
+    this.attachDiscordListeners();
+    this.attachIrcListeners();
     await this.ircClient.connect(this.options.server);
     Object.entries(this.invertedMapping).forEach(([ircChannel, _]) => {
       this.logger.info(`Joining channel ${ircChannel}`);
@@ -161,255 +178,28 @@ export default class Bot {
     Object.values(this.webhooks).forEach((x) => x.client.destroy());
   }
 
-  attachListeners() {
-    this.discord.on('ready', () => {
-      this.logger.info('Connected to Discord');
-    });
-
-    this.ircClient.on('register', (message) => {
-      this.logger.info('Connected to IRC');
-      debug && this.logger.debug(
-        `Registered event:\n${JSON.stringify(message, null, 2)}`,
-      );
-      forEachAsync(
-        this.options.autoSendCommands ?? [],
-        async (element: [any, string]) => {
-          await this.ircClient.send(...element);
-        },
-      );
-    });
-
-    this.ircClient.on('error', (error) => {
-      this.logger.error(
-        `Received error event from IRC\n${JSON.stringify(error, null, 2)}`,
-      );
-    });
-
-    this.discord.on('error', (error) => {
-      this.logger.error(
-        `Received error event from Discord\n${JSON.stringify(error, null, 2)}`,
-      );
-    });
-
-    this.discord.on('warn', (warning) => {
-      this.logger.warn(
-        `Received warn event from Discord\n${JSON.stringify(warning, null, 2)}`,
-      );
-    });
-
-    this.discord.on('messageCreate', async (message) => {
-      // Show the IRC channel's /names list when asked for in Discord
-      if (message.content.toLowerCase() === '/names') {
-        const channelName = `#${(message.channel as GuildChannel)
-          ?.name}`;
-        const ircChannel = this.channelMapping[message.channel.id] ||
-          this.channelMapping[channelName];
-        if (this.channelUsers[ircChannel]) {
-          const ircNames = this.channelUsers[ircChannel].values();
-          const ircNamesArr = new Array(...ircNames);
-          await this.sendExactToDiscord(
-            ircChannel,
-            `Users in ${ircChannel}\n> ${
-              ircNamesArr
-                .map(escapeMarkdown) //TODO: Switch to discord.js escape markdown
-                .join(', ')
-            }`,
-          );
-        } else {
-          this.logger.warn(
-            `No channelUsers found for ${ircChannel} when /names requested`,
-          );
-          // Pass the command through if channelUsers is empty
-          await this.sendToIRC(message);
-        }
-      } else {
-        // Ignore bot messages and people leaving/joining
-        await this.sendToIRC(message);
-      }
-    });
-
-    this.ircClient.on(
-      'privmsg:channel',
-      async (event) => {
-        await this.sendToDiscord(
-          event.source?.name ?? '',
-          event.params.target,
-          event.params.text,
-        );
-      },
-    );
-
-    this.ircClient.on(
-      'notice',
-      (event) => {
-        debug &&
-          this.logger.debug(
-            `Received notice:\n${JSON.stringify(event.params.text)}`,
-          );
-      },
-    );
-
-    this.ircClient.on(
-      'nick',
-      (event) => {
-        Object.values(this.channelMapping).forEach((channelName) => {
-          const channel = channelName.toLowerCase();
-          const newNick = event.params.nick;
-          const oldNick = event.source?.name ?? '';
-          if (this.channelUsers[channelName]) {
-            let users = this.channelUsers[channel];
-            const index = users.indexOf(oldNick);
-            if (index !== -1) {
-              users = users.splice(index, 1);
-              users.push(newNick);
-              if (!this.options.ircStatusNotices) return;
-              this.sendExactToDiscord(
-                channel,
-                `*${oldNick}* is now known as ${newNick}`,
-              );
-            }
-          } else {
-            this.logger.warn(
-              `No channelUsers found for ${channel} when ${oldNick} changed.`,
-            );
-          }
-        });
-      },
-    );
-
-    this.ircClient.on('join', async (event) => {
-      const channelName = event.params.channel;
-      const nick = event.source?.name ?? '';
-      debug && this.logger.debug(`Received join: ${channelName} -- ${nick}`);
-      if (nick === this.options.nickname && !this.options.announceSelfJoin) {
-        return;
-      }
-      const channel = channelName.toLowerCase();
-      // self-join is announced before names (which includes own nick)
-      // so don't add nick to channelUsers
-      if (nick !== this.options.nickname) {
-        this.channelUsers[channel].push(nick);
-      }
-      if (!this.options.ircStatusNotices) return;
-      await this.sendExactToDiscord(
-        channel,
-        `*${nick}* has joined the channel`,
-      );
-    });
-
-    this.ircClient.on(
-      'part',
-      async (event) => {
-        const channelName = event.params.channel;
-        const nick = event.source?.name ?? '';
-        const reason = event.params.comment;
-        debug && this.logger.debug(
-          `Received part: ${channelName} -- ${nick} -- ${reason}`,
-        );
-        const channel = channelName.toLowerCase();
-        // remove list of users when no longer in channel (as it will become out of date)
-        if (nick === this.options.nickname) {
-          debug && this.logger.debug(
-            `Deleting channelUsers as bot parted: ${channel}`,
-          );
-          delete this.channelUsers[channel];
-          return;
-        }
-        const users = this.channelUsers[channel];
-        if (users) {
-          const index = users.indexOf(nick);
-          this.channelUsers[channel] = users.splice(index, 1);
-        } else {
-          this.logger.warn(
-            `No channelUsers found for ${channel} when ${nick} parted.`,
-          );
-        }
-        if (!this.options.ircStatusNotices) return;
-        await this.sendExactToDiscord(
-          channel,
-          `*${nick}* has left the channel (${reason})`,
-        );
-      },
-    );
-
-    this.ircClient.on(
-      'quit',
-      (event) => {
-        const nick = event.source?.name ?? '';
-        const reason = event.params.comment ?? '';
-        debug && this.logger.debug(
-          `Received quit: ${nick}`,
-        );
-        Object.values(this.channelMapping).forEach((channelName) => {
-          const channel = channelName.toLowerCase();
-          const users = this.channelUsers[channel];
-          if (!users) {
-            this.logger.warn(
-              `No channelUsers found for ${channel} when ${nick} quit, ignoring.`,
-            );
-            return;
-          }
-          const index = users.indexOf(nick);
-          if (index === -1) return;
-          else this.channelUsers[channel] = users.splice(index, 1);
-          if (
-            !this.options.ircStatusNotices || nick === this.options.nickname
-          ) return;
-          this.sendExactToDiscord(
-            channel,
-            `*${nick}* has quit (${reason})`,
-          );
-        });
-        console.log('quit');
-        console.log(event);
-      },
-    );
-
-    this.ircClient.on('nicklist', (event) => {
-      const channelName = event.params.channel;
-      const nicks = event.params.nicklist;
-      debug && this.logger.debug(
-        `Received names: ${channelName}\n${JSON.stringify(nicks, null, 2)}`,
-      );
-      const channel = channelName.toLowerCase();
-      this.channelUsers[channel] = nicks.map((n) => n.nick);
-    });
-
-    this.ircClient.on('ctcp_action', async (event) => {
-      await this.sendToDiscord(
-        event.source?.name ?? '',
-        event.params.target,
-        `_${event.params.text}_`,
-      );
-    });
-
-    this.ircClient.on('invite', (event) => {
-      const channel = event.params.channel;
-      const from = event.params.nick;
-      debug && this.logger.debug(`Received invite: ${channel} -- ${from}`);
-      if (!this.invertedMapping[channel]) {
-        debug && this.logger.debug(
-          `Channel not found in config, not joining: ${channel}`,
-        );
-      } else {
-        this.ircClient.join(channel);
-        debug && this.logger.debug(`Joining channel: ${channel}`);
-      }
-    });
-
-    if (debug) {
-      this.discord.on('debug', (message) => {
-        debug && this.logger.debug(
-          `Received debug event from Discord: ${
-            JSON.stringify(
-              message,
-              null,
-              2,
-            )
-          }`,
-        );
-      });
+  private attachDiscordListeners() {
+    this.discord.on('ready', createDiscordReadyListener(this));
+    this.discord.on('error', createDiscordErrorListener(this));
+    this.discord.on('warn', createDiscordWarningListener(this));
+    this.discord.on('messageCreate', createDiscordMessageListener(this));
+    if (this.debug) {
+      this.discord.on('debug', createDiscordDebugListener(this));
     }
+  }
+
+  private attachIrcListeners() {
+    this.ircClient.on('register', createIrcRegisterListener(this));
+    this.ircClient.on('error', createIrcErrorListener(this));
+    this.ircClient.on('privmsg:channel', createIrcPrivMessageListener(this));
+    this.ircClient.on('notice', createIrcNoticeListener(this));
+    this.ircClient.on('nick', createIrcNickListener(this));
+    this.ircClient.on('join', createIrcJoinListener(this));
+    this.ircClient.on('part', createIrcPartListener(this));
+    this.ircClient.on('quit', createIrcQuitListener(this));
+    this.ircClient.on('nicklist', createIrcNicklistListener(this));
+    this.ircClient.on('ctcp_action', createIrcActionListener(this));
+    this.ircClient.on('invite', createIrcInviteListener(this));
   }
 
   async getDiscordNicknameOnServer(user: discord.User, guild: discord.Guild) {
@@ -418,12 +208,12 @@ export default class Bot {
       const userDetails = members.get(user.id);
       if (userDetails) {
         const value = userDetails.nickname || user.displayName;
-        debug && this.logger.debug(`Got username value: ${value}`);
+        this.debug && this.logger.debug(`Got username value: ${value}`);
         return value;
       }
     }
     const value = user.username;
-    debug && this.logger.debug(`Got username value: ${value}`);
+    this.debug && this.logger.debug(`Got username value: ${value}`);
     return user.username;
   }
 
@@ -587,7 +377,7 @@ export default class Bot {
 
       if (this.isCommandMessage(text)) {
         //patternMap.side = 'Discord';
-        debug && this.logger.debug(
+        this.debug && this.logger.debug(
           `Sending command message to IRC ${ircChannel} -- ${text}`,
         );
         // if (prelude) this.ircClient.say(ircChannel, prelude);
@@ -606,7 +396,7 @@ export default class Bot {
           patternMap.text = text;
 
           text = Bot.substitutePattern(this.formatIRCText, patternMap);
-          debug && this.logger.debug(
+          this.debug && this.logger.debug(
             `Sending message to IRC ${ircChannel} -- ${text}`,
           );
           this.ircClient.privmsg(ircChannel, text);
@@ -620,7 +410,7 @@ export default class Bot {
               patternMap,
             );
 
-            debug && this.logger.debug(
+            this.debug && this.logger.debug(
               `Sending attachment URL to IRC ${ircChannel} ${urlMessage}`,
             );
             this.ircClient.privmsg(ircChannel, urlMessage);
@@ -749,7 +539,7 @@ export default class Bot {
 
     if (this.isCommandMessage(text)) {
       patternMap.side = 'IRC';
-      debug && this.logger.debug(
+      this.debug && this.logger.debug(
         `Sending command message to Discord #${channelName} -- ${text}`,
       );
       if (this.formatCommandPrelude) {
@@ -911,7 +701,7 @@ export default class Bot {
     const webhook = this.findWebhook(channel);
     if (webhook) {
       if (discordChannel.type === discord.ChannelType.GuildText) {
-        debug && this.logger.debug(
+        this.debug && this.logger.debug(
           `Sending message to Discord via webhook ${withMentions} ${channel} -> #${discordChannel.name}`,
         );
       }
@@ -951,7 +741,7 @@ export default class Bot {
     // Use custom formatting from config / default formatting with bold author
     const withAuthor = Bot.substitutePattern(this.formatDiscord, patternMap);
     if (discordChannel.type === discord.ChannelType.GuildText) {
-      debug && this.logger.debug(
+      this.debug && this.logger.debug(
         `Sending message to Discord ${withAuthor} ${channel} -> #${discordChannel.name}`,
       );
       discordChannel.send(withAuthor);
@@ -964,7 +754,7 @@ export default class Bot {
     if (!discordChannel) return;
 
     if (discordChannel.type === discord.ChannelType.GuildText) {
-      debug && this.logger.debug(
+      this.debug && this.logger.debug(
         `Sending special message to Discord ${text} ${channel} -> #${discordChannel.name}`,
       );
       await discordChannel.send(text);
