@@ -575,8 +575,6 @@ export default class Bot {
 
     const processQuickUsernames = (input: string) => {
       return input.replace(/@([^\s#]+)/g, (match, username) => {
-        // @username#1234 => mention
-        // skips usernames including spaces for ease (they cannot include hashes)
         // checks case insensitively as Discord does
         const user = members?.find(
           (x) =>
