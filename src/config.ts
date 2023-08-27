@@ -30,7 +30,6 @@ export type Config = {
   ircStatusNotices?: boolean;
   announceSelfJoin?: boolean;
   webhooks?: Dictionary<string>;
-  partialMatch?: boolean;
   ignoreUsers?: IgnoreUsers;
   // "{$keyName}" => "variableValue"
   // author/nickname: nickname of the user who sent the message

@@ -403,7 +403,7 @@ export default class Bot {
         }
 
         if (message.attachments && message.attachments.size) {
-          message.attachments.forEach((a: { url: any }) => {
+          message.attachments.forEach((a) => {
             patternMap.attachmentURL = a.url;
             const urlMessage = Bot.substitutePattern(
               this.formatURLAttachment,
@@ -594,71 +594,14 @@ export default class Bot {
               Bot.caseComp(x.user.username, reference) ||
               Bot.caseComp(x.user.displayName, reference),
           );
-          if (user) return user;
+          if (user) return user.toString();
 
-          if (!this.options.allowRolePings) return;
+          if (!this.options.allowRolePings) return match;
           // @role => mention, case insensitively
           const role = roles.find(
             (x) => x.mentionable && Bot.caseComp(x.name, reference),
           );
-          if (role) return role;
-
-          // Disable broken partial mentions
-          if (!this.options.partialMatch) return match;
-
-          // No match found checking the whole word. Check for partial matches now instead.
-          // @nameextra => [mention]extra, case insensitively, as Discord does
-          // uses the longest match, and if there are two, whichever is a match by case
-          let matchLength = 0;
-          let bestMatch: any = null;
-          let caseMatched = false;
-
-          // check if a partial match is found in reference and if so update the match values
-          const checkMatch = function (
-            matchString: string | string[],
-            matchValue: any,
-          ) {
-            // if the matchString is longer than the current best and is a match
-            // or if it's the same length but it matches by case unlike the current match
-            // set the best match to this matchString and matchValue
-            if (
-              (matchString.length > matchLength &&
-                Bot.caseStartsWith(
-                  reference,
-                  matchString as string,
-                )) ||
-              (matchString.length === matchLength &&
-                !caseMatched &&
-                reference.startsWith(matchString))
-            ) {
-              matchLength = matchString.length;
-              bestMatch = matchValue;
-              caseMatched = reference.startsWith(matchString);
-            }
-          };
-
-          // check users by username and nickname
-          members.forEach(
-            (
-              member: { user: { username: any }; nickname: any },
-            ) => {
-              checkMatch(member.user.username, member);
-              if (bestMatch === member || !member.nickname) return;
-              checkMatch(member.nickname, member);
-            },
-          );
-          // check mentionable roles by visible name
-          roles.forEach((member: { mentionable: any; name: any }) => {
-            if (!member.mentionable) return;
-            checkMatch(member.name, member);
-          });
-
-          // if a partial match was found, return the match and the unmatched trailing characters
-          if (bestMatch) {
-            return bestMatch.toString() +
-              reference.substring(matchLength);
-          }
-
+          if (role) return role.toString();
           return match;
         },
       );
@@ -667,9 +610,8 @@ export default class Bot {
     const processEmoji = (input: string) => {
       return input.replace(/:(\w+):/g, (match, ident) => {
         // :emoji: => mention, case sensitively
-        const emoji = guild?.emojis.cache.find(
-          (x: { name: any; requiresColons: any }) =>
-            x.name === ident && x.requiresColons,
+        const emoji = guild?.emojis.cache.find((x) =>
+          x.name === ident && x.requiresColons
         );
         if (emoji) return emoji.toString();
 
@@ -684,7 +626,7 @@ export default class Bot {
         // but these seem likely to be common around channel references)
 
         // discord matches channel names case insensitively
-        const chan = guild?.channels.cache.find((x: { name: any }) =>
+        const chan = guild?.channels.cache.find((x) =>
           Bot.caseComp(x.name, channelName)
         );
         return (chan || match).toString();
