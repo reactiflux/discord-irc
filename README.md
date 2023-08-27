@@ -53,7 +53,7 @@ If you've checked out the repository already, you can build the Docker image loc
 
 ```bash
 docker build -t discord-irc .
-docker run -v /path/to/config.json:/app/config.json ghcr.io/aronson/discord-irc
+docker run -v /path/to/config.json:/app/config.json discord-irc
 ```
 
 Note that the path to the config file on the host (`/path/to/config`) _must_ be a valid absolute path to a config file.
