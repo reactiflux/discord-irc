@@ -1,19 +1,12 @@
 #!/usr/bin/env -S deno run -A
 
 import { resolve as resolvePath } from 'path';
-import { program } from 'npm:commander';
+import { parse as parseCLI } from 'flags';
 import * as helpers from './helpers.ts';
 import { Config } from './config.ts';
 
 async function run() {
-  program
-    .option(
-      '-c, --config <path>',
-      'Sets the path to the config file, otherwise read from the env variable CONFIG_FILE.',
-    )
-    .parse(Deno.args);
-
-  const opts = program.opts();
+  const opts = parseCLI(Deno.args, { alias: { c: 'config' } });
 
   let configFilePath: string;
   if (opts.config) {
