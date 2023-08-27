@@ -5,7 +5,6 @@ COPY . /bot
 
 WORKDIR /bot
 
-RUN deno task prepare && \
-	mkdir /config
+RUN deno task prepare
 
 ENTRYPOINT ["/bot/discord-irc"]
