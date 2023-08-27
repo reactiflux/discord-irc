@@ -1,5 +1,4 @@
 import { ConfigurationError } from './errors.ts';
-import {} from './botWorker.ts';
 import { Config } from './config.ts';
 
 export async function exists(filename: string): Promise<boolean> {
@@ -73,7 +72,7 @@ export function escapeMarkdown(text: string) {
  */
 export function createBots(
   configFile: Config | Config[],
-): Promise<object[]> {
+): Worker[] {
   const bots: Worker[] = [];
 
   // The config file can be both an array and an object
