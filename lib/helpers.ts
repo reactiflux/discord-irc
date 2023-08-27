@@ -1,5 +1,6 @@
 import { ConfigurationError } from './errors.ts';
 import {} from './botWorker.ts';
+import { Config } from './config.ts';
 
 export async function exists(filename: string) {
   try {
@@ -56,7 +57,7 @@ export function escapeMarkdown(text: string) {
  * Reads from the provided config file and returns an array of bots
  * @return {object[]}
  */
-export function createBots(configFile: any[]): object[] {
+export function createBots(configFile: Config | Config[]): object[] {
   const bots: Worker[] = [];
 
   // The config file can be both an array and an object
