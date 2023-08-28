@@ -43,6 +43,8 @@ chmod +x ./discord-irc-apple-* && xattr -c ./discord-irc-apple-*
 ./discord-irc-apple-* -c ./config.json
 ```
 
+#### Config file location
+
 If run with no arguments, the application will search for a `config.json` within
 the current working directory.
 
