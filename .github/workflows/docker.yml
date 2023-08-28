@@ -7,6 +7,7 @@ on:
       - .github/workflows/ci.yaml
       - lib/**
       - deno.json
+      - Dockerfile
   release:
     types:
       - published
