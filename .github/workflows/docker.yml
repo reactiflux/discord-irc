@@ -23,11 +23,6 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@v2
 
-      - name: Set up QEMU
-        uses: docker/setup-qemu-action@v2
-        with:
-          platforms: "arm64,arm"
-
       - name: Set up Docker Buildx
         uses: docker/setup-buildx-action@v2
 
@@ -59,4 +54,36 @@ jobs:
           file: ./docker/Dockerfile
           tags: ${{ steps.metadata.outputs.tags }}
           labels: ${{ steps.metadata.outputs.labels }}
-          platforms: linux/amd64,linux/arm64
+
+      - name: Setup Deno
+        uses: denoland/setup-deno@v1
+        with:
+          deno-version: v1.x
+
+      - name: Compile Windows binary
+        run: deno compile -A --target=x86_64-pc-windows-msvc -o discord-irc-windows-x86_64.exe lib/index.ts
+      - uses: actions/upload-artifact@v3
+        with:
+          name: windows-x86_64
+          path: ./discord-irc-windows-x86_64.exe
+
+      - name: Compile Linux binary
+        run: deno compile -A --target=x86_64-unknown-linux-gnu -o discord-irc-linux-x86_64 lib/index.ts && chmod +x discord-irc-linux-x86_64
+      - uses: actions/upload-artifact@v3
+        with:
+          name: linux-x86_64
+          path: ./discord-irc-linux-x86_64
+
+      - name: Compile macOS (Intel) binary
+        run: deno compile -A --target=x86_64-apple-darwin -o discord-irc-apple-x86_64 lib/index.ts && chmod +x discord-irc-apple-x86_64
+      - uses: actions/upload-artifact@v3
+        with:
+          name: apple-x86_64
+          path: ./discord-irc-apple-x86_64
+
+      - name: Compile macOS (Apple Silicon) binary
+        run: deno compile -A --target=x86_64-apple-darwin -o discord-irc-apple-arm64 lib/index.ts && chmod +x discord-irc-apple-arm64
+      - uses: actions/upload-artifact@v3
+        with:
+          name: apple-arm64
+          path: ./discord-irc-apple-arm64

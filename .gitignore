@@ -4,9 +4,6 @@ discord-irc
 # Git hooks
 .git-hooks/
 
-# Deno lock
-deno.lock
-
 # Logs
 logs
 *.log
