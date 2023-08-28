@@ -540,42 +540,21 @@ export default class Bot {
     if (discordChannel.isGuildText()) {
       guild = discordChannel.guild;
     }
-    const members = await guild?.members.fetchList();
-    if (!members) return;
     const roles = await guild?.roles.fetchAll();
     if (!roles) return;
     const channels = await guild?.channels.array();
     if (!channels) return;
 
-    const processQuickUsernames = (input: string) => {
-      return input.replace(/@([^\s#]+)/g, (match, username) => {
-        // checks case insensitively as Discord does
-        const user = members?.find(
-          (x) =>
-            Bot.caseComp(x.user.username, username) ||
-            Bot.caseComp(x.nick ?? '', username) ||
-            Bot.caseComp(x.user.displayName, username),
-        );
-        if (user) return `<@${user.id}>`;
-
-        return match;
-      });
-    };
-
-    const processMentionables = (input: string) => {
-      return input.replace(
+    const processMentionables = async (input: string) => {
+      return await replaceAsync(
+        input,
         /^([^@\s:,]+)[:,]|@([^\s]+(?:\s[^\s]+)*)/g,
-        (match, startRef, atRef) => {
+        async (match, startRef, atRef) => {
           const reference = startRef || atRef;
+          const members = await guild?.members.search(reference);
 
           // @username => mention, case insensitively
-          const user = members?.find(
-            (x) =>
-              Bot.caseComp(x.user.username, reference) ||
-              Bot.caseComp(x.nick ?? '', reference) ||
-              Bot.caseComp(x.user.displayName, reference),
-          );
-          if (user) return `<@${user.id}>`;
+          if (members && members.length > 0) return `<@${members[0].id}>`;
 
           if (!this.options.allowRolePings) return match;
           // @role => mention, case insensitively
@@ -614,7 +593,7 @@ export default class Bot {
 
     const withMentions = processChannels(
       await processEmoji(
-        processMentionables(processQuickUsernames(withFormat)),
+        await processMentionables(withFormat),
       ),
     );
 
@@ -654,7 +633,13 @@ export default class Bot {
           replied_user: true,
         },
       };
-      webhook.client.send(withMentions, payload);
+      try {
+        await webhook.client.send(withMentions, payload);
+      } catch (e) {
+        this.logger.error(
+          `Received error on webhook send: ${JSON.stringify(e, null, 2)}`,
+        );
+      }
       return;
     }
 
