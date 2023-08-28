@@ -8,15 +8,27 @@
 
 ## Installation and usage
 
-**Note**: discord-irc requires Deno, as it depends on [discord.js](https://github.com/hydrabolt/discord.js).
-Future versions may require newer Deno versions, though we should support active releases.
-Please see the [official install instructions](https://deno.land/manual/getting_started/installation) to install Deno for your platform.
-
 Before you can run discord-irc you need to create a configuration file by
 following the instructions [here](https://github.com/aronson/discord-irc#configuration).
 Place config.json in the same directory as the cloned sources.
 
-When you've done that you can install and start the bot through cloning the repository:
+When you've done that you can install and start the bot by downloading the [latest release](https://github.com/aronson/discord-irc/releases) for your platform.
+
+Windows:
+```batch
+.\discord-irc-windows-x86_64.exe -c C:\Path\To\config.json
+```
+
+Linux/macOS (make sure to replace the name of the program file with the one you downloaded):
+```bash
+## Linux
+./discord-irc-linux-x86_64 -c /path/to/config.json
+```
+
+**Note**: For *development* work, discord-irc requires Deno, as it depends on [Harmony](https://harmony.mod.land).
+Please see the [official install instructions](https://deno.land/manual/getting_started/installation) to install Deno for your platform.
+
+One can also run the bot for development purposes through cloning the repository:
 
 ```bash
 ## Clone the repo
