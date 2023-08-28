@@ -48,9 +48,9 @@ chmod +x ./discord-irc-apple-* && xattr -c ./discord-irc-apple-*
 If run with no arguments, the application will search for a `config.json` within
 the current working directory.
 
-**Note:** For security, the application cannot read `config.json` files that are in 
-a path *above* the current working directory. Ensure the `config.json` is in the same 
-folder to have no problems.
+**Note:** For security, the application cannot read `config.json` files that are
+in a path _above_ the current working directory. Ensure the `config.json` is in
+the same folder to have no problems.
 
 ### Running with Deno (developers)
 
