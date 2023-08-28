@@ -2,6 +2,11 @@ name: Publish Docker image
 
 on:
   push:
+    paths:
+      - .github/workflows/docker.yaml
+      - .github/workflows/ci.yaml
+      - lib/**
+      - deno.json
   release:
     types:
       - published
