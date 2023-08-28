@@ -37,7 +37,6 @@ import {
   createDiscordReadyListener,
 } from './discordListeners.ts';
 import { AllWebhookMessageOptions } from 'https://raw.githubusercontent.com/harmonyland/harmony/main/src/structures/webhook.ts';
-const _ = {};
 
 // Usernames need to be between 2 and 32 characters for webhooks:
 const USERNAME_MIN_LENGTH = 2;
