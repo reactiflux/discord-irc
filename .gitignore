@@ -33,7 +33,7 @@ node_modules
 # Environment variables and configuration
 .env
 .environment
-config.json
+config*.json
 
 # Build
 dist/
