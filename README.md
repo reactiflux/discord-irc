@@ -23,6 +23,10 @@ Linux/macOS (make sure to replace the name of the program file with the one you 
 ```bash
 ## Linux
 ./discord-irc-linux-x86_64 -c /path/to/config.json
+## Apple users may need to mark as executable and disable quarantine before running
+chmod +x ./discord-irc-apple-*
+xattr -c ./discord-irc-apple-*
+./discord-irc-apple-* -c /path/to/config.json
 ```
 
 **Note**: For *development* work, discord-irc requires Deno, as it depends on [Harmony](https://harmony.mod.land).
