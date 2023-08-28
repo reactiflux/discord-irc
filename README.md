@@ -14,20 +14,27 @@ following the instructions [here](https://github.com/aronson/discord-irc#configu
 ### Native builds (easiest)
 Start the bot by downloading the [latest release](https://github.com/aronson/discord-irc/releases) for your platform.
 
-Windows:
+#### Windows:
+The easiest method is place your config.json in the same folder as discord-irc-windows-x86_64.exe and double-click the application.
+
+To run manually from command line, or adjust the config file path:
 ```batch
 .\discord-irc-windows-x86_64.exe -c C:\Path\To\config.json
 ```
 
-Linux/macOS (make sure to replace the name of the program file with the one you downloaded):
+#### Linux/macOS (make sure to replace the name of the program file with the one you downloaded):
+
 ```bash
-## Linux
+## Linux users may need to mark as executable first
+chmod +x ./discord-irc-linux-x86_64
 ./discord-irc-linux-x86_64 -c /path/to/config.json
+
 ## Apple users may need to mark as executable and disable quarantine before running
-chmod +x ./discord-irc-apple-*
-xattr -c ./discord-irc-apple-*
+chmod +x ./discord-irc-apple-* && xattr -c ./discord-irc-apple-*
 ./discord-irc-apple-* -c /path/to/config.json
 ```
+
+If run with no arguments, the application will search for a `config.json` within the current working directory.
 
 ### Running with Deno (developers)
 For *development* work, discord-irc requires Deno, as it depends on [Harmony](https://harmony.mod.land).
