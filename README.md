@@ -1,4 +1,5 @@
-[![Coverage Status](https://coveralls.io/repos/github/reactiflux/discord-irc/badge.svg?branch=main)](https://coveralls.io/github/reactiflux/discord-irc?branch=main)
+[![CI](https://github.com/aronson/discord-irc/actions/workflows/ci.yaml/badge.svg)](https://github.com/aronson/discord-irc/actions/workflows/ci.yaml)
+[![Publish Docker Image and Native Binaries](https://github.com/aronson/discord-irc/actions/workflows/build.yaml/badge.svg)](https://github.com/aronson/discord-irc/actions/workflows/build.yaml)
 
 > Connects [Discord](https://discord.com/) and
 > [IRC](https://www.ietf.org/rfc/rfc1459.txt) channels by sending messages back
