@@ -608,7 +608,7 @@ export default class Bot {
 
         // discord matches channel names case insensitively
         const chan = channels.find((x) => Bot.caseComp(x.name, channelName));
-        return chan?.name ? `${chan.name}` : match;
+        return chan?.name ? `${chan.mention}` : match;
       });
     };
 
