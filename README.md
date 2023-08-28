@@ -22,7 +22,7 @@ To run manually from command line, or adjust the config file path:
 .\discord-irc-windows-x86_64.exe -c C:\Path\To\config.json
 ```
 
-#### Linux/macOS (make sure to replace the name of the program file with the one you downloaded):
+#### Linux/macOS:
 
 ```bash
 ## Linux users may need to mark as executable first
