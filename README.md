@@ -12,7 +12,7 @@ Before you can run discord-irc you need to create a configuration file by
 following the instructions [here](https://github.com/aronson/discord-irc#configuration).
 Place config.json in the same directory as the cloned sources.
 
-## Native builds (easiest)
+### Native builds (easiest)
 Start the bot by downloading the [latest release](https://github.com/aronson/discord-irc/releases) for your platform.
 
 Windows:
@@ -30,7 +30,7 @@ xattr -c ./discord-irc-apple-*
 ./discord-irc-apple-* -c /path/to/config.json
 ```
 
-## Running with Deno (developers)
+### Running with Deno (developers)
 For *development* work, discord-irc requires Deno, as it depends on [Harmony](https://harmony.mod.land).
 Please see the [official install instructions](https://deno.land/manual/getting_started/installation) to install Deno for your platform.
 
