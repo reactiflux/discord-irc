@@ -5,7 +5,6 @@ import {
   Client,
   GatewayIntents,
   Guild,
-  Member,
   Message,
   User,
   Webhook,
@@ -463,36 +462,12 @@ export default class Bot {
     const channelRef = await this.findDiscordChannel(channel);
     if (channelRef === null) return null;
     if (!channelRef.isGuildText()) return null;
-    const guildMembers = await channelRef.guild.members.array();
-    const findByNicknameOrUsername =
-      (caseSensitive: boolean) => (member: Member) => {
-        if (caseSensitive) {
-          return (
-            member.user.username === nick ||
-            member.nick === nick ||
-            member.displayName === nick
-          );
-        }
-        const nickLowerCase = nick.toLowerCase();
-        return (
-          member.user.username.toLowerCase() === nickLowerCase ||
-          (member.nick &&
-            member.nick.toLowerCase() === nickLowerCase) ||
-          member.displayName?.toLowerCase() === nickLowerCase
-        );
-      };
+    const guildMember = await channelRef.guild.members.search(nick);
 
     // Try to find exact matching case
-    let users = guildMembers.filter(findByNicknameOrUsername(true));
-
-    // Now let's search case insensitive.
-    if (users.length === 0) {
-      users = guildMembers.filter(findByNicknameOrUsername(false));
-    }
-
     // No matching user or more than one => default avatar
-    if (users && users.length === 1) {
-      const url = users[0]?.user.avatarURL();
+    if (guildMember) {
+      const url = guildMember[0]?.avatarURL();
       if (url) return url;
     }
 
