@@ -1,4 +1,4 @@
-FROM denoland/deno AS builder
+FROM lukechannings/deno AS builder
 WORKDIR /app
 
 COPY . .

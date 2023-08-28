@@ -1,0 +1,79 @@
+name: Release
+
+on:
+  push:
+    tags: '*.*.*'
+
+permissions:
+  contents: write
+  packages: write
+  id-token: write
+
+jobs:
+  create-release:
+    name: Create Release
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v3
+
+      - name: Generate release notes
+        uses: actions/github-script@v6
+        with:
+          script: |
+            const tag = context.ref.split('/').at(-1);
+            github.rest.repos.createRelease({
+              name: `Release ${tag}`,
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              tag_name: tag,
+              generate_release_notes: true
+            })
+
+  build-binaries:
+    name: Build Binaries and Add Them to the Release
+    needs: create-release
+    runs-on: ${{ matrix.os }}
+    strategy:
+      matrix:
+        os:
+          - ubuntu-latest
+          - pi
+          - windows-latest
+          - macos-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v3
+
+      - name: Setup Deno
+        if: matrix.os != 'pi'
+        uses: denoland/setup-deno@v1
+        with:
+          deno-version: v1.x
+
+      - name: Set the OS name suffix
+        id: os-suffix
+        uses: actions/github-script@v6
+        with:
+          result-encoding: string
+          script: return "${{ runner.os }}".toLowerCase();
+
+      - name: Set the arch suffix
+        id: arch-suffix
+        uses: actions/github-script@v6
+        with:
+          result-encoding: string
+          script: return "${{ runner.arch }}".toLowerCase();
+
+      - name: Compile binary
+        run: deno compile --allow-net --allow-env=CONFIG_FILE,DEBUG,VERBOSE --allow-read lib/index.ts --output discord-irc-${{ steps.os-suffix.outputs.result }}-${{ steps.arch-suffix.outputs.result }}
+
+      - name: Compile ARM64 binary for macOS
+        if: runner.os == 'macOS'
+        run: deno compile --allow-net --allow-env=CONFIG_FILE,DEBUG,VERBOSE --allow-read lib/index.ts --output discord-irc-${{ steps.os-suffix.outputs.result }}-arm64 --target aarch64-apple-darwin
+
+      - name: Upload binaries to release
+        uses: svenstaro/upload-release-action@v2
+        with:
+          file: discord-irc*
+          file_glob: true

@@ -1,6 +1,0 @@
-FROM debian:stable-slim
-WORKDIR /app
-
-COPY ./discord-irc .
-
-ENTRYPOINT ["/app/discord-irc"]

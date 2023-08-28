@@ -2,6 +2,11 @@ name: CI
 
 on:
   push:
+    paths:
+      - .github/workflows/ci.yaml
+      - lib/**
+      - deno.*
+      # - test/**
   pull_request:
     branches:
       - main
