@@ -7,13 +7,10 @@
     }
   },
   "fmt": {
-    "useTabs": false,
     "lineWidth": 80,
-    "indentWidth": 2,
     "semiColons": true,
     "singleQuote": true,
-    "proseWrap": "preserve",
-    "include": ["lib/"]
+    "include": ["lib/", "README.md"]
   },
   "tasks": {
     "start": "deno run -A lib/index.ts",
