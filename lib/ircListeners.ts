@@ -86,13 +86,16 @@ export function createIrcJoinListener(bot: Bot) {
     const channelName = event.params.channel;
     const nick = event.source?.name ?? '';
     bot.debug && bot.logger.debug(`Received join: ${channelName} -- ${nick}`);
+    const channel = channelName.toLowerCase();
     if (nick === bot.options.nickname && !bot.options.announceSelfJoin) {
       return;
     }
-    const channel = channelName.toLowerCase();
     // self-join is announced before names (which includes own nick)
     // so don't add nick to channelUsers
-    if (nick !== bot.options.nickname) {
+    if (
+      nick !== bot.options.nickname &&
+      bot.channelUsers[channel].indexOf(nick) === -1
+    ) {
       bot.channelUsers[channel].push(nick);
     }
     if (!bot.options.ircStatusNotices) return;
