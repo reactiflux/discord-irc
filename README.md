@@ -56,7 +56,7 @@ docker build -t discord-irc .
 docker run -v /path/to/config.json:/app/config.json discord-irc
 ```
 
-Note that the path to the config file on the host (`/path/to/config`) _must_ be a valid absolute path to a config file.
+Note that the path to the config file on the host (`/path/to/`) _must_ be a valid absolute path to a config file.
 Otherwise, you may get the error "illegal operation on a directory".
 
 ## Configuration
