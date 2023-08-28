@@ -21,7 +21,6 @@ import {
   createIrcActionListener,
   createIrcErrorListener,
   createIrcInviteListener,
-  createIrcJoinListener,
   createIrcNickListener,
   createIrcNicklistListener,
   createIrcNoticeListener,
@@ -203,7 +202,6 @@ export default class Bot {
     this.ircClient.on('privmsg:channel', createIrcPrivMessageListener(this));
     this.ircClient.on('notice', createIrcNoticeListener(this));
     this.ircClient.on('nick', createIrcNickListener(this));
-    this.ircClient.on('join', createIrcJoinListener(this));
     this.ircClient.on('part', createIrcPartListener(this));
     this.ircClient.on('quit', createIrcQuitListener(this));
     this.ircClient.on('nicklist', createIrcNicklistListener(this));
