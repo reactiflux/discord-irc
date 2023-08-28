@@ -13,8 +13,8 @@
     "include": ["lib/", "README.md"]
   },
   "tasks": {
-    "start": "deno run --allow-net --allow-env=CONFIG_FILE,DEBUG,VERBOSE --allow-read=./ lib/index.ts",
-    "prepare": "deno compile --allow-net --allow-env=CONFIG_FILE,DEBUG,VERBOSE --allow-read=./ lib/index.ts --output discord-irc",
+    "start": "deno run --allow-net --allow-env=CONFIG_FILE,DEBUG,VERBOSE --allow-read lib/index.ts",
+    "prepare": "deno compile --allow-net --allow-env=CONFIG_FILE,DEBUG,VERBOSE --allow-read lib/index.ts --output discord-irc",
     "prepareAndStart": "deno task prepare && ./discord-irc",
     "startPrepared": "./discord-irc"
   },
