@@ -28,7 +28,7 @@ discord-irc-windows-x86_64.exe and double-click the application.
 To run manually from command line, or adjust the config file path:
 
 ```batch
-.\discord-irc-windows-x86_64.exe -c C:\Path\To\config.json
+.\discord-irc-windows-x86_64.exe -c .\config.json
 ```
 
 #### Linux/macOS:
@@ -36,15 +36,19 @@ To run manually from command line, or adjust the config file path:
 ```bash
 ## Linux users may need to mark as executable first
 chmod +x ./discord-irc-linux-x86_64
-./discord-irc-linux-x86_64 -c /path/to/config.json
+./discord-irc-linux-x86_64 -c ./config.json
 
 ## Apple users may need to mark as executable and disable quarantine before running
 chmod +x ./discord-irc-apple-* && xattr -c ./discord-irc-apple-*
-./discord-irc-apple-* -c /path/to/config.json
+./discord-irc-apple-* -c ./config.json
 ```
 
 If run with no arguments, the application will search for a `config.json` within
 the current working directory.
+
+**Note:** For security, the application cannot read `config.json` files that are in 
+a path *above* the current working directory. Ensure the `config.json` is in the same 
+folder to have no problems.
 
 ### Running with Deno (developers)
 
