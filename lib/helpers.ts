@@ -1,6 +1,6 @@
 import { ConfigurationError } from './errors.ts';
-import {} from './botWorker.ts';
 import { Config } from './config.ts';
+import Bot from './bot.ts';
 
 export async function exists(filename: string) {
   try {
@@ -39,6 +39,20 @@ export async function forEachAsync<T>(
   }
 }
 
+export async function replaceAsync(
+  str: string,
+  regex: RegExp,
+  asyncFn: (match: any, ...args: any) => Promise<any>,
+) {
+  const promises: Promise<any>[] = [];
+  str.replace(regex, (match, ...args) => {
+    promises.push(asyncFn(match, ...args));
+    return match;
+  });
+  const data = await Promise.all(promises);
+  return str.replace(regex, () => data.shift());
+}
+
 export function isObject(a: any) {
   return a instanceof Object;
 }
@@ -57,35 +71,23 @@ export function escapeMarkdown(text: string) {
  * Reads from the provided config file and returns an array of bots
  * @return {object[]}
  */
-export function createBots(configFile: Config | Config[]): object[] {
-  const bots: Worker[] = [];
+export function createBots(
+  configFile: Config | Config[],
+): Bot[] {
+  const bots: Bot[] = [];
 
   // The config file can be both an array and an object
   // The config file can be both an array and an object
   if (Array.isArray(configFile)) {
     configFile.forEach((config) => {
-      const botWorker = new Worker(
-        new URL('./botWorker.ts', import.meta.url).href,
-        { type: 'module' },
-      );
-      botWorker.postMessage(config);
-      botWorker.onmessage = (event) => {
-        if (event.data === 'connected') {
-          bots.push(botWorker);
-        }
-      };
+      const bot = new Bot(config);
+      bot.connect();
+      bots.push(bot);
     });
   } else if (isObject(configFile)) {
-    const botWorker = new Worker(
-      new URL('./botWorker.ts', import.meta.url).href,
-      { type: 'module' },
-    );
-    botWorker.postMessage(configFile);
-    botWorker.onmessage = (event) => {
-      if (event.data === 'connected') {
-        bots.push(botWorker);
-      }
-    };
+    const bot = new Bot(configFile);
+    bot.connect();
+    bots.push(bot);
   } else {
     throw new ConfigurationError('');
   }

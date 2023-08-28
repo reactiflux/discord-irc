@@ -18,11 +18,9 @@ export type IgnoreUsers = {
 export type Config = {
   server: string;
   nickname: string;
-  channelMapping: Dictionary<string>;
-  outgoingToken: string;
-  incomingURL: string;
-  ircOptions?: Partial<ClientOptions>;
   discordToken: string;
+  channelMapping: Dictionary<string>;
+  ircOptions?: Partial<ClientOptions>;
   commandCharacters?: string[];
   ircNickColor?: boolean;
   ircNickColors?: string[];
