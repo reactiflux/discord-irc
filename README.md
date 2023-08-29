@@ -73,9 +73,34 @@ CONFIG_FILE=/path/to/config.json deno task start
 It can also be used as a module:
 
 ```js
-import discordIRC from 'discord-irc';
-import config from './config.json';
-discordIRC(config);
+import {
+  Config,
+  createBots,
+} from 'https://raw.githubusercontent.com/aronson/discord-irc/main/mod.ts';
+
+const configFile = Deno.readFileSync('./config.json') as Config;
+
+const bots = createBots(configFile);
+
+function startBots() {
+  for (const bot of bots) {
+    // Intentionally not awaited, edit your code to await if necessary
+    bot.connect();
+  }
+}
+
+Deno.addSignalListener('SIGINT', () => {
+  bots[0].logger.warn('Received Ctrl+C! Disconnecting...');
+  try {
+    // Intentionally not awaited, edit your code to await if necessary
+    for (const bot of bots) bot.disconnect();
+  } catch (e) {
+    bots[0].logger.error(e);
+  }
+  Deno.exit();
+});
+
+startBots();
 ```
 
 ### Docker
