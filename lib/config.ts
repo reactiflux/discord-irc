@@ -1,4 +1,4 @@
-import { ClientOptions } from 'irc';
+import { ClientOptions } from './deps.ts';
 import { Dictionary } from './helpers.ts';
 
 export type Format = {

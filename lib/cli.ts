@@ -1,7 +1,6 @@
 #!/usr/bin/env -S deno run -A
 
-import { resolve as resolvePath } from 'path';
-import { parse as parseCLI } from 'flags';
+import { parseCLI, resolvePath } from './deps.ts';
 import * as helpers from './helpers.ts';
 import { Config } from './config.ts';
 

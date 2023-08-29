@@ -1,16 +1,18 @@
 import Bot from './bot.ts';
-import { PrivmsgEvent } from 'https://deno.land/x/irc@v0.12.5/plugins/privmsg.ts';
-import { ClientError } from 'https://deno.land/x/irc@v0.12.5/core/errors.ts';
-import { RegisterEvent } from 'https://deno.land/x/irc@v0.12.5/plugins/register.ts';
+import {
+  ClientError,
+  CtcpActionEvent,
+  InviteEvent,
+  JoinEvent,
+  NickEvent,
+  NicklistEvent,
+  NoticeEvent,
+  PartEvent,
+  PrivmsgEvent,
+  QuitEvent,
+  RegisterEvent,
+} from './deps.ts';
 import { forEachAsync } from './helpers.ts';
-import { NoticeEvent } from 'https://deno.land/x/irc@v0.12.5/plugins/notice.ts';
-import { NickEvent } from 'https://deno.land/x/irc@v0.12.5/plugins/nick.ts';
-import { JoinEvent } from 'https://deno.land/x/irc@v0.12.5/plugins/join.ts';
-import { PartEvent } from 'https://deno.land/x/irc@v0.12.5/plugins/part.ts';
-import { QuitEvent } from 'https://deno.land/x/irc@v0.12.5/plugins/quit.ts';
-import { NicklistEvent } from 'https://deno.land/x/irc@v0.12.5/plugins/nicklist.ts';
-import { CtcpActionEvent } from 'https://deno.land/x/irc@v0.12.5/plugins/action.ts';
-import { InviteEvent } from 'https://deno.land/x/irc@v0.12.5/plugins/invite.ts';
 
 export function createIrcRegisterListener(bot: Bot) {
   return (message: RegisterEvent) => {

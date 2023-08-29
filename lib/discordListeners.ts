@@ -1,6 +1,6 @@
 import Bot from './bot.ts';
 import { escapeMarkdown } from './helpers.ts';
-import { Message } from 'harmony';
+import { Message } from './deps.ts';
 
 export function createDiscordReadyListener(bot: Bot) {
   return () => {

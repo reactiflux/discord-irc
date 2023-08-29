@@ -1,5 +1,5 @@
-import { Client as IrcClient, ClientOptions } from 'irc';
-import Dlog from 'dlog';
+import { ClientOptions, IrcClient } from './deps.ts';
+import Dlog from 'https://deno.land/x/dlog2@2.0/classic.ts';
 import {
   AllowedMentionType,
   Client,
@@ -8,7 +8,7 @@ import {
   Message,
   User,
   Webhook,
-} from 'harmony';
+} from './deps.ts';
 import { validateChannelMapping } from './validators.ts';
 import {
   formatFromDiscordToIRC,
