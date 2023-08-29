@@ -1,3 +1,5 @@
+/// <reference no-default-lib="true" />
+/// <reference lib="deno.worker" />
 import { Config } from './config.ts';
 import Bot from './bot.ts';
 

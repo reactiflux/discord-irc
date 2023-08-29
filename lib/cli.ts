@@ -23,7 +23,12 @@ async function run() {
   const config = JSON.parse(await Deno.readTextFile(configFilePath)) as
     | Config
     | Config[];
-  helpers.createBots(config);
+  const bots = helpers.createBots(config);
+  Deno.addSignalListener('SIGINT', async () => {
+    bots[0].logger.warn('Received Ctrl+C! Disconnecting...');
+    await helpers.forEachAsync(bots, async (bot) => await bot.disconnect());
+    Deno.exit();
+  });
 }
 
 export default run;

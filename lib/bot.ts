@@ -188,9 +188,9 @@ export default class Bot {
     });
   }
 
-  disconnect() {
+  async disconnect() {
     this.ircClient.disconnect();
-    this.discord.destroy();
+    await this.discord.destroy();
   }
 
   private attachDiscordListeners() {
