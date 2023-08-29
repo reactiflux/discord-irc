@@ -76,7 +76,7 @@ It can also be used as a module:
 import {
   Config,
   createBots,
-} from 'https://raw.githubusercontent.com/aronson/discord-irc/main/mod.ts';
+} from 'https://deno.land/x/discord_irc@4.5.2/mod.ts';
 
 const configFile = Deno.readFileSync('./config.json') as Config;
 
