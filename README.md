@@ -51,8 +51,8 @@ the current working directory.
 
 ### Running with Deno (developers)
 
-For _development_ work, discord-irc requires Deno, as it depends on
-[Harmony](https://harmony.mod.land). Please see the
+For _development_ work, discord-irc requires [Deno](https://deno.com), as it
+depends on [Harmony](https://harmony.mod.land). Please see the
 [official install instructions](https://deno.land/manual/getting_started/installation)
 to install Deno for your platform.
 
