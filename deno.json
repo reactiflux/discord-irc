@@ -1,6 +1,6 @@
 {
   "lint": {
-    "include": ["lib/"],
+    "include": ["lib/", "discord-irc.ts"],
     "rules": {
       "tags": ["recommended"],
       "exclude": ["no-explicit-any"]
@@ -10,11 +10,11 @@
     "lineWidth": 80,
     "semiColons": true,
     "singleQuote": true,
-    "include": ["lib/", "README.md"]
+    "include": ["lib/", "discord-irc.ts", "README.md"]
   },
   "tasks": {
-    "start": "deno run --allow-net --allow-env=CONFIG_FILE,DEBUG,VERBOSE --allow-read lib/mod.ts",
-    "prepare": "deno compile --allow-net --allow-env=CONFIG_FILE,DEBUG,VERBOSE --allow-read lib/mod.ts --output discord-irc",
+    "start": "deno run --allow-net --allow-env=CONFIG_FILE,DEBUG,VERBOSE --allow-read discord-irc.ts",
+    "prepare": "deno compile --allow-net --allow-env=CONFIG_FILE,DEBUG,VERBOSE --allow-read discord-irc.ts",
     "prepareAndStart": "deno task prepare && ./discord-irc",
     "startPrepared": "./discord-irc"
   }

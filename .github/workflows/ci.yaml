@@ -5,6 +5,8 @@ on:
     paths:
       - .github/workflows/ci.yaml
       - lib/**
+      - mod.ts
+      - discord-irc.ts
       - deno.*
       # - test/**
   pull_request:
@@ -31,7 +33,9 @@ jobs:
         run: deno fmt --check
 
       - name: Check types
-        run: deno check lib/mod.ts
+        run: |
+          deno check discord-irc.ts
+          deno check mod.ts
   # test:
   #   name: Run tests
   #   runs-on: ubuntu-latest
