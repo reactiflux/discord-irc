@@ -31,7 +31,7 @@ jobs:
         run: deno fmt --check
 
       - name: Check types
-        run: deno check lib/index.ts
+        run: deno check lib/mod.ts
   # test:
   #   name: Run tests
   #   runs-on: ubuntu-latest

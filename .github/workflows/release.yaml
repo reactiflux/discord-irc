@@ -66,11 +66,11 @@ jobs:
           script: return "${{ runner.arch }}".toLowerCase();
 
       - name: Compile binary
-        run: deno compile --allow-net --allow-env=CONFIG_FILE,DEBUG,VERBOSE --allow-read lib/index.ts --output discord-irc-${{ steps.os-suffix.outputs.result }}-${{ steps.arch-suffix.outputs.result }}
+        run: deno compile --allow-net --allow-env=CONFIG_FILE,DEBUG,VERBOSE --allow-read lib/mod.ts --output discord-irc-${{ steps.os-suffix.outputs.result }}-${{ steps.arch-suffix.outputs.result }}
 
       - name: Compile ARM64 binary for macOS
         if: runner.os == 'macOS'
-        run: deno compile --allow-net --allow-env=CONFIG_FILE,DEBUG,VERBOSE --allow-read lib/index.ts --output discord-irc-${{ steps.os-suffix.outputs.result }}-arm64 --target aarch64-apple-darwin
+        run: deno compile --allow-net --allow-env=CONFIG_FILE,DEBUG,VERBOSE --allow-read lib/mod.ts --output discord-irc-${{ steps.os-suffix.outputs.result }}-arm64 --target aarch64-apple-darwin
 
       - name: Upload binaries to release
         uses: svenstaro/upload-release-action@v2
