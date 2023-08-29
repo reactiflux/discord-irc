@@ -25,11 +25,13 @@ async function run() {
   const bots = helpers.createBots(config);
   Deno.addSignalListener('SIGINT', async () => {
     bots[0].logger.warn('Received Ctrl+C! Disconnecting...');
-    try {
-      await helpers.forEachAsync(bots, async (bot) => await bot.disconnect());
-    } catch (e) {
-      bots[0].logger.error(e);
-    }
+    await helpers.forEachAsync(bots, async (bot) => {
+      try {
+        await bot.disconnect();
+      } catch (e) {
+        bots[0].logger.error(e);
+      }
+    });
     Deno.exit();
   });
   return bots;
