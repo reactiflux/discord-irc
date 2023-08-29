@@ -82,13 +82,14 @@ const configFile = JSON.parse(Deno.readTextFileSync('./config.json')) as Config;
 
 const bots = createBots(configFile);
 
-Deno.addSignalListener('SIGINT', () => {
+Deno.addSignalListener('SIGINT', async () => {
   bots[0].logger.warn('Received Ctrl+C! Disconnecting...');
-  try {
-    // Intentionally not awaited, edit your code to await if necessary
-    for (const bot of bots) bot.disconnect();
-  } catch (e) {
-    bots[0].logger.error(e);
+  for (const bot of bots) {
+    try {
+      await bot.disconnect();
+    } catch (e) {
+      bot.logger.error(e);
+    }
   }
   Deno.exit();
 });
