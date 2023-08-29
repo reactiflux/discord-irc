@@ -15,6 +15,20 @@ export type IgnoreUsers = {
   discordIds: string[];
 };
 
+export type GameLogConfig = {
+  patterns: {
+    user: string;
+    matches: {
+      regex: string;
+      color: string;
+    }[];
+  }[];
+};
+
+export type IgnoreConfig = {
+  ignorePatterns: Dictionary<string[]>[];
+};
+
 export type Config = {
   server: string;
   nickname: string;
@@ -29,6 +43,8 @@ export type Config = {
   announceSelfJoin?: boolean;
   webhooks?: Dictionary<string>;
   ignoreUsers?: IgnoreUsers;
+  gameLogConfig?: GameLogConfig;
+  ignoreConfig?: IgnoreConfig;
   // "{$keyName}" => "variableValue"
   // author/nickname: nickname of the user who sent the message
   // discordChannel: Discord channel (e.g. #general)

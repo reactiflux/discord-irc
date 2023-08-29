@@ -1,6 +1,7 @@
 import ircFormatting from 'npm:irc-formatting@1.0.0-rc3';
 import SimpleMarkdown from 'npm:simple-markdown';
 import colors from 'npm:irc-colors';
+import { GameLogConfig } from './config.ts';
 
 function mdNodeToIRC(node: any) {
   let { content } = node;
@@ -22,13 +23,51 @@ export function formatFromDiscordToIRC(text: any) {
   return markdownAST.map(mdNodeToIRC).join('');
 }
 
-export function formatFromIRCToDiscord(text: any) {
+function applyFormattingRules(
+  text: string,
+  ircUser: string,
+  config?: GameLogConfig,
+): { text: string; needColorFormat: boolean } {
+  let mdText = '';
+  let colorize = false;
+
+  if (!config) return { text: mdText, needColorFormat: colorize };
+
+  for (const pattern of config.patterns) {
+    if (pattern.user.toLowerCase() !== ircUser.toLowerCase()) continue;
+    for (const value of Object.values(pattern.matches)) {
+      const regex = new RegExp(value.regex);
+      if (regex.test(text)) {
+        mdText += '```ansi\n';
+        mdText += `\u{001b}[${value.color}m`;
+        colorize = true;
+        break;
+      }
+    }
+  }
+
+  return { text: mdText, needColorFormat: colorize };
+}
+
+export function formatFromIRCToDiscord(
+  text: any,
+  ircUser: string,
+  config?: GameLogConfig,
+) {
+  const formattedText = applyFormattingRules(text, ircUser, config);
+  let mdText = '';
+
+  if (formattedText.needColorFormat) {
+    mdText = formattedText.text + text;
+    mdText += '\n```';
+    return mdText;
+  }
+
   const blocks = ircFormatting.parse(text).map((block: any) => ({
     // Consider reverse as italic, some IRC clients use that
     ...block,
     italic: block.italic || block.reverse,
   }));
-  let mdText = '';
 
   for (let i = 0; i <= blocks.length; i += 1) {
     // Default to unstyled blocks when index out of range

@@ -16,7 +16,7 @@ import {
 } from './formatting.ts';
 import { DEFAULT_NICK_COLORS, wrap } from './colors.ts';
 import { Dictionary, forEachAsync, invert, replaceAsync } from './helpers.ts';
-import { Config } from './config.ts';
+import { Config, GameLogConfig, IgnoreConfig } from './config.ts';
 import {
   createIrcActionListener,
   createIrcErrorListener,
@@ -60,6 +60,8 @@ export default class Bot {
   options: Config;
   channels: string[];
   webhookOptions: Dictionary<string>;
+  ignoreConfig?: IgnoreConfig;
+  gameLogConfig?: GameLogConfig;
   formatIRCText: string;
   formatURLAttachment: string;
   formatCommandPrelude: string;
@@ -100,6 +102,9 @@ export default class Bot {
     if (options.allowRolePings === undefined) {
       options.allowRolePings = true;
     }
+
+    this.gameLogConfig = options.gameLogConfig;
+    this.ignoreConfig = options.ignoreConfig;
 
     // "{$keyName}" => "variableValue"
     // displayUsername: nickname with wrapped colors
@@ -492,8 +497,29 @@ export default class Bot {
     return str1.toUpperCase().startsWith(str2.toUpperCase());
   }
 
-  async sendToDiscord(author: string, channel: string, text: string) {
-    const discordChannel = await this.findDiscordChannel(channel);
+  static shouldIgnoreMessage(
+    text: string,
+    ircChannel: string,
+    config: IgnoreConfig,
+  ): boolean {
+    for (const dict of config.ignorePatterns) {
+      for (const pattern of dict[ircChannel]) {
+        if (text.indexOf(pattern) !== -1) {
+          return true;
+        }
+      }
+    }
+    return false;
+  }
+
+  async sendToDiscord(author: string, ircChannel: string, text: string) {
+    if (
+      this.ignoreConfig &&
+      Bot.shouldIgnoreMessage(text, ircChannel, this.ignoreConfig)
+    ) {
+      return;
+    }
+    const discordChannel = await this.findDiscordChannel(ircChannel);
     if (!discordChannel) return;
     const channelName = discordChannel.mention;
 
@@ -503,7 +529,7 @@ export default class Bot {
     }
 
     // Convert text formatting (bold, italics, underscore)
-    const withFormat = formatFromIRCToDiscord(text);
+    const withFormat = formatFromIRCToDiscord(text, author, this.gameLogConfig);
 
     const patternMap = {
       author,
@@ -511,7 +537,7 @@ export default class Bot {
       displayUsername: author,
       text: withFormat,
       discordChannel: `#${channelName}`,
-      ircChannel: channel,
+      ircChannel: ircChannel,
       withMentions: '',
       side: '',
     };
@@ -598,11 +624,11 @@ export default class Bot {
     );
 
     // Webhooks first
-    const webhook = this.findWebhook(channel);
+    const webhook = this.findWebhook(ircChannel);
     if (webhook) {
       if (discordChannel.isGuildText()) {
         this.debug && this.logger.debug(
-          `Sending message to Discord via webhook ${withMentions} ${channel} -> #${discordChannel.name}`,
+          `Sending message to Discord via webhook ${withMentions} ${ircChannel} -> #${discordChannel.name}`,
         );
       }
       if (this.discord.user === null) return;
@@ -613,7 +639,7 @@ export default class Bot {
         canPingEveryone = permissions.has(discord.Permissions.FLAGS.MENTION_EVERYONE);
       }
       */
-      const avatarURL = (await this.getDiscordAvatar(author, channel)) ??
+      const avatarURL = (await this.getDiscordAvatar(author, ircChannel)) ??
         undefined;
       const username = author.substring(0, USERNAME_MAX_LENGTH).padEnd(
         USERNAME_MIN_LENGTH,
@@ -650,7 +676,7 @@ export default class Bot {
     const withAuthor = Bot.substitutePattern(this.formatDiscord, patternMap);
     if (discordChannel.isGuildText()) {
       this.debug && this.logger.debug(
-        `Sending message to Discord ${withAuthor} ${channel} -> #${discordChannel.name}`,
+        `Sending message to Discord ${withAuthor} ${ircChannel} -> #${discordChannel.name}`,
       );
       discordChannel.send(withAuthor);
     }
