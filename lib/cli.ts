@@ -4,6 +4,25 @@ import { parseCLI, resolvePath } from './deps.ts';
 import * as helpers from './helpers.ts';
 import { Config, parseConfigObject } from './config.ts';
 
+function testIrcOptions(obj: any): string | null {
+  if ('userName' in obj) {
+    return 'You must provide username not userName!';
+  }
+  if ('realName' in obj) {
+    return 'You must provide realname not realName!';
+  }
+  if ('retryCount' in obj) {
+    return 'You cannot use retryCount, use the sane defaults or read the documentation';
+  }
+  if ('retryDelay' in obj) {
+    return 'You cannot use retryDelay, use the sane defaults or read the documentation';
+  }
+  if ('floodProtection' in obj) {
+    return 'flood protection is enabled by default and cannot be disabled';
+  }
+  return null;
+}
+
 async function run() {
   const opts = parseCLI(Deno.args, { alias: { c: 'config' } });
 
@@ -26,7 +45,35 @@ async function run() {
     console.log(result.error);
     return;
   }
-  const bots = helpers.createBots(result.data as Config | Config[]);
+  let config: Config | Config[] | null = null;
+  // May still fail if invalid ircOptions
+  if (Array.isArray(result.data)) {
+    const valid = result.data.reduce((acc, config) => {
+      const ircOptionsTestResult = testIrcOptions(config.ircOptions);
+      if (ircOptionsTestResult !== null) {
+        console.log('Error parsing ircOptions:');
+        console.log(ircOptionsTestResult);
+        return false;
+      }
+      return acc;
+    }, true);
+    if (valid) {
+      config = result.data as Config[];
+    }
+  } else {
+    const ircOptionsTestResult = testIrcOptions(result.data.ircOptions);
+    if (ircOptionsTestResult !== null) {
+      console.log('Error parsing ircOptions:');
+      console.log(ircOptionsTestResult);
+    } else {
+      config = result.data as Config;
+    }
+  }
+  if (!config) {
+    console.log('Cannot start due to invalid configuration');
+    return;
+  }
+  const bots = helpers.createBots(config);
   // Graceful shutdown of network clients
   Deno.addSignalListener('SIGINT', async () => {
     bots[0].logger.warn('Received Ctrl+C! Disconnecting...');
