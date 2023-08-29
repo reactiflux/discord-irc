@@ -72,22 +72,15 @@ CONFIG_FILE=/path/to/config.json deno task start
 
 It can also be used as a module:
 
-```js
+```ts
 import {
   Config,
   createBots,
-} from 'https://deno.land/x/discord_irc@4.5.3/mod.ts';
+} from 'https://deno.land/x/discord_irc@4.5.4/mod.ts';
 
 const configFile = JSON.parse(Deno.readTextFileSync('./config.json')) as Config;
 
 const bots = createBots(configFile);
-
-function startBots() {
-  for (const bot of bots) {
-    // Intentionally not awaited, edit your code to await if necessary
-    bot.connect();
-  }
-}
 
 Deno.addSignalListener('SIGINT', () => {
   bots[0].logger.warn('Received Ctrl+C! Disconnecting...');
@@ -99,8 +92,6 @@ Deno.addSignalListener('SIGINT', () => {
   }
   Deno.exit();
 });
-
-startBots();
 ```
 
 ### Docker
