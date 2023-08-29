@@ -76,23 +76,35 @@ It can also be used as a module:
 import {
   Config,
   createBots,
-} from 'https://deno.land/x/discord_irc@4.5.4/mod.ts';
+  parseConfigObject,
+} from 'https://raw.githubusercontent.com/aronson/discord-irc/main/mod.ts';
 
-const configFile = JSON.parse(Deno.readTextFileSync('./config.json')) as Config;
+// Read local config file into an object
+const configFileObject = JSON.parse(Deno.readTextFileSync('./config.json'));
+// Parse against provided JSON schema to validate integrity of config
+const result = parseConfigObject(configFileObject);
+if (!result.success) {
+  console.log('Error parsing configuration:');
+  console.log(result.error);
+} else {
+  // May still fail if invalid ircOptions
+  const config = result.data as Config | Config[];
 
-const bots = createBots(configFile);
+  const bots = createBots(config);
 
-Deno.addSignalListener('SIGINT', async () => {
-  bots[0].logger.warn('Received Ctrl+C! Disconnecting...');
-  for (const bot of bots) {
-    try {
-      await bot.disconnect();
-    } catch (e) {
-      bot.logger.error(e);
+  // Graceful shutdown of network clients
+  Deno.addSignalListener('SIGINT', async () => {
+    bots[0].logger.warn('Received Ctrl+C! Disconnecting...');
+    for (const bot of bots) {
+      try {
+        await bot.disconnect();
+      } catch (e) {
+        bot.logger.error(e);
+      }
     }
-  }
-  Deno.exit();
-});
+    Deno.exit();
+  });
+}
 ```
 
 ### Docker

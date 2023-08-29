@@ -1,3 +1,4 @@
+import { z } from 'https://deno.land/x/zod@v3.16.1/mod.ts';
 import { ClientOptions } from './deps.ts';
 import { Dictionary } from './helpers.ts';
 
@@ -54,3 +55,67 @@ export type Config = {
   autoSendCommands?: [any, string][];
   allowRolePings?: boolean;
 };
+
+export const FormatSchema = z.object({
+  ircText: z.string().optional(),
+  discord: z.string().optional(),
+  urlAttachment: z.string().optional(),
+  commandPrelude: z.string().optional(),
+  webhookAvatarURL: z.string().optional(),
+});
+
+export const IgnoreUsersSchema = z.object({
+  irc: z.array(z.string()),
+  discord: z.array(z.string()),
+  discordIds: z.array(z.string()),
+});
+
+export const GameLogConfigSchema = z.object({
+  patterns: z.array(
+    z.object({
+      user: z.string(),
+      matches: z.array(
+        z.object({
+          regex: z.string(),
+          color: z.string(),
+        }),
+      ),
+    }),
+  ),
+});
+
+export const IgnoreConfigSchema = z.object({
+  ignorePatterns: z.array(z.record(z.array(z.string()))),
+});
+
+export const ConfigSchema = z.object({
+  server: z.string(),
+  nickname: z.string(),
+  discordToken: z.string(),
+  channelMapping: z.record(z.string()),
+  ircOptions: z.unknown().optional(),
+  commandCharacters: z.array(z.string()).optional(),
+  ircNickColor: z.boolean().optional(),
+  ircNickColors: z.array(z.string()).optional(),
+  parallelPingFix: z.boolean().optional(),
+  ircStatusNotices: z.boolean().optional(),
+  announceSelfJoin: z.boolean().optional(),
+  webhooks: z.record(z.string()).optional(),
+  ignoreUsers: IgnoreUsersSchema.optional(),
+  gameLogConfig: GameLogConfigSchema.optional(),
+  ignoreConfig: IgnoreConfigSchema.optional(),
+  format: FormatSchema.optional(),
+  autoSendCommands: z.array(z.tuple([z.unknown(), z.string()])).optional(),
+  allowRolePings: z.boolean().optional(),
+});
+
+const ConfigArraySchema = z.array(ConfigSchema);
+
+export function parseConfigObject(input: any) {
+  if (Array.isArray(input)) {
+    const result = ConfigArraySchema.safeParse(input);
+    return result;
+  } else {
+    return ConfigSchema.safeParse(input);
+  }
+}
