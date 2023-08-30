@@ -10,7 +10,7 @@
     "lineWidth": 80,
     "semiColons": true,
     "singleQuote": true,
-    "include": ["lib/", "discord-irc.ts", "README.md"]
+    "include": ["lib/", "discord-irc.ts", "README.md", "TODO.md"]
   },
   "tasks": {
     "start": "deno run --allow-net --allow-env=CONFIG_FILE,DEBUG,VERBOSE --allow-read discord-irc.ts",
