@@ -1,9 +1,8 @@
 [![CI](https://github.com/aronson/discord-irc/actions/workflows/ci.yaml/badge.svg)](https://github.com/aronson/discord-irc/actions/workflows/ci.yaml)
 [![Publish Docker Image and Native Binaries](https://github.com/aronson/discord-irc/actions/workflows/build.yaml/badge.svg)](https://github.com/aronson/discord-irc/actions/workflows/build.yaml)
 
-> Connects [Discord](https://discord.com/) and
-> [IRC](https://www.ietf.org/rfc/rfc1459.txt) channels by sending messages back
-> and forth.
+> Connects [Discord](https://discord.com/) and [IRC](https://www.ietf.org/rfc/rfc1459.txt) channels by sending messages
+> back and forth.
 
 ## Example
 
@@ -11,20 +10,17 @@
 
 ## Installation and usage
 
-Before you can run discord-irc you need to create a configuration file by
-following the instructions
+Before you can run discord-irc you need to create a configuration file by following the instructions
 [here](https://github.com/aronson/discord-irc#configuration).
 
 ### Native builds (easiest)
 
-Start the bot by downloading the
-[latest release](https://github.com/aronson/discord-irc/releases) for your
-platform.
+Start the bot by downloading the [latest release](https://github.com/aronson/discord-irc/releases) for your platform.
 
 #### Windows:
 
-The easiest method is place your config.json in the same folder as
-discord-irc-windows-x86_64.exe and double-click the application.
+The easiest method is place your config.json in the same folder as discord-irc-windows-x86_64.exe and double-click the
+application.
 
 To run manually from command line, or adjust the config file path:
 
@@ -46,15 +42,14 @@ chmod +x ./discord-irc-apple-* && xattr -c ./discord-irc-apple-*
 
 #### Config file location
 
-If run with no arguments, the application will search for a `config.json` within
-the current working directory.
+If run with no arguments, the application will search for a `config.json` within the current working directory.
 
 ### Running with Deno (developers)
 
-For _development_ work, discord-irc requires [Deno](https://deno.com), as it
-depends on [Harmony](https://harmony.mod.land). Please see the
-[official install instructions](https://deno.land/manual/getting_started/installation)
-to install Deno for your platform.
+For _development_ work, discord-irc requires [Deno](https://deno.com), as it depends on
+[Harmony](https://harmony.mod.land). Please see the
+[official install instructions](https://deno.land/manual/getting_started/installation) to install Deno for your
+platform.
 
 ```bash
 ## Clone the repo
@@ -109,30 +104,26 @@ if (!result.success) {
 
 ### Docker
 
-As an alternative to running discord-irc directly on your machine, we provide a
-Docker container image. After creating a configuration file, you can fetch the
-image from Docker Hub and run it with the following command:
+As an alternative to running discord-irc directly on your machine, we provide a Docker container image. After creating a
+configuration file, you can fetch the image from Docker Hub and run it with the following command:
 
 ```bash
 docker run -v /path/to/config.json:/app/config.json ghcr.io/aronson/discord-irc
 ```
 
-If you've checked out the repository already, you can build the Docker image
-locally and run that instead:
+If you've checked out the repository already, you can build the Docker image locally and run that instead:
 
 ```bash
 docker build -t discord-irc .
 docker run -v /path/to/config.json:/app/config.json discord-irc
 ```
 
-Note that the path to the config file on the host (`/path/to/`) _must_ be a
-valid absolute path to a config file. Otherwise, you may get the error "illegal
-operation on a directory".
+Note that the path to the config file on the host (`/path/to/`) _must_ be a valid absolute path to a config file.
+Otherwise, you may get the error "illegal operation on a directory".
 
 ## Configuration
 
-First you need to create a Discord bot user, which you can do by following the
-instructions
+First you need to create a Discord bot user, which you can do by following the instructions
 [here](https://github.com/reactiflux/discord-irc/wiki/Creating-a-discord-bot-&-getting-a-token).
 
 ### Example configuration
@@ -174,7 +165,7 @@ instructions
       // Optional custom formatting options
       // Patterns, represented by {$patternName}, are replaced when sending messages
       commandPrelude: 'Command sent by {$nickname}', // Message sent before a command
-      ircText: '<{$displayUsername}> {$text}', // When sending a message to IRC
+      ircText: '<{$displayUsername} [@{$discordUsername}]> {$text}', // When sending a message to IRC
       urlAttachment: '<{$displayUsername}> {$attachmentURL}', // When sending a Discord attachment to IRC
       discord: '**<{$author}>** {$withMentions}', // When sending a message to Discord
       // Other patterns that can be used:
@@ -218,21 +209,18 @@ instructions
 The `ircOptions` object is passed directly to deno/irc
 ([available options](https://github.com/jeromeludmann/deno-irc/blob/main/API.md#options)).
 
-To retrieve a discord channel ID, write `\#channel` on the relevant server – it
-should produce something of the form `<#1234567890>`, which you can then use in
-the `channelMapping` config.
+To retrieve a discord channel ID, write `\#channel` on the relevant server – it should produce something of the form
+`<#1234567890>`, which you can then use in the `channelMapping` config.
 
 ### Webhooks
 
-Webhooks lets you override nicknames and avatars, so messages coming from IRC
-can appear as regular Discord messages:
+Webhooks lets you override nicknames and avatars, so messages coming from IRC can appear as regular Discord messages:
 
 ![discord-webhook](http://i.imgur.com/lNeJIUI.jpg)
 
 To enable webhooks, follow part 1 of
-[this guide](https://support.discord.com/hc/en-us/articles/228383668-Intro-to-Webhooks)
-to create and retrieve a webhook URL for a specific channel, then enable it in
-discord-irc's config as follows:
+[this guide](https://support.discord.com/hc/en-us/articles/228383668-Intro-to-Webhooks) to create and retrieve a webhook
+URL for a specific channel, then enable it in discord-irc's config as follows:
 
 ```json
 "webhooks": {
@@ -250,5 +238,5 @@ deno test
 
 ## Style Guide
 
-discord-irc follows the deno standard styles with some tweaks. Please use
-`deno lint` and `deno fmt` to make sure this is followed correctly.
+discord-irc follows the deno standard styles with some tweaks. Please use `deno lint` and `deno fmt` to make sure this
+is followed correctly.

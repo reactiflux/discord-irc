@@ -7,15 +7,14 @@
     }
   },
   "fmt": {
-    "lineWidth": 80,
+    "lineWidth": 120,
     "semiColons": true,
     "singleQuote": true,
     "include": ["lib/", "discord-irc.ts", "README.md", "TODO.md"]
   },
   "tasks": {
     "start": "deno run --allow-net --allow-env=CONFIG_FILE,DEBUG,VERBOSE --allow-read discord-irc.ts",
-    "prepare": "deno compile --allow-net --allow-env=CONFIG_FILE,DEBUG,VERBOSE --allow-read discord-irc.ts",
-    "prepareAndStart": "deno task prepare && ./discord-irc",
-    "startPrepared": "./discord-irc"
-  }
+    "prepare": "deno compile --allow-net --allow-env=CONFIG_FILE,DEBUG,VERBOSE --allow-read discord-irc.ts"
+  },
+  "lock": false
 }

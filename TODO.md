@@ -1,7 +1,6 @@
 # Desired changes for discord-irc development
 
-This document tracks upcoming and in-progress changes for the discord-irc
-project.
+This document tracks upcoming and in-progress changes for the discord-irc project.
 
 These are worked on in no particular order and not guaranteed to be completed.
 

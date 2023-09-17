@@ -79,9 +79,7 @@ export function createDiscordDebugListener(bot: Bot) {
     }
     bot.debug &&
       bot.logger.debug(
-        `Received debug event from Discord: ${
-          JSON.stringify(message, null, 2)
-        }`,
+        `Received debug event from Discord: ${JSON.stringify(message, null, 2)}`,
       );
   };
 }

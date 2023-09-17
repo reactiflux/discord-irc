@@ -1,19 +1,8 @@
 import { ClientOptions, IrcClient } from './deps.ts';
 import Dlog from 'https://deno.land/x/dlog2@2.0/classic.ts';
-import {
-  AllowedMentionType,
-  Client,
-  GatewayIntents,
-  Guild,
-  Message,
-  User,
-  Webhook,
-} from './deps.ts';
+import { AllowedMentionType, Client, GatewayIntents, Guild, Message, User, Webhook } from './deps.ts';
 import { validateChannelMapping } from './validators.ts';
-import {
-  formatFromDiscordToIRC,
-  formatFromIRCToDiscord,
-} from './formatting.ts';
+import { formatFromDiscordToIRC, formatFromIRCToDiscord } from './formatting.ts';
 import { DEFAULT_NICK_COLORS, wrap } from './colors.ts';
 import { Dictionary, forEachAsync, invert, replaceAsync } from './helpers.ts';
 import { Config, GameLogConfig, IgnoreConfig } from './config.ts';
@@ -75,8 +64,7 @@ export default class Bot {
   ircNickColors: string[] = DEFAULT_NICK_COLORS;
   debug: boolean = (Deno.env.get('DEBUG') ?? Deno.env.get('VERBOSE') ?? 'false')
     .toLowerCase() === 'true';
-  verbose: boolean =
-    (Deno.env.get('VERBOSE') ?? 'false').toLowerCase() === 'true';
+  verbose: boolean = (Deno.env.get('VERBOSE') ?? 'false').toLowerCase() === 'true';
   constructor(options: Config) {
     /* REQUIRED_FIELDS.forEach((field) => {
       if (!options[field]) {
@@ -216,25 +204,15 @@ export default class Bot {
     this.ircClient.on('invite', createIrcInviteListener(this));
   }
 
-  async getDiscordNicknameOnServer(user: User, guild: Guild) {
-    if (guild) {
-      const member = await guild.members.fetch(user.id);
-      const value = member.nick || user.displayName || user.username;
-      return value;
-    }
-    return user.username;
-  }
-
   async replaceUserMentions(
     content: string,
     mention: User,
     message: Message,
   ): Promise<string> {
     if (!message.guild) return '';
-    const displayName = await this.getDiscordNicknameOnServer(
-      mention,
-      message.guild,
-    );
+    const member = await message.guild.members.fetch(mention.id);
+    const displayName = member.nick || mention.displayName || mention.username;
+
     const userMentionRegex = RegExp(`<@(&|!)?${mention.id}>`, 'g');
     return content.replace(userMentionRegex, `@${displayName}`);
   }
@@ -285,9 +263,7 @@ export default class Bot {
   }
 
   isCommandMessage(message: string) {
-    return this.options.commandCharacters?.some((prefix: string) =>
-      message.startsWith(prefix)
-    ) ?? false;
+    return this.options.commandCharacters?.some((prefix: string) => message.startsWith(prefix)) ?? false;
   }
 
   ignoredIrcUser(user: string) {
@@ -313,6 +289,7 @@ export default class Bot {
       author?: any;
       nickname?: any;
       displayUsername?: any;
+      discordUsername?: any;
       text?: any;
       discordChannel?: string;
       ircChannel?: any;
@@ -320,8 +297,7 @@ export default class Bot {
   ) {
     return message.replace(
       patternMatch,
-      (match: any, varName: string | number) =>
-        patternMapping[varName] || match,
+      (match: any, varName: string | number) => patternMapping[varName] || match,
     );
   }
 
@@ -351,12 +327,12 @@ export default class Bot {
     if (ircChannel) {
       const fromGuild = message.guild;
       if (!fromGuild) return;
-      const nickname = await this.getDiscordNicknameOnServer(
-        author,
-        fromGuild,
-      );
+      const member = await fromGuild.members.fetch(author.id);
+
       let text = await this.parseText(message);
-      let displayUsername = nickname;
+      let displayUsername = member.nick || author.displayName ||
+        author.username;
+      let discordUsername = member.user.username;
 
       if (this.options.parallelPingFix) {
         // Prevent users of both IRC and Discord from
@@ -370,18 +346,25 @@ export default class Bot {
       }
 
       if (this.options.ircNickColor) {
-        const colorIndex = (nickname.charCodeAt(0) + nickname.length) %
+        const displayColorIdx = (displayUsername.charCodeAt(0) + displayUsername.length) %
+            this.ircNickColors.length ?? 0;
+        const discordColorIdx = (discordUsername.charCodeAt(0) + discordUsername.length) %
             this.ircNickColors.length ?? 0;
         displayUsername = wrap(
-          this.ircNickColors[colorIndex],
+          this.ircNickColors[displayColorIdx],
           displayUsername,
+        );
+        discordUsername = wrap(
+          this.ircNickColors[discordColorIdx],
+          discordUsername,
         );
       }
 
       const patternMap = {
-        author: nickname,
-        nickname,
+        author: displayUsername,
+        nickname: displayUsername,
         displayUsername,
+        discordUsername,
         text,
         discordChannel: channelName,
         ircChannel,
@@ -574,9 +557,9 @@ export default class Bot {
     const processMentionables = async (input: string) => {
       return await replaceAsync(
         input,
-        /^([^@\s:,]+)[:,]|@([^\s]+(?:\s[^\s]+)*)/g,
-        async (match, startRef, atRef) => {
-          const reference = startRef || atRef;
+        /([^@\s:,]+):|@([^\s]+)/g,
+        async (match, colonRef, atRef) => {
+          const reference = colonRef || atRef;
           const members = await guild?.members.search(reference);
 
           // @username => mention, case insensitively
@@ -596,9 +579,7 @@ export default class Bot {
     const processEmoji = async (input: string) => {
       return await replaceAsync(input, /:(\w+):/g, async (match, ident) => {
         // :emoji: => mention, case sensitively
-        const emoji = (await guild?.emojis.array())?.find((x) =>
-          x.name === ident && x.requireColons
-        );
+        const emoji = (await guild?.emojis.array())?.find((x) => x.name === ident && x.requireColons);
         if (emoji) return `${emoji.name}`;
 
         return match;
