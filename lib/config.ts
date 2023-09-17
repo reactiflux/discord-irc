@@ -28,6 +28,7 @@ export type GameLogConfig = {
 
 export type IgnoreConfig = {
   ignorePatterns: Dictionary<string[]>[];
+  ignorePingIrcUsers?: string[];
 };
 
 export type Config = {
@@ -86,6 +87,7 @@ export const GameLogConfigSchema = z.object({
 
 export const IgnoreConfigSchema = z.object({
   ignorePatterns: z.array(z.record(z.array(z.string()))),
+  ignorePingIrcUsers: z.array(z.string()),
 });
 
 export const ConfigSchema = z.object({

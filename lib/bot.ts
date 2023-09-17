@@ -84,6 +84,11 @@ export default class Bot {
     });
 
     this.options = options;
+    // Make usernames lowercase for IRC ignore
+    if (this.options.ignoreConfig) {
+      this.options.ignoreConfig.ignorePingIrcUsers = this.options.ignoreConfig.ignorePingIrcUsers
+        ?.map((s) => s.toLocaleLowerCase());
+    }
     this.logger = new Dlog(options.nickname);
     this.channels = Object.values(options.channelMapping);
     this.webhookOptions = options.webhooks ?? {};
@@ -555,6 +560,7 @@ export default class Bot {
     if (!channels) return;
 
     const processMentionables = async (input: string) => {
+      if (this.options.ignoreConfig?.ignorePingIrcUsers?.includes(author.toLocaleLowerCase())) return input;
       return await replaceAsync(
         input,
         /([^@\s:,]+):|@([^\s]+)/g,
