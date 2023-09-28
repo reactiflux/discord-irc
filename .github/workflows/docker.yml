@@ -15,7 +15,7 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-    - uses: actions/checkout@v2
+    - uses: actions/checkout@v3
     - name: Build and push to Docker Hub
       uses: docker/build-push-action@v1
       with:
