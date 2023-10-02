@@ -1,0 +1,10 @@
+version: "3.9"
+services:
+  discord-irc:
+    image: discord-irc
+    restart: unless-stopped
+    build:
+      context: .
+      dockerfile: ./Dockerfile
+    volumes:
+      - ./config:/config/config.json
