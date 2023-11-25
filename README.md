@@ -120,11 +120,12 @@ First you need to create a Discord bot user, which you can do by following the i
     },
     // List of webhooks per channel
     "webhooks": {
-      "#discord": "https://discord.com/api/webhooks/id/token"
+      "1234567890": "https://discord.com/api/webhooks/id/token" // 1234567890 means the channel ID
     }
   }
 ]
 ```
+_remove the "// comments" from the JSON to make it work. You can validate your JSON [here](https://jsonlint.com/)._
 
 The `ircOptions` object is passed directly to irc-upd ([available options](https://node-irc-upd.readthedocs.io/en/latest/API.html#irc.Client)).
 
